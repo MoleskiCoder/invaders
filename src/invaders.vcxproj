@@ -144,12 +144,14 @@
   <ItemGroup>
     <ClInclude Include="Board.h" />
     <ClInclude Include="Configuration.h" />
+    <ClInclude Include="Intel8080.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="Configuration.cpp" />
+    <ClCompile Include="Intel8080.cpp" />
     <ClCompile Include="invaders.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="stdafx.cpp">

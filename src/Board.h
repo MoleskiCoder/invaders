@@ -4,6 +4,7 @@
 
 #include "Memory.h"
 #include "Configuration.h"
+#include "Intel8080.h"
 
 class Board {
 public:
@@ -20,4 +21,5 @@ public:
 private:
 	const Configuration& m_configuration;
 	Memory m_memory;
+	Intel8080 m_cpu;
 };
