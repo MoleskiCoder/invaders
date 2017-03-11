@@ -22,7 +22,7 @@ uint8_t Memory::get(int address) const {
 uint16_t Memory::getWord(int address) const {
 	auto low = get(address);
 	auto high = get(address + 1);
-	return (high << 8) + low;
+	return makeWord(low, high);
 }
 
 void Memory::set(int address, uint8_t value) {
@@ -30,8 +30,8 @@ void Memory::set(int address, uint8_t value) {
 }
 
 void Memory::setWord(int address, uint16_t value) {
-	set(address, value & 0xFF);
-	set(address + 1, value >> 8);
+	set(address, lowByte(value));
+	set(address + 1, highByte(value));
 }
 
 void Memory::clear() {

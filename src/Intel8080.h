@@ -49,13 +49,28 @@ private:
 	uint8_t h;
 	uint8_t l;
 
+	void pushByte(uint8_t value);
+	uint8_t popByte();
+	void pushWord(uint16_t value);
+	uint16_t popWord();
+
 	static Instruction INS(instruction_t method, uint64_t cycles);
 
 	void installInstructions();
 
 	void ___();
+
 	void nop();
 	void jmp();
 	void lxi_sp();
+	void lxi_d();
+	void lxi_h();
 	void inr_h();
+	void mvi_b();
+	void call();
+	void ldax_d();
+	void mov_m_a();
+	void inx_d();
+	void inx_h();
+	void dcr_b();
 };
