@@ -13,7 +13,12 @@ int main(int argc, char* argv[]) {
 	Game game(configuration);
 	game.initialise();
 
-	game.runLoop();
+	try {
+		game.runLoop();
+	} catch (std::exception& error) {
+		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "%s", error.what());
+		return 2;
+	}
 
 	return 0;
 }
