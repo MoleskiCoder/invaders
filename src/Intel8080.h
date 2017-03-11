@@ -51,7 +51,11 @@ private:
 
 	static Instruction INS(instruction_t method, uint64_t cycles);
 
-	void ___();
-
 	void installInstructions();
+
+	void ___();
+	void nop();
+	void jmp();
+	void lxi_sp();
+	void inr_h();
 };

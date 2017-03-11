@@ -2,6 +2,7 @@
 #include "Intel8080.h"
 
 #include "Memory.h"
+#include "Disassembler.h"
 
 Intel8080::Intel8080(Memory& memory)
 :	m_memory(memory),
@@ -29,23 +30,23 @@ Intel8080::Instruction Intel8080::INS(instruction_t method, uint64_t cycles) {
 
 void Intel8080::installInstructions() {
 	instructions = {
-		////	0					1					2					3					4					5					6					7					8					9					A					B					C					D					E					F
-		/* 0 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 1 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 2 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 3 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 4 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 5 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 6 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 7 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 8 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* 9 */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* A */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* B */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* C */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* D */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* E */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
-		/* F */	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		////	0					1						2					3					4						5					6					7					8					9					A					B					C					D					E					F
+		/* 0 */	INS(BIND(nop), 4),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 1 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 2 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(inr_h), 5),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 3 */	INS(BIND(___), 0),	INS(BIND(lxi_sp), 10),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 4 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 5 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 6 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 7 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 8 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* 9 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* A */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* B */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* C */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(jmp), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* D */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* E */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
+		/* F */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),	INS(BIND(___), 0),
 	};
 }
 
@@ -67,5 +68,24 @@ void Intel8080::step() {
 }
 
 void Intel8080::___() {
-	throw new std::domain_error("Whoops: Invalid instruction.");
+	auto opcode = m_memory.get(pc - 1);
+	auto message = Disassembler::invalid(opcode);
+	throw new std::domain_error(message);
+}
+
+void Intel8080::nop() {
+}
+
+void Intel8080::jmp() {
+	auto destination = m_memory.getWord(pc);
+	pc = destination;
+}
+
+void Intel8080::lxi_sp() {
+	auto word = m_memory.getWord(pc);
+	sp = word;
+}
+
+void Intel8080::inr_h() {
+	++h;
 }
