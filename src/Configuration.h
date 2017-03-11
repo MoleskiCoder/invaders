@@ -31,11 +31,15 @@ public:
 	}
 
 	int getCyclesPerFrame() const {
-		return m_cyclesPerFrame;
+		return m_cyclesPerSecond / getFramesPerSecond();
 	}
 
-	void setCyclesPerFrame(int value) {
-		m_cyclesPerFrame = value;
+	int getCyclesPerSecond() const {
+		return m_cyclesPerSecond;
+	}
+
+	void setCyclesPerSecond(int value) {
+		m_cyclesPerSecond = value;
 	}
 
 	std::string getRomDirectory() const {
@@ -47,8 +51,7 @@ private:
 
 	bool m_vsyncLocked;
 	int m_framesPerSecond;
-	int m_cyclesPerFrame;
+	int m_cyclesPerSecond;
 
 	std::string m_romDirectory;
 };
-

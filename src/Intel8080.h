@@ -2,11 +2,20 @@
 
 #include <cstdint>
 #include <array>
+#include <functional>
 
 class Memory;
 
 class Intel8080 {
 public:
+
+	typedef std::function<void()> instruction_t;
+
+	struct Instruction {
+		instruction_t vector = nullptr;
+		uint64_t count = 0;
+	};
+
 	Intel8080(Memory& memory);
 
 	void initialise();
@@ -19,8 +28,12 @@ public:
 	void step();
 
 private:
+	std::array<Instruction, 0x100> instructions;
+
 	Memory& m_memory;
 	std::array<uint8_t, 0x100> ports;
+
+	uint64_t cycles;
 
 	uint16_t pc;
 	uint16_t sp;
@@ -35,4 +48,10 @@ private:
 
 	uint8_t h;
 	uint8_t l;
+
+	static Instruction INS(instruction_t method, uint64_t cycles);
+
+	void ___();
+
+	void installInstructions();
 };
