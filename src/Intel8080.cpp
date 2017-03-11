@@ -12,8 +12,10 @@ void Intel8080::reset() {
 }
 
 void Intel8080::initialise() {
-	m_memory.clear();
 	pc = sp = 0;
 	a = b = c = d = e = h = l = 0;
 	reset();
+}
+
+void Intel8080::step() {
 }

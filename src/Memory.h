@@ -2,9 +2,15 @@
 
 #include <vector>
 #include <cstdint>
+#include <string>
 
 class Memory {
 public:
+	enum {
+		WorkRam = 0x2000,
+		VideoRam = 0x2400
+	};
+
 	Memory();
 
 	const std::vector<uint8_t>& getBus() const;
@@ -22,4 +28,3 @@ public:
 private:
 	std::vector<uint8_t> m_bus;
 };
-

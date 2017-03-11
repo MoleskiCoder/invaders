@@ -16,6 +16,8 @@ public:
 	const Memory& getMemory() const { return m_memory; }
 	Memory& getMemoryMutable() { return m_memory; }
 
+	Intel8080& getCPU() { return m_cpu; }
+
 	void initialise();
 
 private:

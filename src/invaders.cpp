@@ -1,13 +1,15 @@
 #include "stdafx.h"
 
-#include "Board.h"
+#include "Game.h"
 
-int main() {
+int main(int argc, char* argv[]) {
 
 	Configuration configuration;
 
-	Board board(configuration);
-	board.initialise();
+	Game game(configuration);
+	game.initialise();
+
+	game.runLoop();
 
 	return 0;
 }

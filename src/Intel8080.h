@@ -16,6 +16,8 @@ public:
 	const std::array<uint8_t, 0x100>& getPorts() const { return ports; }
 	std::array<uint8_t, 0x100>& getPortsMutable() { return ports; }
 
+	void step();
+
 private:
 	Memory& m_memory;
 	std::array<uint8_t, 0x100> ports;
