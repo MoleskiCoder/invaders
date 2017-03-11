@@ -55,7 +55,7 @@ void Intel8080::reset() {
 }
 
 void Intel8080::initialise() {
-	pc = sp = 0;
+	sp = 0;
 	a = b = c = d = e = h = l = 0;
 	reset();
 }
