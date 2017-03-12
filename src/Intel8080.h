@@ -117,6 +117,16 @@ private:
 		subtraction & 0x100 ? setCarry() : resetCarry();
 	}
 
+	void callAddress(uint16_t address) {
+		pushWord(pc - 1);
+		pc = address;
+	}
+
+	void restart(uint8_t position) {
+		auto address = position << 3;
+		callAddress(address);
+	}
+
 	//
 
 	void ___();
@@ -124,17 +134,29 @@ private:
 	void nop();
 	void jmp();
 	void lxi_sp();
+	void lxi_b();
 	void lxi_d();
 	void lxi_h();
+	void inr_d();
 	void inr_h();
 	void mvi_b();
 	void mvi_c();
 	void mvi_h();
 	void mvi_m();
+	void push_b();
 	void push_d();
 	void push_h();
+	void pop_b();
 	void pop_h();
 	void call();
+	void rst_0();
+	void rst_1();
+	void rst_2();
+	void rst_3();
+	void rst_4();
+	void rst_5();
+	void rst_6();
+	void rst_7();
 	void ret();
 	void ldax_d();
 	void mov_m_a();
@@ -149,8 +171,10 @@ private:
 	void sta();
 	void ani();
 	void cpi();
+	void dad_b();
 	void dad_d();
 	void dad_h();
+	void dad_sp();
 	void xchg();
 	void out();
 };

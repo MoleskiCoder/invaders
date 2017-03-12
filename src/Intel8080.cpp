@@ -33,10 +33,10 @@ Intel8080::Instruction Intel8080::INS(instruction_t method, uint64_t cycles) {
 void Intel8080::installInstructions() {
 	instructions = {
 		////	0					1						2					3						4						5						6						7						8					9						A						B					C						D						E						F
-		/* 0 */	INS(BIND(nop), 4),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(dcr_b), 5),	INS(BIND(mvi_b), 7),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mvi_c), 10),	INS(BIND(___), 0),		//	0
-		/* 1 */	INS(BIND(___), 0),	INS(BIND(lxi_d), 10),	INS(BIND(___), 0),	INS(BIND(inx_d), 5),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_d), 10),	INS(BIND(ldax_d), 7),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	1
+		/* 0 */	INS(BIND(nop), 4),	INS(BIND(lxi_b), 10),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(dcr_b), 5),	INS(BIND(mvi_b), 7),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_b), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mvi_c), 10),	INS(BIND(___), 0),		//	0
+		/* 1 */	INS(BIND(___), 0),	INS(BIND(lxi_d), 10),	INS(BIND(___), 0),	INS(BIND(inx_d), 5),	INS(BIND(inr_d), 5),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_d), 10),	INS(BIND(ldax_d), 7),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	1
 		/* 2 */	INS(BIND(___), 0),	INS(BIND(lxi_h), 10),	INS(BIND(___), 0),	INS(BIND(inx_h), 5),	INS(BIND(inr_h), 5),	INS(BIND(___), 0),		INS(BIND(mvi_h), 7),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_h), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	2
-		/* 3 */	INS(BIND(___), 0),	INS(BIND(lxi_sp), 10),	INS(BIND(sta), 13),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mvi_m), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	3
+		/* 3 */	INS(BIND(___), 0),	INS(BIND(lxi_sp), 10),	INS(BIND(sta), 13),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mvi_m), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_sp), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	3
 		/* 4 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	4
 		/* 5 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(mov_e_h), 5),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mov_e_a), 5),	//	5
 		/* 6 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mov_l_a), 5),	//	6
@@ -45,10 +45,10 @@ void Intel8080::installInstructions() {
 		/* 9 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	9
 		/* A */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	A
 		/* B */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	B
-		/* C */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(jnz), 10),	INS(BIND(jmp), 10),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(ret), 10),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(call), 17),	INS(BIND(___), 0),		INS(BIND(___), 0),		//	C
-		/* D */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(out), 10),		INS(BIND(___), 0),		INS(BIND(push_d), 11),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	D
-		/* E */	INS(BIND(___), 0),	INS(BIND(pop_h), 10),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(push_h), 11),	INS(BIND(ani), 7),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(xchg), 4),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	E
-		/* F */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(cpi), 7),		INS(BIND(___), 0),		//	F
+		/* C */	INS(BIND(___), 0),	INS(BIND(pop_b), 10),	INS(BIND(jnz), 10),	INS(BIND(jmp), 10),		INS(BIND(___), 0),		INS(BIND(push_b), 11),	INS(BIND(___), 0),		INS(BIND(rst_0), 11),	INS(BIND(___), 0),	INS(BIND(ret), 10),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(call), 17),	INS(BIND(___), 0),		INS(BIND(rst_1), 11),	//	C
+		/* D */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(out), 10),		INS(BIND(___), 0),		INS(BIND(push_d), 11),	INS(BIND(___), 0),		INS(BIND(rst_2), 11),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(rst_3), 11),	//	D
+		/* E */	INS(BIND(___), 0),	INS(BIND(pop_h), 10),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(push_h), 11),	INS(BIND(ani), 7),		INS(BIND(rst_4), 11),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(xchg), 4),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(rst_5), 11),	//	E
+		/* F */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(rst_6), 11),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(cpi), 7),		INS(BIND(rst_7), 11),	//	F
 	};
 }
 
@@ -110,6 +110,11 @@ void Intel8080::lxi_sp() {
 	sp = fetchWord();
 }
 
+void Intel8080::lxi_b() {
+	c = fetchByte();
+	b = fetchByte();
+}
+
 void Intel8080::lxi_d() {
 	e = fetchByte();
 	d = fetchByte();
@@ -118,6 +123,10 @@ void Intel8080::lxi_d() {
 void Intel8080::lxi_h() {
 	l = fetchByte();
 	h = fetchByte();
+}
+
+void Intel8080::inr_d() {
+	adjustSZP(++d);
 }
 
 void Intel8080::inr_h() {
@@ -142,6 +151,11 @@ void Intel8080::mvi_m() {
 	m_memory.set(hl, data);
 }
 
+void Intel8080::push_b() {
+	auto pair = Memory::makeWord(c, b);
+	pushWord(pair);
+}
+
 void Intel8080::push_d() {
 	auto pair = Memory::makeWord(e, d);
 	pushWord(pair);
@@ -152,6 +166,12 @@ void Intel8080::push_h() {
 	pushWord(pair);
 }
 
+void Intel8080::pop_b() {
+	auto bc = popWord();
+	b = Memory::highByte(bc);
+	c = Memory::lowByte(bc);
+}
+
 void Intel8080::pop_h() {
 	auto hl = popWord();
 	h = Memory::highByte(hl);
@@ -160,8 +180,39 @@ void Intel8080::pop_h() {
 
 void Intel8080::call() {
 	auto destination = m_memory.getWord(pc);
-	pushWord(pc - 1);
-	pc = destination;
+	callAddress(destination);
+}
+
+void Intel8080::rst_0() {
+	restart(0);
+}
+
+void Intel8080::rst_1() {
+	restart(1);
+}
+
+void Intel8080::rst_2() {
+	restart(2);
+}
+
+void Intel8080::rst_3() {
+	restart(3);
+}
+
+void Intel8080::rst_4() {
+	restart(4);
+}
+
+void Intel8080::rst_5() {
+	restart(5);
+}
+
+void Intel8080::rst_6() {
+	restart(6);
+}
+
+void Intel8080::rst_7() {
+	restart(7);
 }
 
 void Intel8080::ret() {
@@ -230,6 +281,15 @@ void Intel8080::cpi() {
 	compare(fetchByte());
 }
 
+void Intel8080::dad_b() {
+	auto bc = Memory::makeWord(c, b);
+	auto hl = Memory::makeWord(l, h);
+	uint32_t sum = bc + hl;
+	sum & 0x10000 ? setCarry() : resetCarry();
+	h = Memory::highByte(sum);
+	l = Memory::lowByte(sum);
+}
+
 void Intel8080::dad_d() {
 	auto de = Memory::makeWord(e, d);
 	auto hl = Memory::makeWord(l, h);
@@ -245,6 +305,14 @@ void Intel8080::dad_h() {
 	doubled & 0x10000 ? setCarry() : resetCarry();
 	h = Memory::highByte(hl);
 	l = Memory::lowByte(hl);
+}
+
+void Intel8080::dad_sp() {
+	auto hl = Memory::makeWord(l, h);
+	uint32_t sum = sp + hl;
+	sum & 0x10000 ? setCarry() : resetCarry();
+	h = Memory::highByte(sum);
+	l = Memory::lowByte(sum);
 }
 
 void Intel8080::xchg() {
