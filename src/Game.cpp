@@ -69,6 +69,8 @@ void Game::initialise() {
 
 	configureBackground();
 	createBitmapTexture();
+
+	m_board.getIO().WrittenPort.connect(std::bind(&Game::Board_PortWritten, this, std::placeholders::_1));
 }
 
 void Game::configureBackground() const {
@@ -168,6 +170,12 @@ void Game::drawFrame() {
 
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 	verifySDLCall(::SDL_RenderCopy(m_renderer, m_bitmapTexture, NULL, NULL), "Unable to copy texture to renderer");
+}
+
+void Game::Board_PortWritten(const PortEventArgs& portEvent) {
+	auto port = portEvent.getPort();
+	auto value = m_board.getIO().readOutputPort(port);
+	std::cout << "Port written: Port: " << (int)port << ", value: " << (int)value << std::endl;
 }
 
 void Game::dumpRendererInformation() {

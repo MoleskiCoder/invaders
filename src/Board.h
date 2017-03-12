@@ -10,14 +10,11 @@
 class Board {
 public:
 	Board(const Configuration& configuration);
-	~Board();
 
 	const Configuration& getConfiguration() const { return m_configuration; }
-
-	const Memory& getMemory() const { return m_memory; }
-	Memory& getMemoryMutable() { return m_memory; }
-
+	Memory& getMemory() { return m_memory; }
 	Intel8080& getCPU() { return m_cpu; }
+	InputOutput& getIO() { return m_ports; }
 
 	void initialise();
 

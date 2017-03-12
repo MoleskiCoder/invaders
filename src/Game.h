@@ -74,6 +74,8 @@ private:
 		return DisplayHeight * DisplayScale;
 	}
 
+	void Board_PortWritten(const PortEventArgs& portEvent);
+
 	static void dumpRendererInformation();
 	static void dumpRendererInformation(::SDL_RendererInfo info);
 };
