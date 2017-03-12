@@ -12,6 +12,7 @@
 
 #include <array>
 #include <vector>
+#include <bitset>
 
 #include <SDL.h>
 
