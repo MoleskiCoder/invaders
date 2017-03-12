@@ -147,6 +147,7 @@
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Disassembler.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="InputOutput.h" />
     <ClInclude Include="Intel8080.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="stdafx.h" />
@@ -157,6 +158,7 @@
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Disassembler.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="InputOutput.cpp" />
     <ClCompile Include="Intel8080.cpp" />
     <ClCompile Include="invaders.cpp" />
     <ClCompile Include="Memory.cpp" />

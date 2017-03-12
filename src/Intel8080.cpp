@@ -4,8 +4,9 @@
 #include "Memory.h"
 #include "Disassembler.h"
 
-Intel8080::Intel8080(Memory& memory)
+Intel8080::Intel8080(Memory& memory, InputOutput& ports)
 :	m_memory(memory),
+	m_ports(ports),
 	cycles(0),
 	pc(0),
 	sp(0),
@@ -253,5 +254,5 @@ void Intel8080::xchg() {
 
 void Intel8080::out() {
 	auto port = fetchByte();
-	ports[port] = a;
+	m_ports.write(port, a);
 }

@@ -3,6 +3,7 @@
 #include <string>
 
 #include "Memory.h"
+#include "InputOutput.h"
 #include "Configuration.h"
 #include "Intel8080.h"
 
@@ -23,5 +24,6 @@ public:
 private:
 	const Configuration& m_configuration;
 	Memory m_memory;
+	InputOutput m_ports;
 	Intel8080 m_cpu;
 };

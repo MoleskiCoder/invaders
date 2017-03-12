@@ -6,6 +6,7 @@
 #include <bitset>
 
 #include "Memory.h"
+#include "InputOutput.h"
 
 class Intel8080 {
 public:
@@ -17,22 +18,18 @@ public:
 		uint64_t count = 0;
 	};
 
-	Intel8080(Memory& memory);
+	Intel8080(Memory& memory, InputOutput& ports);
 
 	void initialise();
 
 	void reset();
-
-	const std::array<uint8_t, 0x100>& getPorts() const { return ports; }
-	std::array<uint8_t, 0x100>& getPortsMutable() { return ports; }
-
 	void step();
 
 private:
 	std::array<Instruction, 0x100> instructions;
 
 	Memory& m_memory;
-	std::array<uint8_t, 0x100> ports;
+	InputOutput& m_ports;
 
 	uint64_t cycles;
 
