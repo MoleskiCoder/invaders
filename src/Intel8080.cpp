@@ -300,7 +300,7 @@ void Intel8080::dcr_b() {
 
 void Intel8080::jnz() {
 	auto destination  = fetchWord();
-	if (f & F_Z)
+	if (!(f & F_Z))
 		pc = destination;
 }
 
