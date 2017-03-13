@@ -74,54 +74,9 @@ void Intel8080::initialise() {
 	reset();
 }
 
-//
-
-void Intel8080::disassemble(const Intel8080& cpu, const Memory& memory, uint16_t pc) {
-
-	// address
-	std::cout << Disassembler::hex(pc) << "\t";
-
-	// hex opcode
-	auto opcode = memory.get(pc);
-	std::cout << Disassembler::hex(opcode);
-
-	// hex raw operand
-	auto instruction = cpu.getInstructions()[opcode];
-	switch (instruction.mode) {
-	case Immediate:
-		std::cout << Disassembler::hex(memory.get(pc + 1));
-		break;
-	case Absolute:
-		std::cout << Disassembler::hex(m_memory.get(pc + 1));
-		std::cout << Disassembler::hex(m_memory.get(pc + 2));
-		break;
-	default:
-		break;
-	}
-	std::cout << "\t";
-
-	// base disassembly
-	std::cout << instruction.disassembly;
-
-	// disassembly operand
-	switch (instruction.mode) {
-	case Immediate:
-		std::cout << Disassembler::hex(m_memory.get(pc + 1));
-		break;
-	case Absolute:
-		std::cout << Disassembler::hex(m_memory.getWord(pc + 1));
-		break;
-	default:
-		break;
-	}
-	std::cout << std::endl;
-}
-
-//
-
 void Intel8080::step() {
 
-	disassemble(*this, m_memory, pc);
+	ExecutingInstruction.fire(CpuEventArgs(*this));
 
 	auto opcode = m_memory.get(pc++);
 	auto instruction = instructions[opcode];

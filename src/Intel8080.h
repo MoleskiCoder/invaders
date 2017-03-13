@@ -7,6 +7,8 @@
 
 #include "Memory.h"
 #include "InputOutput.h"
+#include "Signal.h"
+#include "CpuEventArgs.h"
 
 class Intel8080 {
 public:
@@ -29,7 +31,11 @@ public:
 
 	Intel8080(Memory& memory, InputOutput& ports);
 
+	Signal<CpuEventArgs> ExecutingInstruction;
+
 	const std::array<Instruction, 0x100>& getInstructions() const { return instructions;  }
+	const Memory& getMemory() const { return m_memory; }
+	uint16_t getProgramCounter() const { return pc;  }
 
 	void initialise();
 
@@ -127,8 +133,6 @@ private:
 	Instruction UNKNOWN();
 
 	void installInstructions();
-
-	void disassemble(const Intel8080& cpu, const Memory& memory, uint16_t pc);	//
 
 	//
 

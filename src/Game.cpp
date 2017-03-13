@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Game.h"
+#include "Disassembler.h"
 
 Game::Game(const Configuration& configuration)
 :	m_configuration(configuration),
@@ -71,6 +72,7 @@ void Game::initialise() {
 	createBitmapTexture();
 
 	m_board.getIO().WrittenPort.connect(std::bind(&Game::Board_PortWritten, this, std::placeholders::_1));
+	m_board.getCPU().ExecutingInstruction.connect(std::bind(&Game::Cpu_ExecutingInstruction, this, std::placeholders::_1));
 }
 
 void Game::configureBackground() const {
@@ -175,7 +177,11 @@ void Game::drawFrame() {
 void Game::Board_PortWritten(const PortEventArgs& portEvent) {
 	auto port = portEvent.getPort();
 	auto value = m_board.getIO().readOutputPort(port);
-	//std::cout << "Port written: Port: " << (int)port << ", value: " << (int)value << std::endl;
+	std::cout << "Port written: Port: " << (int)port << ", value: " << (int)value << std::endl;
+}
+
+void Game::Cpu_ExecutingInstruction(const CpuEventArgs& cpuEvent) {
+	std::cout << Disassembler::disassemble(cpuEvent.getCpu()) << std::endl;
 }
 
 void Game::dumpRendererInformation() {

@@ -75,6 +75,7 @@ private:
 	}
 
 	void Board_PortWritten(const PortEventArgs& portEvent);
+	void Cpu_ExecutingInstruction(const CpuEventArgs& cpuEvent);
 
 	static void dumpRendererInformation();
 	static void dumpRendererInformation(::SDL_RendererInfo info);
