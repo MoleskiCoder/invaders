@@ -181,7 +181,11 @@ void Game::Board_PortWritten(const PortEventArgs& portEvent) {
 }
 
 void Game::Cpu_ExecutingInstruction(const CpuEventArgs& cpuEvent) {
-	std::cout << Disassembler::disassemble(cpuEvent.getCpu()) << std::endl;
+	std::cout
+		<< Disassembler::state(cpuEvent.getCpu())
+		<< "\t"
+		<< Disassembler::disassemble(cpuEvent.getCpu())
+		<< std::endl;
 }
 
 void Game::dumpRendererInformation() {

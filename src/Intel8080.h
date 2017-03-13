@@ -29,13 +29,35 @@ public:
 		uint64_t count = 0;
 	};
 
+	enum {
+		F_C = 0x1,
+		F_P = 0x4,
+		F_AC = 0x10,
+		F_Z = 0x40,
+		F_S = 0x80
+	};
+
 	Intel8080(Memory& memory, InputOutput& ports);
 
 	Signal<CpuEventArgs> ExecutingInstruction;
 
 	const std::array<Instruction, 0x100>& getInstructions() const { return instructions;  }
 	const Memory& getMemory() const { return m_memory; }
-	uint16_t getProgramCounter() const { return pc;  }
+
+	uint16_t getProgramCounter() const { return pc; }
+	uint16_t getStackPointer() const { return sp; }
+
+	uint8_t getA() const { return a; }
+	uint8_t getF() const { return f; }
+
+	uint8_t getB() const { return b; }
+	uint8_t getC() const { return c; }
+
+	uint8_t getD() const { return d; }
+	uint8_t getE() const { return e; }
+
+	uint8_t getH() const { return h; }
+	uint8_t getL() const { return l; }
 
 	void initialise();
 
@@ -64,14 +86,6 @@ private:
 
 	uint8_t h;
 	uint8_t l;
-
-	enum {
-		F_C = 0x1,
-		F_P = 0x4,
-		F_AC = 0x10,
-		F_Z = 0x40,
-		F_S = 0x80
-	};
 
 	static uint8_t setFlag(uint8_t status, uint8_t flag) { return status | flag; }
 	static uint8_t resetFlag(uint8_t status, uint8_t flag) { return status & ~flag; }
@@ -115,7 +129,6 @@ private:
 		resetAuxiliaryCarry();
 		resetZero();
 		resetSign();
-
 		resetUnusedFlags();
 	}
 

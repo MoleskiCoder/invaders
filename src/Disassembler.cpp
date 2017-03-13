@@ -11,6 +11,24 @@
 Disassembler::Disassembler() {
 }
 
+std::string Disassembler::state(const Intel8080& cpu) {
+
+	auto pc = cpu.getProgramCounter();
+	auto sp = cpu.getStackPointer();
+	auto f = cpu.getF();
+
+	std::ostringstream output;
+
+	output
+		<< "PC=" << hex(pc)
+		<< " "
+		<< "SP=" << hex(sp)
+		<< " "
+		<< "F=" << flag(f);
+
+	return output.str();
+}
+
 std::string Disassembler::disassemble(const Intel8080& cpu) {
 
 	const auto& memory = cpu.getMemory();
@@ -19,9 +37,6 @@ std::string Disassembler::disassemble(const Intel8080& cpu) {
 	const auto& instruction = cpu.getInstructions()[opcode];
 
 	std::ostringstream output;
-
-	// address
-	output << hex(pc) << "\t";
 
 	// hex opcode
 	output << hex(opcode);
@@ -55,6 +70,20 @@ std::string Disassembler::disassemble(const Intel8080& cpu) {
 		break;
 	}
 
+	return output.str();
+}
+
+std::string Disassembler::flag(uint8_t value) {
+	std::ostringstream output;
+	output
+		<< (value & Intel8080::F_S ? "S" : "-")
+		<< (value & Intel8080::F_Z ? "Z" : "-")
+		<< "0"
+		<< (value & Intel8080::F_AC ? "A" : "-")
+		<< "0"
+		<< (value & Intel8080::F_P ? "P" : "-")
+		<< "1"
+		<< (value & Intel8080::F_C ? "C" : "-");
 	return output.str();
 }
 
