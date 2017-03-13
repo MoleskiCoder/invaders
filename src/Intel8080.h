@@ -102,8 +102,15 @@ private:
 	void pushWord(uint16_t value);
 	uint16_t popWord();
 
-	uint8_t fetchByte() { return m_memory.get(pc++); }
-	uint16_t fetchWord() { return m_memory.getWord(pc); pc += 2;  }
+	uint8_t fetchByte() {
+		return m_memory.get(pc++);
+	}
+
+	uint16_t fetchWord() {
+		auto value = m_memory.getWord(pc);
+		pc += 2;
+		return value;
+	}
 
 	static Instruction INS(instruction_t method, uint64_t cycles);
 
