@@ -13,12 +13,23 @@ public:
 
 	typedef std::function<void()> instruction_t;
 
+	enum AddressingMode {
+		Unknown,
+		Implied,	// zero bytes
+		Immediate,	// single byte
+		Absolute	// two bytes, little endian
+	};
+
 	struct Instruction {
 		instruction_t vector = nullptr;
+		AddressingMode mode = Unknown;
+		std::string disassembly;
 		uint64_t count = 0;
 	};
 
 	Intel8080(Memory& memory, InputOutput& ports);
+
+	const std::array<Instruction, 0x100>& getInstructions() const { return instructions;  }
 
 	void initialise();
 
@@ -112,9 +123,12 @@ private:
 		return value;
 	}
 
-	static Instruction INS(instruction_t method, uint64_t cycles);
+	static Instruction INS(instruction_t method, AddressingMode mode, std::string disassembly, uint64_t cycles);
+	Instruction UNKNOWN();
 
 	void installInstructions();
+
+	void disassemble(const Intel8080& cpu, const Memory& memory, uint16_t pc);	//
 
 	//
 
@@ -153,6 +167,7 @@ private:
 	void push_b();
 	void push_d();
 	void push_h();
+	void push_psw();
 	void pop_b();
 	void pop_h();
 	void call();
@@ -175,6 +190,7 @@ private:
 	void inx_h();
 	void dcr_b();
 	void jnz();
+	void lda();
 	void sta();
 	void ani();
 	void cpi();
@@ -184,4 +200,6 @@ private:
 	void dad_sp();
 	void xchg();
 	void out();
+	void rrc();
+	void adi();
 };

@@ -14,6 +14,12 @@ std::string Disassembler::hex(uint8_t value) {
 	return output.str();
 }
 
+std::string Disassembler::hex(uint16_t value) {
+	std::ostringstream output;
+	output << std::hex << std::setw(4) << std::setfill('0') << (int)value;
+	return output.str();
+}
+
 std::string Disassembler::binary(uint8_t value) {
 	std::ostringstream output;
 	output << std::bitset<8>(value);

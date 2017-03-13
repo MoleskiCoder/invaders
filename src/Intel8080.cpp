@@ -21,10 +21,21 @@ Intel8080::Intel8080(Memory& memory, InputOutput& ports)
 	installInstructions();
 }
 
-Intel8080::Instruction Intel8080::INS(instruction_t method, uint64_t cycles) {
+Intel8080::Instruction Intel8080::INS(instruction_t method, AddressingMode mode, std::string disassembly, uint64_t cycles) {
 	Intel8080::Instruction returnValue;
 	returnValue.vector = method;
+	returnValue.mode = mode;
+	returnValue.disassembly = disassembly;
 	returnValue.count = cycles;
+	return returnValue;
+}
+
+Intel8080::Instruction Intel8080::UNKNOWN() {
+	Intel8080::Instruction returnValue;
+	returnValue.vector = std::bind(&Intel8080::___, this);
+	returnValue.mode = Unknown;
+	returnValue.disassembly = "";
+	returnValue.count = 0;
 	return returnValue;
 }
 
@@ -32,23 +43,23 @@ Intel8080::Instruction Intel8080::INS(instruction_t method, uint64_t cycles) {
 
 void Intel8080::installInstructions() {
 	instructions = {
-		////	0					1						2					3						4						5						6						7						8					9						A						B					C						D						E						F
-		/* 0 */	INS(BIND(nop), 4),	INS(BIND(lxi_b), 10),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(dcr_b), 5),	INS(BIND(mvi_b), 7),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_b), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mvi_c), 10),	INS(BIND(___), 0),		//	0
-		/* 1 */	INS(BIND(___), 0),	INS(BIND(lxi_d), 10),	INS(BIND(___), 0),	INS(BIND(inx_d), 5),	INS(BIND(inr_d), 5),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_d), 10),	INS(BIND(ldax_d), 7),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	1
-		/* 2 */	INS(BIND(___), 0),	INS(BIND(lxi_h), 10),	INS(BIND(___), 0),	INS(BIND(inx_h), 5),	INS(BIND(inr_h), 5),	INS(BIND(___), 0),		INS(BIND(mvi_h), 7),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_h), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	2
-		/* 3 */	INS(BIND(___), 0),	INS(BIND(lxi_sp), 10),	INS(BIND(sta), 13),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mvi_m), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(dad_sp), 10),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	3
-		/* 4 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	4
-		/* 5 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(mov_e_h), 5),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mov_e_a), 5),	//	5
-		/* 6 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mov_l_a), 5),	//	6
-		/* 7 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(mov_m_a), 7),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(mov_a_h), 5),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	7
-		/* 8 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	8
-		/* 9 */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	9
-		/* A */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	A
-		/* B */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		//	B
-		/* C */	INS(BIND(___), 0),	INS(BIND(pop_b), 10),	INS(BIND(jnz), 10),	INS(BIND(jmp), 10),		INS(BIND(___), 0),		INS(BIND(push_b), 11),	INS(BIND(___), 0),		INS(BIND(rst_0), 11),	INS(BIND(___), 0),	INS(BIND(ret), 10),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(call), 17),	INS(BIND(___), 0),		INS(BIND(rst_1), 11),	//	C
-		/* D */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(out), 10),		INS(BIND(___), 0),		INS(BIND(push_d), 11),	INS(BIND(___), 0),		INS(BIND(rst_2), 11),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(rst_3), 11),	//	D
-		/* E */	INS(BIND(___), 0),	INS(BIND(pop_h), 10),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(push_h), 11),	INS(BIND(ani), 7),		INS(BIND(rst_4), 11),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(xchg), 4),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(rst_5), 11),	//	E
-		/* F */	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(rst_6), 11),	INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(___), 0),	INS(BIND(___), 0),		INS(BIND(___), 0),		INS(BIND(cpi), 7),		INS(BIND(rst_7), 11),	//	F
+		////	0									1											2										3										4										5												6											7											8					9											A											B										C											D											E											F
+		/* 0 */	INS(BIND(nop), Implied, "NOP", 4),	INS(BIND(lxi_b), Absolute, "LXI B,", 10),	UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								INS(BIND(dcr_b), Implied, "DCR B", 5),			INS(BIND(mvi_b), Immediate, "MVI B,", 7),	UNKNOWN(),									UNKNOWN(),			INS(BIND(dad_b), Implied, "DAD B", 10),		UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									INS(BIND(mvi_c), Immediate, "MVI C,", 10),	INS(BIND(rrc), Implied, "RRC", 4),			//	0
+		/* 1 */	UNKNOWN(),							INS(BIND(lxi_d), Absolute, "LXI D,", 10),	UNKNOWN(),								INS(BIND(inx_d), Implied, "INX D", 5),	INS(BIND(inr_d), Implied, "INR D", 5),	UNKNOWN(),										UNKNOWN(),									UNKNOWN(),									UNKNOWN(),			INS(BIND(dad_d), Implied, "DAD D", 10),		INS(BIND(ldax_d), Implied, "LDAX D", 7),	UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	1
+		/* 2 */	UNKNOWN(),							INS(BIND(lxi_h), Absolute, "LXI H,", 10),	UNKNOWN(),								INS(BIND(inx_h), Implied, "INX H", 5),	INS(BIND(inr_h), Implied, "INR H", 5),	UNKNOWN(),										INS(BIND(mvi_h), Immediate, "MVI H,",7),	UNKNOWN(),									UNKNOWN(),			INS(BIND(dad_h), Implied, "DAD H", 10),		UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	2
+		/* 3 */	UNKNOWN(),							INS(BIND(lxi_sp), Absolute, "LXI SP,", 10),	INS(BIND(sta), Absolute, "STA ", 13),	UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										INS(BIND(mvi_m), Immediate, "MVI M,", 10),	UNKNOWN(),									UNKNOWN(),			INS(BIND(dad_sp), Implied, "DAD SP", 10),	INS(BIND(lda), Absolute, "LDA ", 13),		UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	3
+		/* 4 */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										UNKNOWN(),									UNKNOWN(),									UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	4
+		/* 5 */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										UNKNOWN(),									UNKNOWN(),									UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								INS(BIND(mov_e_h), Implied, "MOV E,H", 5),	UNKNOWN(),									UNKNOWN(),									INS(BIND(mov_e_a), Implied, "MOV E,A", 5),	//	5
+		/* 6 */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										UNKNOWN(),									UNKNOWN(),									UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									INS(BIND(mov_l_a), Implied, "MOV L,A", 5),	//	6
+		/* 7 */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										UNKNOWN(),									INS(BIND(mov_m_a), Implied, "MOV M,A", 7),	UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								INS(BIND(mov_a_h), Implied, "MOV A,H", 5),	UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	7
+		/* 8 */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										UNKNOWN(),									UNKNOWN(),									UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	8
+		/* 9 */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										UNKNOWN(),									UNKNOWN(),									UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	9
+		/* A */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										UNKNOWN(),									UNKNOWN(),									UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	A
+		/* B */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								UNKNOWN(),										UNKNOWN(),									UNKNOWN(),									UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									//	B
+		/* C */	UNKNOWN(),							INS(BIND(pop_b), Implied, "POP B", 10),		INS(BIND(jnz), Absolute, "JNZ ", 10),	INS(BIND(jmp), Absolute, "JMP ", 10),	UNKNOWN(),								INS(BIND(push_b), Implied, "PUSH B", 11),		INS(BIND(adi), Immediate, "ADI ", 7),		INS(BIND(rst_0), Implied, "RST 0", 11),		UNKNOWN(),			INS(BIND(ret), Implied, "RET", 10),			UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									INS(BIND(call), Absolute, "CALL ", 17),		UNKNOWN(),									INS(BIND(rst_1), Implied, "RST 1", 11),		//	C
+		/* D */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								INS(BIND(out), Immediate, "OUT ", 10),	UNKNOWN(),								INS(BIND(push_d), Implied, "PUSH D", 11),		UNKNOWN(),									INS(BIND(rst_2), Implied, "RST 2", 11),		UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									INS(BIND(rst_3), Implied, "RST 3", 11),		//	D
+		/* E */	UNKNOWN(),							INS(BIND(pop_h), Implied, "POP H", 10),		UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								INS(BIND(push_h), Implied, "PUSH H", 11),		INS(BIND(ani), Immediate, "ANI ", 7),		INS(BIND(rst_4), Implied, "RST 4", 11),		UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									INS(BIND(xchg), Implied, "XCHG", 4),	UNKNOWN(),									UNKNOWN(),									UNKNOWN(),									INS(BIND(rst_5), Implied, "RST 5", 11),		//	E
+		/* F */	UNKNOWN(),							UNKNOWN(),									UNKNOWN(),								UNKNOWN(),								UNKNOWN(),								INS(BIND(push_psw), Implied, "PUSH PSW", 11),	UNKNOWN(),									INS(BIND(rst_6), Implied, "RST 6", 11),		UNKNOWN(),			UNKNOWN(),									UNKNOWN(),									UNKNOWN(),								UNKNOWN(),									UNKNOWN(),									INS(BIND(cpi), Immediate, "CPI ", 7),		INS(BIND(rst_7), Implied, "RST 7", 11),		//	F
 	};
 }
 
@@ -63,7 +74,55 @@ void Intel8080::initialise() {
 	reset();
 }
 
+//
+
+void Intel8080::disassemble(const Intel8080& cpu, const Memory& memory, uint16_t pc) {
+
+	// address
+	std::cout << Disassembler::hex(pc) << "\t";
+
+	// hex opcode
+	auto opcode = memory.get(pc);
+	std::cout << Disassembler::hex(opcode);
+
+	// hex raw operand
+	auto instruction = cpu.getInstructions()[opcode];
+	switch (instruction.mode) {
+	case Immediate:
+		std::cout << Disassembler::hex(memory.get(pc + 1));
+		break;
+	case Absolute:
+		std::cout << Disassembler::hex(m_memory.get(pc + 1));
+		std::cout << Disassembler::hex(m_memory.get(pc + 2));
+		break;
+	default:
+		break;
+	}
+	std::cout << "\t";
+
+	// base disassembly
+	std::cout << instruction.disassembly;
+
+	// disassembly operand
+	switch (instruction.mode) {
+	case Immediate:
+		std::cout << Disassembler::hex(m_memory.get(pc + 1));
+		break;
+	case Absolute:
+		std::cout << Disassembler::hex(m_memory.getWord(pc + 1));
+		break;
+	default:
+		break;
+	}
+	std::cout << std::endl;
+}
+
+//
+
 void Intel8080::step() {
+
+	disassemble(*this, m_memory, pc);
+
 	auto opcode = m_memory.get(pc++);
 	auto instruction = instructions[opcode];
 	instruction.vector();
@@ -163,6 +222,11 @@ void Intel8080::push_d() {
 
 void Intel8080::push_h() {
 	auto pair = Memory::makeWord(l, h);
+	pushWord(pair);
+}
+
+void Intel8080::push_psw() {
+	auto pair = Memory::makeWord(f, a);
 	pushWord(pair);
 }
 
@@ -267,6 +331,11 @@ void Intel8080::jnz() {
 		pc = destination;
 }
 
+void Intel8080::lda() {
+	auto source = fetchWord();
+	a = m_memory.get(source);
+}
+
 void Intel8080::sta() {
 	auto destination = fetchWord();
 	m_memory.set(destination, a);
@@ -323,4 +392,19 @@ void Intel8080::xchg() {
 void Intel8080::out() {
 	auto port = fetchByte();
 	m_ports.write(port, a);
+}
+
+void Intel8080::rrc() {
+	auto carry = a & 1;
+	a >>= 1;
+	a &= carry << 7;
+	carry ? setCarry() : resetCarry();
+}
+
+void Intel8080::adi() {
+	auto immediate = fetchByte();
+	uint16_t sum = a + immediate;
+	a = Memory::lowByte(sum);
+	sum > 0xff ? setCarry() : resetCarry();
+	adjustSZP(a);
 }
