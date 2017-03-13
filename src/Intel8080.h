@@ -103,15 +103,20 @@ private:
 	void setAuxillaryCarry() { setFlag(F_AC); }
 	void resetAuxiliaryCarry() { resetFlag(F_AC); }
 
+	void resetUnusedFlags() {
+		setFlag(0x2);
+		resetFlag(0x8);
+		resetFlag(0x20);
+	}
+
 	void resetFlags() {
 		resetCarry();
-		setFlag(0x2);
 		resetParity();
-		resetFlag(0x8);
 		resetAuxiliaryCarry();
-		resetFlag(0x20);
 		resetZero();
 		resetSign();
+
+		resetUnusedFlags();
 	}
 
 	void pushByte(uint8_t value);
@@ -173,7 +178,9 @@ private:
 	void push_h();
 	void push_psw();
 	void pop_b();
+	void pop_d();
 	void pop_h();
+	void pop_psw();
 	void call();
 	void rst_0();
 	void rst_1();
@@ -186,6 +193,7 @@ private:
 	void ret();
 	void ldax_d();
 	void mov_m_a();
+	void mov_m_d();
 	void mov_a_h();
 	void mov_e_a();
 	void mov_e_h();
@@ -197,6 +205,7 @@ private:
 	void lda();
 	void sta();
 	void ani();
+	void xra_a();
 	void cpi();
 	void dad_b();
 	void dad_d();
