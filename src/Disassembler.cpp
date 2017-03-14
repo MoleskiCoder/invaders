@@ -34,14 +34,10 @@ std::string Disassembler::state(const Intel8080& cpu) {
 		<< "PC=" << hex(pc)
 		<< " "
 		<< "SP=" << hex(sp)
-		<< " "
-		<< "F=" << flag(f)
-		<< " "
-		<< "A=" << hex(a)
-		<< " "
-		<< "H=" << hex(h)
-		<< " "
-		<< "L=" << hex(l);
+		<< " " << "A=" << hex(a) << " " << "F=" << flag(f)
+		<< " " << "B=" << hex(b) << " " << "C=" << hex(c)
+		<< " " << "D=" << hex(d) << " " << "E=" << hex(e)
+		<< " " << "H=" << hex(h) << " " << "L=" << hex(l);
 
 	return output.str();
 }
