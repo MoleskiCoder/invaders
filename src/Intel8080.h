@@ -45,6 +45,8 @@ public:
 	const Memory& getMemory() const { return m_memory; }
 
 	uint16_t getProgramCounter() const { return pc; }
+	void setProgramCounter(uint16_t value) { pc = value; }
+
 	uint16_t getStackPointer() const { return sp; }
 
 	uint8_t getA() const { return a; }
@@ -168,7 +170,7 @@ private:
 	}
 
 	void callAddress(uint16_t address) {
-		pushWord(pc - 1);
+		pushWord(pc + 2);
 		pc = address;
 	}
 
@@ -294,6 +296,7 @@ private:
 	void mov_h_m() { h = mov_r_m(); }
 	void mov_l_m() { l = mov_r_m(); }
 
+	void mvi_a() { a = fetchByte(); }
 	void mvi_b() { b = fetchByte(); }
 	void mvi_c() { c = fetchByte(); }
 	void mvi_h() { h = fetchByte(); }
@@ -403,6 +406,12 @@ private:
 			pc = destination;
 	}
 
+	void jz() {
+		auto destination = fetchWord();
+		if (f & F_Z)
+			pc = destination;
+	}
+
 	void jnz() {
 		auto destination = fetchWord();
 		if (!(f & F_Z))
@@ -423,7 +432,7 @@ private:
 	// return
 
 	void ret() {
-		pc = popWord() + 1;
+		pc = popWord();
 	}
 
 	void rnc() { if (!(f & F_C)) ret(); }
