@@ -15,7 +15,18 @@ std::string Disassembler::state(const Intel8080& cpu) {
 
 	auto pc = cpu.getProgramCounter();
 	auto sp = cpu.getStackPointer();
+
+	auto a = cpu.getA();
 	auto f = cpu.getF();
+
+	auto b = cpu.getB();
+	auto c = cpu.getC();
+
+	auto d = cpu.getD();
+	auto e = cpu.getE();
+
+	auto h = cpu.getH();
+	auto l = cpu.getL();
 
 	std::ostringstream output;
 
@@ -24,7 +35,13 @@ std::string Disassembler::state(const Intel8080& cpu) {
 		<< " "
 		<< "SP=" << hex(sp)
 		<< " "
-		<< "F=" << flag(f);
+		<< "F=" << flag(f)
+		<< " "
+		<< "A=" << hex(a)
+		<< " "
+		<< "H=" << hex(h)
+		<< " "
+		<< "L=" << hex(l);
 
 	return output.str();
 }
