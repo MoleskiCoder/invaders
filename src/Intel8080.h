@@ -408,6 +408,12 @@ private:
 			pc = destination;
 	}
 
+	void jnc() {
+		auto destination = fetchWord();
+		if (!(f & F_C))
+			pc = destination;
+	}
+
 	void jz() {
 		auto destination = fetchWord();
 		if (f & F_Z)
@@ -417,6 +423,24 @@ private:
 	void jnz() {
 		auto destination = fetchWord();
 		if (!(f & F_Z))
+			pc = destination;
+	}
+
+	void jpe() {
+		auto destination = fetchWord();
+		if (f & F_P)
+			pc = destination;
+	}
+
+	void jpo() {
+		auto destination = fetchWord();
+		if (!(f & F_P))
+			pc = destination;
+	}
+
+	void jm() {
+		auto destination = fetchWord();
+		if (f & F_S)
 			pc = destination;
 	}
 
@@ -431,15 +455,83 @@ private:
 		callAddress(destination);
 	}
 
+	void cc() {
+		if (f & F_C) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
+	void cnc() {
+		if (!(f & F_C)) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
+	void cpe() {
+		if (f & F_P) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
+	void cpo() {
+		if (!(f & F_P)) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
+	void cz() {
+		if (f & F_Z) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
+	void cnz() {
+		if (!(f & F_Z)) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
+	void cm() {
+		if (f & F_S) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
+	void cp() {
+		if (!(f & F_S)) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
 	// return
 
 	void ret() {
 		pc = popWord();
 	}
 
+	void rc() { if (f & F_C) ret(); }
 	void rnc() { if (!(f & F_C)) ret(); }
+	void rz() { if (f & F_Z) ret(); }
 	void rnz() { if (!(f & F_Z)) ret(); }
+	void rpe() { if (f & F_P) ret(); }
 	void rpo() { if (!(f & F_P)) ret(); }
+	void rm() { if (f & F_S) ret(); }
 	void rp() { if (!(f & F_S)) ret(); }
 
 	// restart
@@ -542,7 +634,6 @@ private:
 		a |= carry << 7;
 		carry ? setCarry() : resetCarry();
 	}
-
 
 	// specials
 
