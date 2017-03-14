@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0050)http://pastraiser.com/cpu/i8080/i8080_opcodes.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1250">
+	<title>Intel 8080 OPCODES</title>
+	
+	<style type="text/css"> <!--
+		table.withborder {
+			border-width: 1px;
+			border-style: solid;
+			border-color: black;
+			border-collapse: collapse;
+		}
+		td.withborder {
+			border-width: 1px;
+			border-style: solid;
+			border-color: black;
+			border-collapse: collapse;
+		}
+		a:link {
+			text-decoration: none;
+			color: #2018A0;
+		}
+		a:visited {
+			text-decoration: none;
+			color: #2018A0;
+		}
+		a:active {
+			text-decoration: none;
+			color: #2018A0;
+		}
+		a:hover {
+			text-decoration: none;
+			color: #4030FF;
+		}
+		sub {
+			font-size: 8pt;
+		}
+		sup {
+			font-size: 8pt;
+		}
+		hr {
+			height: 1px;
+			color: black;
+		}
+		--></style>
+</head>
+
+<body bgcolor="#dfdfdf">
+<span style="font-size: 150%"><b>Intel 8080 instruction set</b></span>
+<br><br>
+<table cellspacing="0" cellpadding="0" class="withborder" bgcolor="#bfbfbf" width="1200">
+	<tbody><tr style="font-family: monospace; font-size: 8pt" align="center" bgcolor="#9f9f9f"><td class="withborder">&nbsp;</td><td class="withborder" style="width: 7em"><b>&nbsp;x0&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x1&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x2&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x3&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x4&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x5&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x6&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x7&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x8&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;x9&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;xA&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;xB&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;xC&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;xD&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;xE&nbsp;</b></td><td class="withborder" style="width: 7em"><b>&nbsp;xF&nbsp;</b></td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;0x&nbsp;</b></td><td class="withborder" bgcolor="#ff99cc">NOP<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">LXI B,d16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">STAX B<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">INX B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">INR B<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ffff99">DCR B<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ccccff">MVI B,d8<br>2&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">RLC<br>1&nbsp;&nbsp;4<br>- - - - C</td><td class="withborder" bgcolor="#ff99cc">*NOP<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">DAD B<br>1&nbsp;&nbsp;10<br>- - - - C</td><td class="withborder" bgcolor="#ccccff">LDAX B<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">DCX B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">INR C<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ffff99">DCR C<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ccccff">MVI C,d8<br>2&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">RRC<br>1&nbsp;&nbsp;4<br>- - - - C</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;1x&nbsp;</b></td><td class="withborder" bgcolor="#ff99cc">*NOP<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">LXI D,d16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">STAX D<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">INX D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">INR D<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ffff99">DCR D<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ccccff">MVI D,d8<br>2&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">RAL<br>1&nbsp;&nbsp;4<br>- - - - C</td><td class="withborder" bgcolor="#ff99cc">*NOP<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">DAD D<br>1&nbsp;&nbsp;10<br>- - - - C</td><td class="withborder" bgcolor="#ccccff">LDAX D<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">DCX D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">INR E<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ffff99">DCR E<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ccccff">MVI E,d8<br>2&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">RAR<br>1&nbsp;&nbsp;4<br>- - - - C</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;2x&nbsp;</b></td><td class="withborder" bgcolor="#ff99cc">*NOP<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">LXI H,d16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">SHLD a16<br>3&nbsp;&nbsp;16<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">INX H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">INR H<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ffff99">DCR H<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ccccff">MVI H,d8<br>2&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">DAA<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ff99cc">*NOP<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">DAD H<br>1&nbsp;&nbsp;10<br>- - - - C</td><td class="withborder" bgcolor="#ccffcc">LHLD a16<br>3&nbsp;&nbsp;16<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">DCX H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">INR L<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ffff99">DCR L<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ccccff">MVI L,d8<br>2&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">CMA<br>1&nbsp;&nbsp;4<br>- - - - -</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;3x&nbsp;</b></td><td class="withborder" bgcolor="#ff99cc">*NOP<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">LXI SP,d16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">STA a16<br>3&nbsp;&nbsp;13<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">INX SP<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">INR M<br>1&nbsp;&nbsp;10<br>S Z A P -</td><td class="withborder" bgcolor="#ffff99">DCR M<br>1&nbsp;&nbsp;10<br>S Z A P -</td><td class="withborder" bgcolor="#ccccff">MVI M,d8<br>2&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">STC<br>1&nbsp;&nbsp;4<br>- - - - C</td><td class="withborder" bgcolor="#ff99cc">*NOP<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">DAD SP<br>1&nbsp;&nbsp;10<br>- - - - C</td><td class="withborder" bgcolor="#ccccff">LDA a16<br>3&nbsp;&nbsp;13<br>- - - - -</td><td class="withborder" bgcolor="#ffcccc">DCX SP<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">INR A<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ffff99">DCR A<br>1&nbsp;&nbsp;5<br>S Z A P -</td><td class="withborder" bgcolor="#ccccff">MVI A,d8<br>2&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">CMC<br>1&nbsp;&nbsp;4<br>- - - - C</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;4x&nbsp;</b></td><td class="withborder" bgcolor="#ccccff">MOV B,B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV B,C<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV B,D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV B,E<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV B,H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV B,L<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV B,M<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV B,A<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV C,B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV C,C<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV C,D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV C,E<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV C,H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV C,L<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV C,M<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV C,A<br>1&nbsp;&nbsp;5<br>- - - - -</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;5x&nbsp;</b></td><td class="withborder" bgcolor="#ccccff">MOV D,B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV D,C<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV D,D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV D,E<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV D,H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV D,L<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV D,M<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV D,A<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV E,B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV E,C<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV E,D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV E,E<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV E,H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV E,L<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV E,M<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV E,A<br>1&nbsp;&nbsp;5<br>- - - - -</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;6x&nbsp;</b></td><td class="withborder" bgcolor="#ccccff">MOV H,B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV H,C<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV H,D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV H,E<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV H,H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV H,L<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV H,M<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV H,A<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV L,B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV L,C<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV L,D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV L,E<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV L,H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV L,L<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV L,M<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV L,A<br>1&nbsp;&nbsp;5<br>- - - - -</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;7x&nbsp;</b></td><td class="withborder" bgcolor="#ccccff">MOV M,B<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV M,C<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV M,D<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV M,E<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV M,H<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV M,L<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ff99cc">HLT<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV M,A<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV A,B<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV A,C<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV A,D<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV A,E<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV A,H<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV A,L<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV A,M<br>1&nbsp;&nbsp;7<br>- - - - -</td><td class="withborder" bgcolor="#ccccff">MOV A,A<br>1&nbsp;&nbsp;5<br>- - - - -</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;8x&nbsp;</b></td><td class="withborder" bgcolor="#ffff99">ADD B<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADD C<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADD D<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADD E<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADD H<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADD L<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADD M<br>1&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADD A<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADC B<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADC C<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADC D<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADC E<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADC H<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADC L<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADC M<br>1&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ADC A<br>1&nbsp;&nbsp;4<br>S Z A P C</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;9x&nbsp;</b></td><td class="withborder" bgcolor="#ffff99">SUB B<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SUB C<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SUB D<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SUB E<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SUB H<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SUB L<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SUB M<br>1&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SUB A<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SBB B<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SBB C<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SBB D<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SBB E<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SBB H<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SBB L<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SBB M<br>1&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">SBB A<br>1&nbsp;&nbsp;4<br>S Z A P C</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;Ax&nbsp;</b></td><td class="withborder" bgcolor="#ffff99">ANA B<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ANA C<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ANA D<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ANA E<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ANA H<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ANA L<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ANA M<br>1&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ANA A<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">XRA B<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">XRA C<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">XRA D<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">XRA E<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">XRA H<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">XRA L<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">XRA M<br>1&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">XRA A<br>1&nbsp;&nbsp;4<br>S Z A P C</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;Bx&nbsp;</b></td><td class="withborder" bgcolor="#ffff99">ORA B<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ORA C<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ORA D<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ORA E<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ORA H<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ORA L<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ORA M<br>1&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">ORA A<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">CMP B<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">CMP C<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">CMP D<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">CMP E<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">CMP H<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">CMP L<br>1&nbsp;&nbsp;4<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">CMP M<br>1&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffff99">CMP A<br>1&nbsp;&nbsp;4<br>S Z A P C</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;Cx&nbsp;</b></td><td class="withborder" bgcolor="#ffcc99">RNZ<br>1&nbsp;&nbsp;11/5<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">POP B<br>1&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">JNZ a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">JMP a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CNZ a16<br>3&nbsp;&nbsp;17/11<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">PUSH B<br>1&nbsp;&nbsp;11<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">ADI d8<br>2&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">RST 0<br>1&nbsp;&nbsp;11<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">RZ<br>1&nbsp;&nbsp;11/5<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">RET<br>1&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">JZ a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">*JMP a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CZ a16<br>3&nbsp;&nbsp;17/11<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CALL a16<br>3&nbsp;&nbsp;17<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">ACI d8<br>2&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">RST 1<br>1&nbsp;&nbsp;11<br>- - - - -</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;Dx&nbsp;</b></td><td class="withborder" bgcolor="#ffcc99">RNC<br>1&nbsp;&nbsp;11/5<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">POP D<br>1&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">JNC a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ff99cc">OUT d8<br>2&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CNC a16<br>3&nbsp;&nbsp;17/11<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">PUSH D<br>1&nbsp;&nbsp;11<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">SUI d8<br>2&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">RST 2<br>1&nbsp;&nbsp;11<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">RC<br>1&nbsp;&nbsp;11/5<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">*RET<br>1&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">JC a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ff99cc">IN d8<br>2&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CC a16<br>3&nbsp;&nbsp;17/11<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">*CALL a16<br>3&nbsp;&nbsp;17<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">SBI d8<br>2&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">RST 3<br>1&nbsp;&nbsp;11<br>- - - - -</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;Ex&nbsp;</b></td><td class="withborder" bgcolor="#ffcc99">RPO<br>1&nbsp;&nbsp;11/5<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">POP H<br>1&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">JPO a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">XTHL<br>1&nbsp;&nbsp;18<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CPO a16<br>3&nbsp;&nbsp;17/11<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">PUSH H<br>1&nbsp;&nbsp;11<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">ANI d8<br>2&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">RST 4<br>1&nbsp;&nbsp;11<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">RPE<br>1&nbsp;&nbsp;11/5<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">PCHL<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">JPE a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">XCHG<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CPE a16<br>3&nbsp;&nbsp;17/11<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">*CALL a16<br>3&nbsp;&nbsp;17<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">XRI d8<br>2&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">RST 5<br>1&nbsp;&nbsp;11<br>- - - - -</td></tr>
+	<tr style="font-family: monospace; font-size: 8pt" align="center"><td class="withborder" bgcolor="#9f9f9f"><b>&nbsp;Fx&nbsp;</b></td><td class="withborder" bgcolor="#ffcc99">RP<br>1&nbsp;&nbsp;11/5<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">POP PSW<br>1&nbsp;&nbsp;10<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">JP a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ff99cc">DI<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CP a16<br>3&nbsp;&nbsp;17/11<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">PUSH PSW<br>1&nbsp;&nbsp;11<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">ORI d8<br>2&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">RST 6<br>1&nbsp;&nbsp;11<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">RM<br>1&nbsp;&nbsp;11/5<br>- - - - -</td><td class="withborder" bgcolor="#ccffcc">SPHL<br>1&nbsp;&nbsp;5<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">JM a16<br>3&nbsp;&nbsp;10<br>- - - - -</td><td class="withborder" bgcolor="#ff99cc">EI<br>1&nbsp;&nbsp;4<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">CM a16<br>3&nbsp;&nbsp;17/11<br>- - - - -</td><td class="withborder" bgcolor="#ffcc99">*CALL a16<br>3&nbsp;&nbsp;17<br>- - - - -</td><td class="withborder" bgcolor="#ffff99">CPI d8<br>2&nbsp;&nbsp;7<br>S Z A P C</td><td class="withborder" bgcolor="#ffcc99">RST 7<br>1&nbsp;&nbsp;11<br>- - - - -</td></tr>
+</tbody></table>
+<br><br>
+<table cellspacing="0" cellpadding="0" style="font-family: monospace; font-size: 8pt" width="1200">
+	<tbody><tr>
+	<td>
+	<table cellspacing="0" cellpadding="0" style="font-family: monospace; font-size: 8pt">
+		<tbody><tr><td bgcolor="#ff99cc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>Misc/control instructions</td></tr>
+		<tr><td bgcolor="#ffcc99">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>Jumps/calls</td></tr>
+		<tr><td bgcolor="#ccccff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>8bit load/store/move instructions</td></tr>
+		<tr><td bgcolor="#ccffcc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>16bit load/store/move instructions</td></tr>
+		<tr><td bgcolor="#ffff99">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>8bit arithmetic/logical instructions</td></tr>
+		<tr><td bgcolor="#ffcccc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>16bit arithmetic/logical instructions</td></tr>
+	</tbody></table>
+	</td>
+	<td width="25">&nbsp;</td>
+	<td>
+	<table cellspacing="0" cellpadding="0">
+		<tbody><tr style="font-family: monospace; font-size: 8pt" align="center">
+			<td align="right">&nbsp;<br>Length in bytes&nbsp;&#8594;<br>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td class="withborder" style="width: 7em" bgcolor="#ffffff">INS reg<br>2&nbsp;&nbsp;7<br>S Z A P C</td>
+			<td>&nbsp;</td>
+			<td align="left">&#8592;&nbsp;Instruction mnemonic<br>&#8592;&nbsp;Duration in cycles<br>&#8592;&nbsp;Flags affected</td>
+		</tr>
+	</tbody></table>
+	</td>
+	<td width="25">&nbsp;</td>
+	<td width="450">
+	Duration of conditional calls and returns is different when action is taken or not. This is indicated by two numbers separated by "/". The higher number (on the left side of "/") means duration of instruction when action is taken, the lower number (on the right side of "/") means duration of instruction when action is not taken.<br>
+	All instructions marked by "*" are only alternative opcodes for existing instructions. Those alternative opcodes should not be used.
+	</td>
+	</tr>
+</tbody></table>
+<br><br>
+
+<span style="font-size: 150%"><b>Registers</b></span>
+<br><br>
+<table>
+<tbody><tr><td>
+<table cellspacing="0" cellpadding="0">
+<tbody><tr><td><table cellspacing="0" cellpadding="0" class="withborder" bgcolor="#efefef" width="300">
+	<tbody><tr align="center" bgcolor="#bfbfbf"><td class="withborder" width="150">15&nbsp;&nbsp;.&nbsp;.&nbsp;.&nbsp;&nbsp;8</td><td class="withborder width=" 150""="">7&nbsp;&nbsp;.&nbsp;.&nbsp;.&nbsp;&nbsp;0</td></tr>
+	<tr align="center"><td class="withborder">A (accumulator)</td><td class="withborder">F (flags)</td></tr>
+	<tr align="center"><td class="withborder">B</td><td class="withborder">C</td></tr>
+	<tr align="center"><td class="withborder">D</td><td class="withborder">E</td></tr>
+	<tr align="center"><td class="withborder">H</td><td class="withborder">L</td></tr>
+</tbody></table></td>
+<td><table cellspacing="0" cellpadding="0">
+	<tbody><tr><td>&nbsp;</td></tr>
+	<tr><td>&nbsp;&#8592;&nbsp;PSW</td></tr>
+	<tr><td>&nbsp;&#8592;&nbsp;B</td></tr>
+	<tr><td>&nbsp;&#8592;&nbsp;D</td></tr>
+	<tr><td>&nbsp;&#8592;&nbsp;H</td></tr>
+</tbody></table></td></tr>
+</tbody></table>
+<br>
+<table cellspacing="0" cellpadding="0" class="withborder" bgcolor="#efefef" width="300">
+	<tbody><tr align="center" bgcolor="#bfbfbf"><td class="withborder" width="300">15&nbsp;&nbsp;.&nbsp;.&nbsp;.&nbsp;&nbsp;0</td></tr>
+	<tr align="center"><td class="withborder" width="400">SP (stack pointer)</td></tr>
+	<tr align="center"><td class="withborder">PC (program counter)</td></tr>
+</tbody></table>
+<br><br><br>
+</td>
+
+<td width="50">&nbsp;</td>
+
+<td>
+<b>Flag register (F) bits:</b><br><br>
+<table cellspacing="0" cellpadding="0" class="withborder" bgcolor="#efefef" width="200">
+	<tbody><tr align="center" bgcolor="#bfbfbf">
+		<td class="withborder" width="25">7</td>
+		<td class="withborder" width="25">6</td>
+		<td class="withborder" width="25">5</td>
+		<td class="withborder" width="25">4</td>
+		<td class="withborder" width="25">3</td>
+		<td class="withborder" width="25">2</td>
+		<td class="withborder" width="25">1</td>
+		<td class="withborder" width="25">0</td>
+	</tr>
+	<tr align="center">
+		<td class="withborder">S</td>
+		<td class="withborder">Z</td>
+		<td class="withborder">0</td>
+		<td class="withborder">A</td>
+		<td class="withborder">0</td>
+		<td class="withborder">P</td>
+		<td class="withborder">1</td>
+		<td class="withborder">C</td>
+	</tr>
+</tbody></table>
+<br>
+<span style="font-family: monospace; font-size: 14pt">S</span> - Sign Flag<br>
+<span style="font-family: monospace; font-size: 14pt">Z</span> - Zero Flag<br>
+<span style="font-family: monospace; font-size: 14pt">0</span> - Not used, always zero<br>
+<span style="font-family: monospace; font-size: 14pt">A</span> - also called AC, Auxiliary Carry Flag<br>
+<span style="font-family: monospace; font-size: 14pt">0</span> - Not used, always zero<br>
+<span style="font-family: monospace; font-size: 14pt">P</span> - Parity Flag<br>
+<span style="font-family: monospace; font-size: 14pt">1</span> - Not used, always one<br>
+<span style="font-family: monospace; font-size: 14pt">C</span> - Carry Flag<br>
+</td>
+</tr>
+</tbody></table>
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="http://www.google-analytics.com/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+	var pageTracker = _gat._getTracker("UA-6016386-1");
+	pageTracker._trackPageview();
+</script>
+
+
+</body></html>
