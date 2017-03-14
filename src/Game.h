@@ -65,7 +65,6 @@ private:
 	void configureBackground() const;
 	void createBitmapTexture();
 
-
 	int getScreenWidth() const {
 		return DisplayWidth * DisplayScale;
 	}
