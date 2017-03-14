@@ -141,8 +141,6 @@ private:
 		resetUnusedFlags();
 	}
 
-	void pushByte(uint8_t value);
-	uint8_t popByte();
 	void pushWord(uint16_t value);
 	uint16_t popWord();
 
@@ -388,11 +386,15 @@ private:
 	}
 
 	void pop_psw() {
-		auto pair = Memory::makeWord(f, a);
-		pushWord(pair);
+		auto af = popWord();
+		a = Memory::highByte(af);
+		f = Memory::lowByte(af);
+		resetUnusedFlags();
 	}
 
-	void lxi_sp() { sp = fetchWord(); }
+	void lxi_sp() {
+		sp = fetchWord();
+	}
 
 	// jump
 

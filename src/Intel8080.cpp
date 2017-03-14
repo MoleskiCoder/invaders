@@ -88,23 +88,15 @@ void Intel8080::step() {
 
 //
 
-void Intel8080::pushByte(uint8_t value) {
-	m_memory.set(sp--, value);
-}
-
-uint8_t Intel8080::popByte() {
-	return m_memory.get(++sp);
-}
-
 void Intel8080::pushWord(uint16_t value) {
-	pushByte(Memory::highByte(value));
-	pushByte(Memory::lowByte(value));
+	sp -= 2;
+	m_memory.setWord(sp, value);
 }
 
 uint16_t Intel8080::popWord() {
-	auto low = popByte();
-	auto high = popByte();
-	return Memory::makeWord(low, high);
+	auto value = m_memory.getWord(sp);
+	sp += 2;
+	return value;
 }
 
 //
