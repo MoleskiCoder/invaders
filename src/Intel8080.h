@@ -59,6 +59,10 @@ public:
 	uint8_t getH() const { return h; }
 	uint8_t getL() const { return l; }
 
+	bool isInterruptable() const {
+		return m_interrupt;
+	}
+
 	void initialise();
 
 	void reset();
@@ -86,6 +90,9 @@ private:
 
 	uint8_t h;
 	uint8_t l;
+
+	bool m_interrupt;
+	bool m_halted;
 
 	static uint8_t setFlag(uint8_t status, uint8_t flag) { return status | flag; }
 	static uint8_t resetFlag(uint8_t status, uint8_t flag) { return status & ~flag; }
@@ -170,62 +177,379 @@ private:
 		callAddress(address);
 	}
 
+	void and(uint8_t value) {
+		resetCarry();
+		adjustSZP(a &= value);
+	}
+
+	void ora(uint8_t value) {
+		resetCarry();
+		adjustSZP(a |= value);
+	}
+
+	void xra(uint8_t value) {
+		resetCarry();
+		adjustSZP(a ^= value);
+	}
+
+	void add(uint8_t value) {
+		uint16_t sum = a + value;
+		a = Memory::lowByte(sum);
+		sum > 0xff ? setCarry() : resetCarry();
+		adjustSZP(a);
+	}
+
+	void sub(uint8_t value) {
+		uint16_t difference = a - value;
+		a = Memory::lowByte(difference);
+		difference > 0xff ? setCarry() : resetCarry();
+		adjustSZP(a);
+	}
+
+	void mov_m_r(uint8_t value) {
+		auto hl = Memory::makeWord(l, h);
+		m_memory.set(hl, value);
+	}
+
+	uint8_t mov_r_m() {
+		auto hl = Memory::makeWord(l, h);
+		return m_memory.get(hl);
+	}
+
 	//
 
 	void ___();
 
-	void nop();
-	void jmp();
-	void lxi_sp();
-	void lxi_b();
-	void lxi_d();
-	void lxi_h();
-	void inr_d();
-	void inr_h();
-	void mvi_b();
-	void mvi_c();
-	void mvi_h();
-	void mvi_m();
-	void push_b();
-	void push_d();
-	void push_h();
-	void push_psw();
-	void pop_b();
-	void pop_d();
-	void pop_h();
-	void pop_psw();
-	void call();
-	void rst_0();
-	void rst_1();
-	void rst_2();
-	void rst_3();
-	void rst_4();
-	void rst_5();
-	void rst_6();
-	void rst_7();
-	void ret();
-	void ldax_d();
-	void mov_m_a();
-	void mov_m_d();
-	void mov_a_h();
-	void mov_e_a();
-	void mov_e_h();
-	void mov_l_a();
-	void inx_d();
-	void inx_h();
-	void dcr_b();
-	void jnz();
-	void lda();
-	void sta();
-	void ani();
-	void xra_a();
-	void cpi();
-	void dad_b();
-	void dad_d();
-	void dad_h();
-	void dad_sp();
-	void xchg();
-	void out();
-	void rrc();
-	void adi();
+	// Move, load, and store
+
+	void mov_a_a() { a = a; }
+	void mov_a_b() { a = b; }
+	void mov_a_c() { a = c; }
+	void mov_a_d() { a = d; }
+	void mov_a_e() { a = e; }
+	void mov_a_h() { a = h; }
+	void mov_a_l() { a = l; }
+
+	void mov_b_a() { b = a; }
+	void mov_b_b() { b = b; }
+	void mov_b_c() { b = c; }
+	void mov_b_d() { b = d; }
+	void mov_b_e() { b = e; }
+	void mov_b_h() { b = h; }
+	void mov_b_l() { b = l; }
+
+	void mov_c_a() { c = a; }
+	void mov_c_b() { c = b; }
+	void mov_c_c() { c = c; }
+	void mov_c_d() { c = d; }
+	void mov_c_e() { c = e; }
+	void mov_c_h() { c = h; }
+	void mov_c_l() { c = l; }
+
+	void mov_d_a() { d = a; }
+	void mov_d_b() { d = b; }
+	void mov_d_c() { d = c; }
+	void mov_d_d() { d = d; }
+	void mov_d_e() { d = e; }
+	void mov_d_h() { d = h; }
+	void mov_d_l() { d = l; }
+
+	void mov_e_a() { e = a; }
+	void mov_e_b() { e = b; }
+	void mov_e_c() { e = c; }
+	void mov_e_d() { e = d; }
+	void mov_e_e() { e = e; }
+	void mov_e_h() { e = h; }
+	void mov_e_l() { e = l; }
+
+	void mov_h_a() { h = a; }
+	void mov_h_b() { h = b; }
+	void mov_h_c() { h = c; }
+	void mov_h_d() { h = d; }
+	void mov_h_e() { h = e; }
+	void mov_h_h() { h = h; }
+	void mov_h_l() { h = l; }
+
+	void mov_l_a() { l = a; }
+	void mov_l_b() { l = b; }
+	void mov_l_c() { l = c; }
+	void mov_l_d() { l = d; }
+	void mov_l_e() { l = e; }
+	void mov_l_h() { l = h; }
+	void mov_l_l() { l = l; }
+
+	void mov_m_a() { mov_m_r(a); }
+	void mov_m_b() { mov_m_r(b); }
+	void mov_m_c() { mov_m_r(c); }
+	void mov_m_d() { mov_m_r(d); }
+	void mov_m_e() { mov_m_r(e); }
+	void mov_m_h() { mov_m_r(h); }
+	void mov_m_l() { mov_m_r(l); }
+
+	void mov_a_m() { a = mov_r_m(); }
+	void mov_b_m() { b = mov_r_m(); }
+	void mov_c_m() { c = mov_r_m(); }
+	void mov_d_m() { d = mov_r_m(); }
+	void mov_e_m() { e = mov_r_m(); }
+	void mov_h_m() { h = mov_r_m(); }
+	void mov_l_m() { l = mov_r_m(); }
+
+	void mvi_b() { b = fetchByte(); }
+	void mvi_c() { c = fetchByte(); }
+	void mvi_h() { h = fetchByte(); }
+
+	void mvi_m() {
+		auto data = fetchByte();
+		auto hl = Memory::makeWord(l, h);
+		m_memory.set(hl, data);
+	}
+
+	void lxi_b() {
+		c = fetchByte();
+		b = fetchByte();
+	}
+
+	void lxi_d() {
+		e = fetchByte();
+		d = fetchByte();
+	}
+
+	void lxi_h() {
+		l = fetchByte();
+		h = fetchByte();
+	}
+
+	void ldax_b() {
+		auto bc = Memory::makeWord(c, b);
+		a = m_memory.get(bc);
+	}
+
+	void ldax_d() {
+		auto de = Memory::makeWord(e, d);
+		a = m_memory.get(de);
+	}
+
+	void sta() {
+		auto destination = fetchWord();
+		m_memory.set(destination, a);
+	}
+
+	void lda() {
+		auto source = fetchWord();
+		a = m_memory.get(source);
+	}
+
+	void xchg() {
+		std::swap(d, h);
+		std::swap(e, l);
+	}
+
+	// stack ops
+
+	void push_b() {
+		auto pair = Memory::makeWord(c, b);
+		pushWord(pair);
+	}
+
+	void push_d() {
+		auto pair = Memory::makeWord(e, d);
+		pushWord(pair);
+	}
+
+	void push_h() {
+		auto pair = Memory::makeWord(l, h);
+		pushWord(pair);
+	}
+
+	void push_psw() {
+		auto pair = Memory::makeWord(f, a);
+		pushWord(pair);
+	}
+
+	void pop_b() {
+		auto bc = popWord();
+		b = Memory::highByte(bc);
+		c = Memory::lowByte(bc);
+	}
+
+	void pop_d() {
+		auto de = popWord();
+		d = Memory::highByte(de);
+		e = Memory::lowByte(de);
+	}
+
+	void pop_h() {
+		auto hl = popWord();
+		h = Memory::highByte(hl);
+		l = Memory::lowByte(hl);
+	}
+
+	void pop_psw() {
+		auto pair = Memory::makeWord(f, a);
+		pushWord(pair);
+	}
+
+	void lxi_sp() { sp = fetchWord(); }
+
+	// jump
+
+	void jmp() {
+		pc = fetchWord();
+	}
+
+	void jc() {
+		auto destination = fetchWord();
+		if (f & F_C)
+			pc = destination;
+	}
+
+	void jnz() {
+		auto destination = fetchWord();
+		if (!(f & F_Z))
+			pc = destination;
+	}
+
+	void pchl() {
+		pc = Memory::makeWord(l, h);
+	}
+
+	// call
+
+	void call() {
+		auto destination = m_memory.getWord(pc);
+		callAddress(destination);
+	}
+
+	// return
+
+	void ret() {
+		pc = popWord() + 1;
+	}
+
+	void rnc() { if (!(f & F_C)) ret(); }
+	void rnz() { if (!(f & F_Z)) ret(); }
+	void rpo() { if (!(f & F_P)) ret(); }
+	void rp() { if (!(f & F_S)) ret(); }
+
+	// restart
+
+	void rst_0() { restart(0); }
+	void rst_1() { restart(1); }
+	void rst_2() { restart(2); }
+	void rst_3() { restart(3); }
+	void rst_4() { restart(4); }
+	void rst_5() { restart(5); }
+	void rst_6() { restart(6); }
+	void rst_7() { restart(7); }
+
+	// increment and decrement
+
+	void inr_d() { adjustSZP(++d); }
+	void inr_h() { adjustSZP(++h); }
+
+	void dcr_b() { adjustSZP(--b); }
+
+	void inx_d() {
+		auto de = Memory::makeWord(e, d);
+		e = Memory::lowByte(++de);
+		d = Memory::lowByte(de);
+	}
+
+	void inx_h() {
+		auto hl = Memory::makeWord(l, h);
+		l = Memory::lowByte(++hl);
+		h = Memory::lowByte(hl);
+	}
+
+	// add
+
+	void add_b() { add(b); }
+
+	void adi() { add(fetchByte()); }
+
+	void dad_b() {
+		auto bc = Memory::makeWord(c, b);
+		auto hl = Memory::makeWord(l, h);
+		uint32_t sum = bc + hl;
+		sum & 0x10000 ? setCarry() : resetCarry();
+		h = Memory::highByte(sum);
+		l = Memory::lowByte(sum);
+	}
+
+	void dad_d() {
+		auto de = Memory::makeWord(e, d);
+		auto hl = Memory::makeWord(l, h);
+		uint32_t sum = de + hl;
+		sum & 0x10000 ? setCarry() : resetCarry();
+		h = Memory::highByte(sum);
+		l = Memory::lowByte(sum);
+	}
+
+	void dad_h() {
+		auto hl = Memory::makeWord(l, h);
+		uint32_t doubled = hl << 1;
+		doubled & 0x10000 ? setCarry() : resetCarry();
+		h = Memory::highByte(hl);
+		l = Memory::lowByte(hl);
+	}
+
+
+	void dad_sp() {
+		auto hl = Memory::makeWord(l, h);
+		uint32_t sum = sp + hl;
+		sum & 0x10000 ? setCarry() : resetCarry();
+		h = Memory::highByte(sum);
+		l = Memory::lowByte(sum);
+	}
+
+	// subtract
+
+	void sub_b() {
+		sub(b);
+	}
+
+	// logical
+
+	void ana_a() { and(a); }
+	void ana_b() { and(b); }
+
+	void xra_a() { xra(a); }
+
+	void ora_b() { ora(b); }
+
+	void cmp_a() { compare(a); }
+
+	void ani() { and(fetchByte()); }
+
+	void cpi() { compare(fetchByte());	}
+
+	// rotate
+
+	void rrc() {
+		auto carry = a & 1;
+		a >>= 1;
+		a &= carry << 7;
+		carry ? setCarry() : resetCarry();
+	}
+
+
+	// specials
+
+	// input/output
+
+	void out() {
+		auto port = fetchByte();
+		m_ports.write(port, a);
+	}
+
+	// control
+
+	void ei() { m_interrupt = true; }
+	void di() { m_interrupt = false; }
+
+	void nop() {}
+
+	void hlt() {
+		m_halted = true;
+	}
 };
