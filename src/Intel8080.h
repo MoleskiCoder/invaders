@@ -539,7 +539,7 @@ private:
 	void rrc() {
 		auto carry = a & 1;
 		a >>= 1;
-		a &= carry << 7;
+		a |= carry << 7;
 		carry ? setCarry() : resetCarry();
 	}
 
