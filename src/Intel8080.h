@@ -112,7 +112,11 @@ private:
 
 	void setParity() { setFlag(F_P); }
 	void resetParity() { resetFlag(F_P); }
-	void adjustParity(uint8_t value) { std::bitset<8>(value).count() % 2 ? setParity() : resetParity(); }
+	void adjustParity(uint8_t value) {
+		auto set = std::bitset<8>(value).count();
+		auto even = (set % 2) == 0;
+		even ? setParity() : resetParity();
+	}
 
 	void adjustSZP(uint8_t value) {
 		adjustSign(value);
@@ -324,7 +328,10 @@ private:
 	void mvi_a() { a = fetchByte(); }
 	void mvi_b() { b = fetchByte(); }
 	void mvi_c() { c = fetchByte(); }
+	void mvi_d() { d = fetchByte(); }
+	void mvi_e() { e = fetchByte(); }
 	void mvi_h() { h = fetchByte(); }
+	void mvi_l() { l = fetchByte(); }
 
 	void mvi_m() {
 		auto data = fetchByte();
@@ -347,6 +354,16 @@ private:
 		h = fetchByte();
 	}
 
+	void stax_b() {
+		auto bc = Memory::makeWord(c, b);
+		m_memory.set(bc, a);
+	}
+
+	void stax_d() {
+		auto de = Memory::makeWord(e, d);
+		m_memory.set(de, a);
+	}
+
 	void ldax_b() {
 		auto bc = Memory::makeWord(c, b);
 		a = m_memory.get(bc);
@@ -365,6 +382,19 @@ private:
 	void lda() {
 		auto source = fetchWord();
 		a = m_memory.get(source);
+	}
+
+	void shld() {
+		auto destination = fetchWord();
+		auto hl = Memory::makeWord(l, h);
+		m_memory.setWord(destination, hl);
+	}
+
+	void lhld() {
+		auto source = fetchWord();
+		auto hl = m_memory.getWord(source);
+		h = Memory::highByte(hl);
+		l = Memory::lowByte(hl);
 	}
 
 	void xchg() {
@@ -417,6 +447,19 @@ private:
 		a = Memory::highByte(af);
 		f = Memory::lowByte(af);
 		resetUnusedFlags();
+	}
+
+	void xhtl() {
+		auto tos = m_memory.getWord(sp);
+		auto hl = Memory::makeWord(l, h);
+		m_memory.setWord(sp, hl);
+		h = Memory::highByte(tos);
+		l = Memory::lowByte(tos);
+	}
+
+	void sphl() {
+		auto hl = Memory::makeWord(l, h);
+		sp = hl;
 	}
 
 	void lxi_sp() {
@@ -498,6 +541,7 @@ private:
 	void inr_h() { adjustSZP(++h); }
 
 	void dcr_b() { adjustSZP(--b); }
+	void dcr_c() { adjustSZP(--c); }
 
 	void inx_d() {
 		auto de = Memory::makeWord(e, d);
@@ -514,6 +558,7 @@ private:
 	// add
 
 	void add_b() { add(b); }
+	void add_c() { add(c); }
 
 	void adi() { add(fetchByte()); }
 
@@ -538,18 +583,20 @@ private:
 
 	// subtract
 
-	void sub_b() {
-		sub(b);
-	}
+	void sub_b() { sub(b); }
+	void sub_c() { sub(c); }
 
 	// logical
 
 	void ana_a() { and(a); }
 	void ana_b() { and(b); }
+	void ana_c() { and(c); }
 
 	void xra_a() { xra(a); }
 
+	void ora_a() { ora(a); }
 	void ora_b() { ora(b); }
+	void ora_c() { ora(c); }
 
 	void cmp_a() { compare(a); }
 
