@@ -502,13 +502,13 @@ private:
 	void inx_d() {
 		auto de = Memory::makeWord(e, d);
 		e = Memory::lowByte(++de);
-		d = Memory::lowByte(de);
+		d = Memory::highByte(de);
 	}
 
 	void inx_h() {
 		auto hl = Memory::makeWord(l, h);
 		l = Memory::lowByte(++hl);
-		h = Memory::lowByte(hl);
+		h = Memory::highByte(hl);
 	}
 
 	// add
