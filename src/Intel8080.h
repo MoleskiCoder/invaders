@@ -177,6 +177,25 @@ private:
 		callAddress(address);
 	}
 
+	void callConditional(int condition) {
+		if (condition) {
+			call();
+		} else {
+			pc += 2;
+		}
+	}
+
+	void returnConditional(int condition) {
+		if (condition)
+			ret();
+	}
+
+	void jmpConditional(int conditional) {
+		auto destination = fetchWord();
+		if (conditional)
+			pc = destination;
+	}
+
 	void and(uint8_t value) {
 		resetCarry();
 		adjustSZP(a &= value);
@@ -197,6 +216,14 @@ private:
 		a = Memory::lowByte(sum);
 		sum > 0xff ? setCarry() : resetCarry();
 		adjustSZP(a);
+	}
+
+	void dad(uint16_t value) {
+		auto hl = Memory::makeWord(l, h);
+		uint32_t sum = hl + value;
+		sum & 0x10000 ? setCarry() : resetCarry();
+		h = Memory::highByte(sum);
+		l = Memory::lowByte(sum);
 	}
 
 	void sub(uint8_t value) {
@@ -398,52 +425,20 @@ private:
 
 	// jump
 
-	void jmp() {
-		pc = fetchWord();
-	}
-
-	void jc() {
-		auto destination = fetchWord();
-		if (f & F_C)
-			pc = destination;
-	}
-
-	void jnc() {
-		auto destination = fetchWord();
-		if (!(f & F_C))
-			pc = destination;
-	}
-
-	void jz() {
-		auto destination = fetchWord();
-		if (f & F_Z)
-			pc = destination;
-	}
-
-	void jnz() {
-		auto destination = fetchWord();
-		if (!(f & F_Z))
-			pc = destination;
-	}
-
-	void jpe() {
-		auto destination = fetchWord();
-		if (f & F_P)
-			pc = destination;
-	}
-
-	void jpo() {
-		auto destination = fetchWord();
-		if (!(f & F_P))
-			pc = destination;
-	}
-
-	void jm() {
-		auto destination = fetchWord();
-		if (f & F_S)
-			pc = destination;
-	}
-
+	void jmp() { jmpConditional(true); }
+	
+	void jc() { jmpConditional(f & F_C); }
+	void jnc() { jmpConditional(!(f & F_C)); }
+	
+	void jz() { jmpConditional(f & F_Z); }
+	void jnz() { jmpConditional(!(f & F_Z)); }
+	
+	void jpe() { jmpConditional(f & F_P); }
+	void jpo() { jmpConditional(!(f & F_P)); }
+	
+	void jm() { jmpConditional(f & F_S); }
+	void jp() { jmpConditional(!(f & F_S));	}
+	
 	void pchl() {
 		pc = Memory::makeWord(l, h);
 	}
@@ -455,69 +450,17 @@ private:
 		callAddress(destination);
 	}
 
-	void cc() {
-		if (f & F_C) {
-			call();
-		} else {
-			pc += 2;
-		}
-	}
+	void cc() { callConditional(f & F_C); }
+	void cnc() { callConditional(!(f & F_C)); }
 
-	void cnc() {
-		if (!(f & F_C)) {
-			call();
-		} else {
-			pc += 2;
-		}
-	}
+	void cpe() { callConditional(f & F_P); }
+	void cpo() { callConditional(!(f & F_P));  }
 
-	void cpe() {
-		if (f & F_P) {
-			call();
-		} else {
-			pc += 2;
-		}
-	}
+	void cz() { callConditional(f & F_Z); }
+	void cnz() { callConditional(!(f & F_Z)); }
 
-	void cpo() {
-		if (!(f & F_P)) {
-			call();
-		} else {
-			pc += 2;
-		}
-	}
-
-	void cz() {
-		if (f & F_Z) {
-			call();
-		} else {
-			pc += 2;
-		}
-	}
-
-	void cnz() {
-		if (!(f & F_Z)) {
-			call();
-		} else {
-			pc += 2;
-		}
-	}
-
-	void cm() {
-		if (f & F_S) {
-			call();
-		} else {
-			pc += 2;
-		}
-	}
-
-	void cp() {
-		if (!(f & F_S)) {
-			call();
-		} else {
-			pc += 2;
-		}
-	}
+	void cm() { callConditional(f & F_S); }
+	void cp() { callConditional(!(f & F_S)); }
 
 	// return
 
@@ -525,14 +468,17 @@ private:
 		pc = popWord();
 	}
 
-	void rc() { if (f & F_C) ret(); }
-	void rnc() { if (!(f & F_C)) ret(); }
-	void rz() { if (f & F_Z) ret(); }
-	void rnz() { if (!(f & F_Z)) ret(); }
-	void rpe() { if (f & F_P) ret(); }
-	void rpo() { if (!(f & F_P)) ret(); }
-	void rm() { if (f & F_S) ret(); }
-	void rp() { if (!(f & F_S)) ret(); }
+	void rc() { returnConditional(f & F_C); }
+	void rnc() { returnConditional(!(f & F_C)); }
+
+	void rz() { returnConditional(f & F_Z); }
+	void rnz() { returnConditional(!(f & F_Z)); }
+
+	void rpe() { returnConditional(f & F_P); }
+	void rpo() { returnConditional(!(f & F_P)); }
+
+	void rm() { returnConditional(f & F_S); }
+	void rp() { returnConditional(!(f & F_S)); }
 
 	// restart
 
@@ -547,6 +493,7 @@ private:
 
 	// increment and decrement
 
+	void inr_a() { adjustSZP(++a); }
 	void inr_d() { adjustSZP(++d); }
 	void inr_h() { adjustSZP(++h); }
 
@@ -572,37 +519,21 @@ private:
 
 	void dad_b() {
 		auto bc = Memory::makeWord(c, b);
-		auto hl = Memory::makeWord(l, h);
-		uint32_t sum = bc + hl;
-		sum & 0x10000 ? setCarry() : resetCarry();
-		h = Memory::highByte(sum);
-		l = Memory::lowByte(sum);
+		dad(bc);
 	}
 
 	void dad_d() {
 		auto de = Memory::makeWord(e, d);
-		auto hl = Memory::makeWord(l, h);
-		uint32_t sum = de + hl;
-		sum & 0x10000 ? setCarry() : resetCarry();
-		h = Memory::highByte(sum);
-		l = Memory::lowByte(sum);
+		dad(de);
 	}
 
 	void dad_h() {
 		auto hl = Memory::makeWord(l, h);
-		uint32_t doubled = hl << 1;
-		doubled & 0x10000 ? setCarry() : resetCarry();
-		h = Memory::highByte(hl);
-		l = Memory::lowByte(hl);
+		dad(hl);
 	}
 
-
 	void dad_sp() {
-		auto hl = Memory::makeWord(l, h);
-		uint32_t sum = sp + hl;
-		sum & 0x10000 ? setCarry() : resetCarry();
-		h = Memory::highByte(sum);
-		l = Memory::lowByte(sum);
+		dad(sp);
 	}
 
 	// subtract
