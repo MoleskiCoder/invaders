@@ -184,14 +184,17 @@ private:
 	void callConditional(int condition) {
 		if (condition) {
 			call();
+			cycles += 6;
 		} else {
 			pc += 2;
 		}
 	}
 
 	void returnConditional(int condition) {
-		if (condition)
+		if (condition) {
 			ret();
+			cycles += 6;
+		}
 	}
 
 	void jmpConditional(int conditional) {
@@ -222,6 +225,11 @@ private:
 		adjustSZP(a);
 	}
 
+	void adc(uint8_t value) {
+		auto carry = (f & F_C) != 0;
+		add(value + carry);
+	}
+
 	void dad(uint16_t value) {
 		auto hl = Memory::makeWord(l, h);
 		uint32_t sum = hl + value;
@@ -233,8 +241,13 @@ private:
 	void sub(uint8_t value) {
 		uint16_t difference = a - value;
 		a = Memory::lowByte(difference);
-		difference > 0xff ? setCarry() : resetCarry();
+		difference & 0x100 ? setCarry() : resetCarry();
 		adjustSZP(a);
+	}
+
+	void sbb(uint8_t value) {
+		auto carry = (f & F_C) != 0;
+		sub(value + carry);
 	}
 
 	void mov_m_r(uint8_t value) {
@@ -537,11 +550,34 @@ private:
 	// increment and decrement
 
 	void inr_a() { adjustSZP(++a); }
+	void inr_b() { adjustSZP(++b); }
 	void inr_d() { adjustSZP(++d); }
 	void inr_h() { adjustSZP(++h); }
 
+	void inr_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		adjustSZP(++value);
+		m_memory.set(hl, value);
+	}
+
 	void dcr_b() { adjustSZP(--b); }
 	void dcr_c() { adjustSZP(--c); }
+	void dcr_d() { adjustSZP(--d); }
+	void dcr_h() { adjustSZP(--h); }
+
+	void dcr_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		adjustSZP(--value);
+		m_memory.set(hl, value);
+	}
+
+	void inx_b() {
+		auto bc = Memory::makeWord(c, b);
+		c = Memory::lowByte(++bc);
+		b = Memory::highByte(bc);
+	}
 
 	void inx_d() {
 		auto de = Memory::makeWord(e, d);
@@ -555,12 +591,28 @@ private:
 		h = Memory::highByte(hl);
 	}
 
+	void inx_sp() {
+		++sp;
+	}
+
 	// add
 
+	void add_a() { add(a); }
 	void add_b() { add(b); }
 	void add_c() { add(c); }
+	void add_d() { add(d); }
+	void add_e() { add(e); }
+	void add_h() { add(h); }
+	void add_l() { add(l); }
+
+	void add_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		add(value);
+	}
 
 	void adi() { add(fetchByte()); }
+	void aci() { adc(fetchByte()); }
 
 	void dad_b() {
 		auto bc = Memory::makeWord(c, b);
@@ -583,28 +635,66 @@ private:
 
 	// subtract
 
+	void sub_a() { sub(a); }
 	void sub_b() { sub(b); }
 	void sub_c() { sub(c); }
+	void sub_d() { sub(d); }
+	void sub_e() { sub(e); }
+	void sub_h() { sub(h); }
+	void sub_l() { sub(l); }
+
+	void sub_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		sub(value);
+	}
+
+	void sbi() {
+		auto value = fetchByte();
+		sbb(value);
+	}
+
+	void sui() {
+		auto value = fetchByte();
+		sub(value);
+	}
 
 	// logical
 
 	void ana_a() { and(a); }
 	void ana_b() { and(b); }
 	void ana_c() { and(c); }
+	void ana_d() { and(d); }
+	void ana_e() { and(e); }
+	void ana_h() { and(h); }
+	void ana_l() { and(l); }
+
+	void ani() { and(fetchByte()); }
 
 	void xra_a() { xra(a); }
 
 	void ora_a() { ora(a); }
 	void ora_b() { ora(b); }
 	void ora_c() { ora(c); }
+	void ora_d() { ora(d); }
+	void ora_e() { ora(e); }
+	void ora_h() { ora(h); }
+	void ora_l() { ora(l); }
+
+	void ori() { ora(fetchByte()); }
 
 	void cmp_a() { compare(a); }
-
-	void ani() { and(fetchByte()); }
 
 	void cpi() { compare(fetchByte());	}
 
 	// rotate
+
+	void rlc() {
+		auto carry = a & 0x80;
+		a <<= 1;
+		a |= carry >> 7;
+		carry ? setCarry() : resetCarry();
+	}
 
 	void rrc() {
 		auto carry = a & 1;
@@ -613,7 +703,53 @@ private:
 		carry ? setCarry() : resetCarry();
 	}
 
+	void ral() {
+		auto carry = a & 0x80;
+		a <<= 1;
+		a |= ((f & F_C) != 0);
+		carry ? setCarry() : resetCarry();
+	}
+
+	void rar() {
+		auto carry = a & 1;
+		a >>= 1;
+		a |= ((f & F_C) != 0) << 7;
+		carry ? setCarry() : resetCarry();
+	}
+
 	// specials
+
+	void cma() {
+		a = ~a;
+	}
+
+	void stc() {
+		setCarry();
+	}
+
+	void cmc() {
+		f ^= F_C;
+	}
+
+	void daa() {
+
+		auto low = Memory::lowNybble(a);
+		if (low > 9)
+			low += 6;
+
+		auto half = low > 0xf;
+		half ? setAuxillaryCarry() : resetAuxiliaryCarry();
+
+		auto high = Memory::highNybble(a) + half;
+		if (high > 9)
+			high += 6;
+
+		auto carry = high > 0xf;
+		carry ? setCarry() : resetCarry();
+
+		a = Memory::promoteNybble(high) | low;
+		adjustSZP(a);
+	}
 
 	// input/output
 
