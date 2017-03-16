@@ -479,6 +479,9 @@ private:
 		sp = fetchWord();
 	}
 
+	void inx_sp() { ++sp; }
+	void dcx_sp() { --sp; }
+
 	// jump
 
 	void jmp() { jmpConditional(true); }
@@ -551,8 +554,11 @@ private:
 
 	void inr_a() { adjustSZP(++a); }
 	void inr_b() { adjustSZP(++b); }
+	void inr_c() { adjustSZP(++c); }
 	void inr_d() { adjustSZP(++d); }
+	void inr_e() { adjustSZP(++e); }
 	void inr_h() { adjustSZP(++h); }
+	void inr_l() { adjustSZP(++l); }
 
 	void inr_m() {
 		auto hl = Memory::makeWord(l, h);
@@ -561,10 +567,13 @@ private:
 		m_memory.set(hl, value);
 	}
 
+	void dcr_a() { adjustSZP(--a); }
 	void dcr_b() { adjustSZP(--b); }
 	void dcr_c() { adjustSZP(--c); }
 	void dcr_d() { adjustSZP(--d); }
+	void dcr_e() { adjustSZP(--e); }
 	void dcr_h() { adjustSZP(--h); }
+	void dcr_l() { adjustSZP(--l); }
 
 	void dcr_m() {
 		auto hl = Memory::makeWord(l, h);
@@ -591,8 +600,22 @@ private:
 		h = Memory::highByte(hl);
 	}
 
-	void inx_sp() {
-		++sp;
+	void dcx_b() {
+		auto bc = Memory::makeWord(c, b);
+		c = Memory::lowByte(--bc);
+		b = Memory::highByte(bc);
+	}
+
+	void dcx_d() {
+		auto de = Memory::makeWord(e, d);
+		e = Memory::lowByte(--de);
+		d = Memory::highByte(de);
+	}
+
+	void dcx_h() {
+		auto hl = Memory::makeWord(l, h);
+		l = Memory::lowByte(--hl);
+		h = Memory::highByte(hl);
 	}
 
 	// add
@@ -612,6 +635,21 @@ private:
 	}
 
 	void adi() { add(fetchByte()); }
+
+	void adc_a() { adc(a); }
+	void adc_b() { adc(b); }
+	void adc_c() { adc(c); }
+	void adc_d() { adc(d); }
+	void adc_e() { adc(e); }
+	void adc_h() { adc(h); }
+	void adc_l() { adc(l); }
+
+	void adc_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		adc(value);
+	}
+
 	void aci() { adc(fetchByte()); }
 
 	void dad_b() {
@@ -649,6 +687,20 @@ private:
 		sub(value);
 	}
 
+	void sbb_a() { sbb(a); }
+	void sbb_b() { sbb(b); }
+	void sbb_c() { sbb(c); }
+	void sbb_d() { sbb(d); }
+	void sbb_e() { sbb(e); }
+	void sbb_h() { sbb(h); }
+	void sbb_l() { sbb(l); }
+
+	void sbb_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		sbb(value);
+	}
+
 	void sbi() {
 		auto value = fetchByte();
 		sbb(value);
@@ -669,9 +721,29 @@ private:
 	void ana_h() { and(h); }
 	void ana_l() { and(l); }
 
+	void ana_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		and(value);
+	}
+
 	void ani() { and(fetchByte()); }
 
 	void xra_a() { xra(a); }
+	void xra_b() { xra(b); }
+	void xra_c() { xra(c); }
+	void xra_d() { xra(d); }
+	void xra_e() { xra(e); }
+	void xra_h() { xra(h); }
+	void xra_l() { xra(l); }
+
+	void xra_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		xra(value);
+	}
+
+	void xri() { xra(fetchByte()); }
 
 	void ora_a() { ora(a); }
 	void ora_b() { ora(b); }
@@ -681,9 +753,27 @@ private:
 	void ora_h() { ora(h); }
 	void ora_l() { ora(l); }
 
+	void ora_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		ora(value);
+	}
+
 	void ori() { ora(fetchByte()); }
 
 	void cmp_a() { compare(a); }
+	void cmp_b() { compare(b); }
+	void cmp_c() { compare(c); }
+	void cmp_d() { compare(d); }
+	void cmp_e() { compare(e); }
+	void cmp_h() { compare(h); }
+	void cmp_l() { compare(l); }
+
+	void cmp_m() {
+		auto hl = Memory::makeWord(l, h);
+		auto value = m_memory.get(hl);
+		compare(value);
+	}
 
 	void cpi() { compare(fetchByte());	}
 
