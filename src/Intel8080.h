@@ -124,11 +124,19 @@ private:
 		adjustParity(value);
 	}
 
+	void adjustSZPA(uint8_t value) {
+		adjustSZP(value);
+		adjustAuxiliaryCarry(value);
+	}
+
 	void setCarry() { setFlag(F_C); }
 	void resetCarry() { resetFlag(F_C); }
 
-	void setAuxillaryCarry() { setFlag(F_AC); }
+	void setAuxiliaryCarry() { setFlag(F_AC); }
 	void resetAuxiliaryCarry() { resetFlag(F_AC); }
+	void adjustAuxiliaryCarry(uint8_t value) {
+		(a & 0xf) > (value & 0xf) ? setAuxiliaryCarry() : resetAuxiliaryCarry();
+	}
 
 	void resetUnusedFlags() {
 		setFlag(0x2);
@@ -167,7 +175,7 @@ private:
 
 	void compare(uint8_t value) {
 		uint16_t subtraction = a - value;
-		adjustSZP((uint8_t)subtraction);
+		adjustSZPA((uint8_t)subtraction);
 		subtraction & 0x100 ? setCarry() : resetCarry();
 	}
 
@@ -205,24 +213,24 @@ private:
 
 	void and(uint8_t value) {
 		resetCarry();
-		adjustSZP(a &= value);
+		adjustSZPA(a &= value);
 	}
 
 	void ora(uint8_t value) {
 		resetCarry();
-		adjustSZP(a |= value);
+		adjustSZPA(a |= value);
 	}
 
 	void xra(uint8_t value) {
 		resetCarry();
-		adjustSZP(a ^= value);
+		adjustSZPA(a ^= value);
 	}
 
 	void add(uint8_t value) {
 		uint16_t sum = a + value;
 		a = Memory::lowByte(sum);
 		sum > 0xff ? setCarry() : resetCarry();
-		adjustSZP(a);
+		adjustSZPA(a);
 	}
 
 	void adc(uint8_t value) {
@@ -242,7 +250,7 @@ private:
 		uint16_t difference = a - value;
 		a = Memory::lowByte(difference);
 		difference & 0x100 ? setCarry() : resetCarry();
-		adjustSZP(a);
+		adjustSZPA(a);
 	}
 
 	void sbb(uint8_t value) {
@@ -552,33 +560,33 @@ private:
 
 	// increment and decrement
 
-	void inr_a() { adjustSZP(++a); }
-	void inr_b() { adjustSZP(++b); }
-	void inr_c() { adjustSZP(++c); }
-	void inr_d() { adjustSZP(++d); }
-	void inr_e() { adjustSZP(++e); }
-	void inr_h() { adjustSZP(++h); }
-	void inr_l() { adjustSZP(++l); }
+	void inr_a() { adjustSZPA(++a); }
+	void inr_b() { adjustSZPA(++b); }
+	void inr_c() { adjustSZPA(++c); }
+	void inr_d() { adjustSZPA(++d); }
+	void inr_e() { adjustSZPA(++e); }
+	void inr_h() { adjustSZPA(++h); }
+	void inr_l() { adjustSZPA(++l); }
 
 	void inr_m() {
 		auto hl = Memory::makeWord(l, h);
 		auto value = m_memory.get(hl);
-		adjustSZP(++value);
+		adjustSZPA(++value);
 		m_memory.set(hl, value);
 	}
 
-	void dcr_a() { adjustSZP(--a); }
-	void dcr_b() { adjustSZP(--b); }
-	void dcr_c() { adjustSZP(--c); }
-	void dcr_d() { adjustSZP(--d); }
-	void dcr_e() { adjustSZP(--e); }
-	void dcr_h() { adjustSZP(--h); }
-	void dcr_l() { adjustSZP(--l); }
+	void dcr_a() { adjustSZPA(--a); }
+	void dcr_b() { adjustSZPA(--b); }
+	void dcr_c() { adjustSZPA(--c); }
+	void dcr_d() { adjustSZPA(--d); }
+	void dcr_e() { adjustSZPA(--e); }
+	void dcr_h() { adjustSZPA(--h); }
+	void dcr_l() { adjustSZPA(--l); }
 
 	void dcr_m() {
 		auto hl = Memory::makeWord(l, h);
 		auto value = m_memory.get(hl);
-		adjustSZP(--value);
+		adjustSZPA(--value);
 		m_memory.set(hl, value);
 	}
 
@@ -824,21 +832,21 @@ private:
 	void daa() {
 
 		auto low = Memory::lowNybble(a);
-		if (low > 9)
+		if ((low > 9) || (f & F_AC))
 			low += 6;
 
 		auto half = low > 0xf;
-		half ? setAuxillaryCarry() : resetAuxiliaryCarry();
+		half ? setAuxiliaryCarry() : resetAuxiliaryCarry();
 
 		auto high = Memory::highNybble(a) + half;
-		if (high > 9)
+		if ((high > 9) || (f & F_C))
 			high += 6;
 
 		auto carry = high > 0xf;
 		carry ? setCarry() : resetCarry();
 
 		a = Memory::promoteNybble(high) | low;
-		adjustSZP(a);
+		adjustSZPA(a);
 	}
 
 	// input/output
