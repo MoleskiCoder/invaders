@@ -1,5 +1,7 @@
 #pragma once
 
+// Auxiliary carry logic from https://github.com/begoon/i8080-core
+
 #include <cstdint>
 #include <array>
 #include <functional>
@@ -73,6 +75,9 @@ public:
 private:
 	std::array<Instruction, 0x100> instructions;
 
+	std::array<int, 8> m_halfCarryTableAdd = { 0, 0, 1, 0, 1, 0, 1, 1 };
+	std::array<int, 8> m_halfCarryTableSub = { 0, 1, 1, 1, 0, 0, 0, 1 };
+
 	Memory& m_memory;
 	InputOutput& m_ports;
 
@@ -124,18 +129,24 @@ private:
 		adjustParity(value);
 	}
 
-	void adjustSZPA(uint8_t value) {
-		adjustSZP(value);
-		adjustAuxiliaryCarry(value);
-	}
-
 	void setCarry() { setFlag(F_C); }
 	void resetCarry() { resetFlag(F_C); }
 
 	void setAuxiliaryCarry() { setFlag(F_AC); }
 	void resetAuxiliaryCarry() { resetFlag(F_AC); }
-	void adjustAuxiliaryCarry(uint8_t value) {
-		(a & 0xf) > (value & 0xf) ? setAuxiliaryCarry() : resetAuxiliaryCarry();
+
+	int buildAuxiliaryCarryIndex(uint8_t value, int calculation) {
+		return ((a & 0x88) >> 1) | ((value & 0x88) >> 2) | ((calculation & 0x88) >> 3);
+	}
+
+	void adjustAuxiliaryCarryAdd(uint8_t value, int calculation) {
+		auto index = buildAuxiliaryCarryIndex(value, calculation);
+		m_halfCarryTableAdd[index & 0x7] ? setAuxiliaryCarry() : resetAuxiliaryCarry();
+	}
+
+	void adjustAuxiliaryCarrySub(uint8_t value, int calculation) {
+		auto index = buildAuxiliaryCarryIndex(value, calculation);
+		m_halfCarryTableSub[index & 0x7] ? resetAuxiliaryCarry() : setAuxiliaryCarry();
 	}
 
 	void resetUnusedFlags() {
@@ -151,6 +162,16 @@ private:
 		resetZero();
 		resetSign();
 		resetUnusedFlags();
+	}
+
+	void postIncrement(uint8_t value) {
+		adjustSZP(a);
+		(value & 0x0f) == 0 ? setAuxiliaryCarry() : resetAuxiliaryCarry();
+	}
+
+	void postDecrement(uint8_t value) {
+		adjustSZP(a);
+		(value & 0x0f) == 0 ? resetAuxiliaryCarry() : setAuxiliaryCarry();
 	}
 
 	void pushWord(uint16_t value);
@@ -175,7 +196,8 @@ private:
 
 	void compare(uint8_t value) {
 		uint16_t subtraction = a - value;
-		adjustSZPA((uint8_t)subtraction);
+		adjustSZP((uint8_t)subtraction);
+		adjustAuxiliaryCarrySub(value, subtraction);
 		subtraction & 0x100 ? setCarry() : resetCarry();
 	}
 
@@ -212,25 +234,29 @@ private:
 	}
 
 	void and(uint8_t value) {
+		(a | value) & 0x8 ? setAuxiliaryCarry() : resetAuxiliaryCarry();
 		resetCarry();
-		adjustSZPA(a &= value);
+		adjustSZP(a &= value);
 	}
 
 	void ora(uint8_t value) {
+		resetAuxiliaryCarry();
 		resetCarry();
-		adjustSZPA(a |= value);
+		adjustSZP(a |= value);
 	}
 
 	void xra(uint8_t value) {
+		resetAuxiliaryCarry();
 		resetCarry();
-		adjustSZPA(a ^= value);
+		adjustSZP(a ^= value);
 	}
 
 	void add(uint8_t value) {
 		uint16_t sum = a + value;
 		a = Memory::lowByte(sum);
 		sum > 0xff ? setCarry() : resetCarry();
-		adjustSZPA(a);
+		adjustSZP(a);
+		adjustAuxiliaryCarryAdd(value, sum);
 	}
 
 	void adc(uint8_t value) {
@@ -250,7 +276,8 @@ private:
 		uint16_t difference = a - value;
 		a = Memory::lowByte(difference);
 		difference & 0x100 ? setCarry() : resetCarry();
-		adjustSZPA(a);
+		adjustSZP(a);
+		adjustAuxiliaryCarrySub(value, difference);
 	}
 
 	void sbb(uint8_t value) {
@@ -560,33 +587,33 @@ private:
 
 	// increment and decrement
 
-	void inr_a() { adjustSZPA(++a); }
-	void inr_b() { adjustSZPA(++b); }
-	void inr_c() { adjustSZPA(++c); }
-	void inr_d() { adjustSZPA(++d); }
-	void inr_e() { adjustSZPA(++e); }
-	void inr_h() { adjustSZPA(++h); }
-	void inr_l() { adjustSZPA(++l); }
+	void inr_a() { postIncrement(++a); }
+	void inr_b() { postIncrement(++b); }
+	void inr_c() { postIncrement(++c); }
+	void inr_d() { postIncrement(++d); }
+	void inr_e() { postIncrement(++e); }
+	void inr_h() { postIncrement(++h); }
+	void inr_l() { postIncrement(++l); }
 
 	void inr_m() {
 		auto hl = Memory::makeWord(l, h);
 		auto value = m_memory.get(hl);
-		adjustSZPA(++value);
+		postIncrement(++value);
 		m_memory.set(hl, value);
 	}
 
-	void dcr_a() { adjustSZPA(--a); }
-	void dcr_b() { adjustSZPA(--b); }
-	void dcr_c() { adjustSZPA(--c); }
-	void dcr_d() { adjustSZPA(--d); }
-	void dcr_e() { adjustSZPA(--e); }
-	void dcr_h() { adjustSZPA(--h); }
-	void dcr_l() { adjustSZPA(--l); }
+	void dcr_a() { postDecrement(--a); }
+	void dcr_b() { postDecrement(--b); }
+	void dcr_c() { postDecrement(--c); }
+	void dcr_d() { postDecrement(--d); }
+	void dcr_e() { postDecrement(--e); }
+	void dcr_h() { postDecrement(--h); }
+	void dcr_l() { postDecrement(--l); }
 
 	void dcr_m() {
 		auto hl = Memory::makeWord(l, h);
 		auto value = m_memory.get(hl);
-		adjustSZPA(--value);
+		postDecrement(--value);
 		m_memory.set(hl, value);
 	}
 
@@ -830,23 +857,17 @@ private:
 	}
 
 	void daa() {
-
-		auto low = Memory::lowNybble(a);
-		if ((low > 9) || (f & F_AC))
-			low += 6;
-
-		auto half = low > 0xf;
-		half ? setAuxiliaryCarry() : resetAuxiliaryCarry();
-
-		auto high = Memory::highNybble(a) + half;
-		if ((high > 9) || (f & F_C))
-			high += 6;
-
-		auto carry = high > 0xf;
+		auto carry = (f & F_C);
+		auto addition = 0;
+		if ((f & F_AC) || (a & 0xf) > 9) {
+			addition = 0x6;
+		}
+		if (carry || (a >> 4) > 9 || ((a >> 4) >= 9 && (a & 0x0f) > 9)) {
+			addition |= 0x60;
+			carry = 1;
+		}
+		add(addition);
 		carry ? setCarry() : resetCarry();
-
-		a = Memory::promoteNybble(high) | low;
-		adjustSZPA(a);
 	}
 
 	// input/output
