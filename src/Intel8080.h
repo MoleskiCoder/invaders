@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <array>
 #include <functional>
-#include <bitset>
 
 #include "Memory.h"
 #include "InputOutput.h"
@@ -31,6 +30,7 @@ public:
 		uint64_t count = 0;
 	};
 
+	// S Z 0 A 0 P 1 C
 	enum {
 		F_C = 0x1,
 		F_P = 0x4,
@@ -121,7 +121,8 @@ private:
 	void setParity() { setFlag(F_P); }
 	void resetParity() { resetFlag(F_P); }
 	void adjustParity(uint8_t value) {
-		auto set = std::bitset<8>(value).count();
+		static const uint8_t lookup[0x10] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
+		auto set = (lookup[value >> 4] + lookup[value & 0xF]);
 		auto even = (set % 2) == 0;
 		even ? setParity() : resetParity();
 	}
