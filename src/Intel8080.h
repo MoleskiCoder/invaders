@@ -67,6 +67,9 @@ public:
 		return m_interrupt;
 	}
 
+	bool isHalted() const { return m_halted; }
+	void halt() { m_halted = true; }
+
 	void initialise();
 
 	void reset();
@@ -165,12 +168,12 @@ private:
 	}
 
 	void postIncrement(uint8_t value) {
-		adjustSZP(a);
+		adjustSZP(value);
 		(value & 0x0f) == 0 ? setAuxiliaryCarry() : resetAuxiliaryCarry();
 	}
 
 	void postDecrement(uint8_t value) {
-		adjustSZP(a);
+		adjustSZP(value);
 		(value & 0x0f) == 0 ? resetAuxiliaryCarry() : setAuxiliaryCarry();
 	}
 
