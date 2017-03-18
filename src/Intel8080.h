@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "Memory.h"
+#include "StatusFlags.h"
 #include "InputOutput.h"
 #include "Signal.h"
 #include "CpuEventArgs.h"
@@ -30,15 +31,6 @@ public:
 		uint64_t count = 0;
 	};
 
-	// S Z 0 A 0 P 1 C
-	enum {
-		F_C = 0x1,
-		F_P = 0x4,
-		F_AC = 0x10,
-		F_Z = 0x40,
-		F_S = 0x80
-	};
-
 	Intel8080(Memory& memory, InputOutput& ports);
 
 	Signal<CpuEventArgs> ExecutingInstruction;
@@ -52,7 +44,7 @@ public:
 	uint16_t getStackPointer() const { return sp; }
 
 	uint8_t getA() const { return a; }
-	uint8_t getF() const { return f; }
+	StatusFlags getF() const { return f; }
 
 	uint8_t getB() const { return b; }
 	uint8_t getC() const { return c; }
@@ -78,8 +70,8 @@ public:
 private:
 	std::array<Instruction, 0x100> instructions;
 
-	std::array<int, 8> m_halfCarryTableAdd = { 0, 0, 1, 0, 1, 0, 1, 1 };
-	std::array<int, 8> m_halfCarryTableSub = { 0, 1, 1, 1, 0, 0, 0, 1 };
+	std::array<bool, 8> m_halfCarryTableAdd = { false, false, true, false, true, false, true, true };
+	std::array<bool, 8> m_halfCarryTableSub = { false, true, true, true, false, false, false, true };
 
 	Memory& m_memory;
 	InputOutput& m_ports;
@@ -90,7 +82,7 @@ private:
 	uint16_t sp;
 
 	uint8_t a;
-	uint8_t f;
+	StatusFlags f;
 
 	uint8_t b;
 	uint8_t c;
@@ -104,27 +96,13 @@ private:
 	bool m_interrupt;
 	bool m_halted;
 
-	static uint8_t setFlag(uint8_t status, uint8_t flag) { return status | flag; }
-	static uint8_t resetFlag(uint8_t status, uint8_t flag) { return status & ~flag; }
+	void adjustSign(uint8_t value) { f.S = ((value & 0x80) != 0); }
+	void adjustZero(uint8_t value) { f.Z = (value == 0); }
 
-	void setFlag(uint8_t flag) { f = setFlag(f, flag); }
-	void resetFlag(uint8_t flag) { f = resetFlag(f, flag); }
-
-	void setSign() { setFlag(F_S); }
-	void resetSign() { resetFlag(F_S); }
-	void adjustSign(uint8_t value) { value & 0x80 ? setSign() : resetSign(); }
-
-	void setZero() { setFlag(F_Z); }
-	void resetZero() { resetFlag(F_Z); }
-	void adjustZero(uint8_t value) { value ? resetZero() : setZero(); }
-
-	void setParity() { setFlag(F_P); }
-	void resetParity() { resetFlag(F_P); }
 	void adjustParity(uint8_t value) {
 		static const uint8_t lookup[0x10] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
 		auto set = (lookup[value >> 4] + lookup[value & 0xF]);
-		auto even = (set % 2) == 0;
-		even ? setParity() : resetParity();
+		f.P = (set % 2) == 0;
 	}
 
 	void adjustSZP(uint8_t value) {
@@ -133,49 +111,28 @@ private:
 		adjustParity(value);
 	}
 
-	void setCarry() { setFlag(F_C); }
-	void resetCarry() { resetFlag(F_C); }
-
-	void setAuxiliaryCarry() { setFlag(F_AC); }
-	void resetAuxiliaryCarry() { resetFlag(F_AC); }
-
 	int buildAuxiliaryCarryIndex(uint8_t value, int calculation) {
 		return ((a & 0x88) >> 1) | ((value & 0x88) >> 2) | ((calculation & 0x88) >> 3);
 	}
 
 	void adjustAuxiliaryCarryAdd(uint8_t value, int calculation) {
 		auto index = buildAuxiliaryCarryIndex(value, calculation);
-		m_halfCarryTableAdd[index & 0x7] ? setAuxiliaryCarry() : resetAuxiliaryCarry();
+		f.AC = m_halfCarryTableAdd[index & 0x7];
 	}
 
 	void adjustAuxiliaryCarrySub(uint8_t value, int calculation) {
 		auto index = buildAuxiliaryCarryIndex(value, calculation);
-		m_halfCarryTableSub[index & 0x7] ? resetAuxiliaryCarry() : setAuxiliaryCarry();
-	}
-
-	void resetUnusedFlags() {
-		setFlag(0x2);
-		resetFlag(0x8);
-		resetFlag(0x20);
-	}
-
-	void resetFlags() {
-		resetCarry();
-		resetParity();
-		resetAuxiliaryCarry();
-		resetZero();
-		resetSign();
-		resetUnusedFlags();
+		f.AC = !m_halfCarryTableSub[index & 0x7];
 	}
 
 	void postIncrement(uint8_t value) {
 		adjustSZP(value);
-		(value & 0x0f) == 0 ? setAuxiliaryCarry() : resetAuxiliaryCarry();
+		f.AC = (value & 0x0f) == 0;
 	}
 
 	void postDecrement(uint8_t value) {
 		adjustSZP(value);
-		(value & 0x0f) == 0 ? resetAuxiliaryCarry() : setAuxiliaryCarry();
+		f.AC = (value & 0x0f) != 0xf;
 	}
 
 	void pushWord(uint16_t value);
@@ -202,7 +159,7 @@ private:
 		uint16_t subtraction = a - value;
 		adjustSZP((uint8_t)subtraction);
 		adjustAuxiliaryCarrySub(value, subtraction);
-		subtraction & 0x100 ? setCarry() : resetCarry();
+		f.C = subtraction > 0xff;
 	}
 
 	void callAddress(uint16_t address) {
@@ -238,40 +195,37 @@ private:
 	}
 
 	void and(uint8_t value) {
-		(a | value) & 0x8 ? setAuxiliaryCarry() : resetAuxiliaryCarry();
-		resetCarry();
+		f.AC = (((a | value) & 0x8) != 0);
+		f.C = false;
 		adjustSZP(a &= value);
 	}
 
 	void ora(uint8_t value) {
-		resetAuxiliaryCarry();
-		resetCarry();
+		f.AC = f.C = false;
 		adjustSZP(a |= value);
 	}
 
 	void xra(uint8_t value) {
-		resetAuxiliaryCarry();
-		resetCarry();
+		f.AC = f.C = false;
 		adjustSZP(a ^= value);
 	}
 
 	void add(uint8_t value) {
 		uint16_t sum = a + value;
 		a = Memory::lowByte(sum);
-		sum > 0xff ? setCarry() : resetCarry();
+		f.C = sum > 0xff;
 		adjustSZP(a);
 		adjustAuxiliaryCarryAdd(value, sum);
 	}
 
 	void adc(uint8_t value) {
-		auto carry = (f & F_C) != 0;
-		add(value + carry);
+		add(value + f.C);
 	}
 
 	void dad(uint16_t value) {
 		auto hl = Memory::makeWord(l, h);
 		uint32_t sum = hl + value;
-		sum & 0x10000 ? setCarry() : resetCarry();
+		f.C = sum > 0xffff;
 		h = Memory::highByte(sum);
 		l = Memory::lowByte(sum);
 	}
@@ -279,14 +233,13 @@ private:
 	void sub(uint8_t value) {
 		uint16_t difference = a - value;
 		a = Memory::lowByte(difference);
-		difference & 0x100 ? setCarry() : resetCarry();
+		f.C = difference > 0xff;
 		adjustSZP(a);
 		adjustAuxiliaryCarrySub(value, difference);
 	}
 
 	void sbb(uint8_t value) {
-		auto carry = (f & F_C) != 0;
-		sub(value + carry);
+		sub(value + f.C);
 	}
 
 	void mov_m_r(uint8_t value) {
@@ -498,7 +451,6 @@ private:
 		auto af = popWord();
 		a = Memory::highByte(af);
 		f = Memory::lowByte(af);
-		resetUnusedFlags();
 	}
 
 	void xhtl() {
@@ -525,17 +477,17 @@ private:
 
 	void jmp() { jmpConditional(true); }
 	
-	void jc() { jmpConditional(f & F_C); }
-	void jnc() { jmpConditional(!(f & F_C)); }
+	void jc() { jmpConditional(f.C); }
+	void jnc() { jmpConditional(!f.C); }
 	
-	void jz() { jmpConditional(f & F_Z); }
-	void jnz() { jmpConditional(!(f & F_Z)); }
+	void jz() { jmpConditional(f.Z); }
+	void jnz() { jmpConditional(!f.Z); }
 	
-	void jpe() { jmpConditional(f & F_P); }
-	void jpo() { jmpConditional(!(f & F_P)); }
+	void jpe() { jmpConditional(f.P); }
+	void jpo() { jmpConditional(!f.P); }
 	
-	void jm() { jmpConditional(f & F_S); }
-	void jp() { jmpConditional(!(f & F_S));	}
+	void jm() { jmpConditional(f.S); }
+	void jp() { jmpConditional(!f.S); }
 	
 	void pchl() {
 		pc = Memory::makeWord(l, h);
@@ -548,17 +500,17 @@ private:
 		callAddress(destination);
 	}
 
-	void cc() { callConditional(f & F_C); }
-	void cnc() { callConditional(!(f & F_C)); }
+	void cc() { callConditional(f.C); }
+	void cnc() { callConditional(!f.C); }
 
-	void cpe() { callConditional(f & F_P); }
-	void cpo() { callConditional(!(f & F_P));  }
+	void cpe() { callConditional(f.P); }
+	void cpo() { callConditional(!f.P);  }
 
-	void cz() { callConditional(f & F_Z); }
-	void cnz() { callConditional(!(f & F_Z)); }
+	void cz() { callConditional(f.Z); }
+	void cnz() { callConditional(!f.Z); }
 
-	void cm() { callConditional(f & F_S); }
-	void cp() { callConditional(!(f & F_S)); }
+	void cm() { callConditional(f.S); }
+	void cp() { callConditional(!f.S); }
 
 	// return
 
@@ -566,17 +518,17 @@ private:
 		pc = popWord();
 	}
 
-	void rc() { returnConditional(f & F_C); }
-	void rnc() { returnConditional(!(f & F_C)); }
+	void rc() { returnConditional(f.C); }
+	void rnc() { returnConditional(!f.C); }
 
-	void rz() { returnConditional(f & F_Z); }
-	void rnz() { returnConditional(!(f & F_Z)); }
+	void rz() { returnConditional(f.Z); }
+	void rnz() { returnConditional(!f.Z); }
 
-	void rpe() { returnConditional(f & F_P); }
-	void rpo() { returnConditional(!(f & F_P)); }
+	void rpe() { returnConditional(f.P); }
+	void rpo() { returnConditional(!f.P); }
 
-	void rm() { returnConditional(f & F_S); }
-	void rp() { returnConditional(!(f & F_S)); }
+	void rm() { returnConditional(f.S); }
+	void rp() { returnConditional(!f.S); }
 
 	// restart
 
@@ -822,56 +774,56 @@ private:
 		auto carry = a & 0x80;
 		a <<= 1;
 		a |= carry >> 7;
-		carry ? setCarry() : resetCarry();
+		f.C = carry != 0;
 	}
 
 	void rrc() {
 		auto carry = a & 1;
 		a >>= 1;
 		a |= carry << 7;
-		carry ? setCarry() : resetCarry();
+		f.C = carry != 0;
 	}
 
 	void ral() {
 		auto carry = a & 0x80;
 		a <<= 1;
-		a |= ((f & F_C) != 0);
-		carry ? setCarry() : resetCarry();
+		a |= (uint8_t)f.C;
+		f.C = carry != 0;
 	}
 
 	void rar() {
 		auto carry = a & 1;
 		a >>= 1;
-		a |= ((f & F_C) != 0) << 7;
-		carry ? setCarry() : resetCarry();
+		a |= f.C << 7;
+		f.C = carry != 0;
 	}
 
 	// specials
 
 	void cma() {
-		a = ~a;
+		a ^= 0xff;
 	}
 
 	void stc() {
-		setCarry();
+		f.C = true;
 	}
 
 	void cmc() {
-		f ^= F_C;
+		f.C = !f.C;
 	}
 
 	void daa() {
-		auto carry = (f & F_C);
-		auto addition = 0;
-		if ((f & F_AC) || (a & 0xf) > 9) {
+		auto carry = f.C;
+		uint8_t addition = 0;
+		if (f.AC || (a & 0xf) > 9) {
 			addition = 0x6;
 		}
-		if (carry || (a >> 4) > 9 || ((a >> 4) >= 9 && (a & 0x0f) > 9)) {
+		if (f.C || (a >> 4) > 9 || ((a >> 4) >= 9 && (a & 0xf) > 9)) {
 			addition |= 0x60;
-			carry = 1;
+			carry = true;
 		}
 		add(addition);
-		carry ? setCarry() : resetCarry();
+		f.C = carry;
 	}
 
 	// input/output

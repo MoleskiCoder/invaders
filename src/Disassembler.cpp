@@ -7,6 +7,7 @@
 
 #include "Memory.h"
 #include "Intel8080.h"
+#include "StatusFlags.h"
 
 Disassembler::Disassembler() {
 }
@@ -34,7 +35,7 @@ std::string Disassembler::state(const Intel8080& cpu) {
 		<< "PC=" << hex(pc)
 		<< " "
 		<< "SP=" << hex(sp)
-		<< " " << "A=" << hex(a) << " " << "F=" << flag(f)
+		<< " " << "A=" << hex(a) << " " << "F=" << (std::string)f
 		<< " " << "B=" << hex(b) << " " << "C=" << hex(c)
 		<< " " << "D=" << hex(d) << " " << "E=" << hex(e)
 		<< " " << "H=" << hex(h) << " " << "L=" << hex(l);
@@ -83,20 +84,6 @@ std::string Disassembler::disassemble(const Intel8080& cpu) {
 		break;
 	}
 
-	return output.str();
-}
-
-std::string Disassembler::flag(uint8_t value) {
-	std::ostringstream output;
-	output
-		<< (value & Intel8080::F_S ? "S" : "-")
-		<< (value & Intel8080::F_Z ? "Z" : "-")
-		<< "0"
-		<< (value & Intel8080::F_AC ? "A" : "-")
-		<< "0"
-		<< (value & Intel8080::F_P ? "P" : "-")
-		<< "1"
-		<< (value & Intel8080::F_C ? "C" : "-");
 	return output.str();
 }
 

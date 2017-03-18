@@ -75,7 +75,6 @@ void Intel8080::reset() {
 void Intel8080::initialise() {
 	sp = 0;
 	a = f = b = c = d = e = h = l = 0;
-	resetFlags();
 	reset();
 }
 
