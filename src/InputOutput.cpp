@@ -4,16 +4,17 @@
 InputOutput::InputOutput() {
 }
 
-uint8_t InputOutput::readInputPort(uint8_t port) const {
-	ReadingPort.fire(PortEventArgs(port));
-	return input[port];
-	ReadPort.fire(PortEventArgs(port));
+uint8_t InputOutput::readInputPort(uint8_t port) {
+	OnReadingPort(port);
+	auto value = input[port];
+	OnReadPort(port);
+	return value;
 }
 
 void InputOutput::writeOutputPort(uint8_t port, uint8_t value) {
-	WritingPort.fire(PortEventArgs(port));
+	OnWritingPort(port);
 	output[port] = value;
-	WrittenPort.fire(PortEventArgs(port));
+	OnWrittenPort(port);
 }
 
 void InputOutput::OnReadingPort(uint8_t port) {
