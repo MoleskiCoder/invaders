@@ -155,6 +155,7 @@
     <ClInclude Include="Intel8080.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="PortEventArgs.h" />
+    <ClInclude Include="Profiler.h" />
     <ClInclude Include="Signal.h" />
     <ClInclude Include="StatusFlags.h" />
     <ClInclude Include="stdafx.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="Intel8080.cpp" />
     <ClCompile Include="invaders.cpp" />
     <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
