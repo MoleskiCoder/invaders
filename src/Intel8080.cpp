@@ -83,7 +83,7 @@ void Intel8080::step() {
 	ExecutingInstruction.fire(CpuEventArgs(*this));
 
 	auto opcode = m_memory.get(pc++);
-	auto instruction = instructions[opcode];
+	const auto& instruction = instructions[opcode];
 	instruction.vector();
 	cycles += instruction.count;
 }
