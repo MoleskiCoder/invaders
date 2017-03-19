@@ -52,15 +52,14 @@ private:
 	Uint32 m_frames;
 	bool m_vsync;
 
-	bool m_finished;
-
-	void update();
-	void runFrame();
-	bool finishedCycling(int cycles) const;
-	void stop();
-
-	void draw();
+	void runRasterScan();
+	void runVerticalBlank();
+	
 	void drawFrame();
+
+	void runToLimit(int limit);
+	bool finishedCycling(int limit, int cycles) const;
+	void stop();
 
 	void configureBackground() const;
 	void createBitmapTexture();
@@ -72,9 +71,6 @@ private:
 	int getScreenHeight() const {
 		return DisplayHeight * DisplayScale;
 	}
-
-	void Board_PortWritten(const PortEventArgs& portEvent);
-	void Cpu_ExecutingInstruction(const CpuEventArgs& cpuEvent);
 
 	static void dumpRendererInformation();
 	static void dumpRendererInformation(::SDL_RendererInfo info);

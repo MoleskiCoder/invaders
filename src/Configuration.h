@@ -4,6 +4,12 @@
 
 class Configuration {
 public:
+	enum MachineMode {
+		Unknown,
+		SpaceInvaders,
+		CPM
+	};
+
 	Configuration();
 
 	bool isDebugMode() const {
@@ -34,6 +40,14 @@ public:
 		return m_cyclesPerSecond / getFramesPerSecond();
 	}
 
+	int getCyclesDuringRasterScan() const {
+		return getCyclesPerFrame() - getCyclesDuringVerticalBlank();
+	}
+
+	int getCyclesDuringVerticalBlank() const {
+		return getCyclesPerFrame() / 6;
+	}
+
 	int getCyclesPerSecond() const {
 		return m_cyclesPerSecond;
 	}
@@ -46,6 +60,22 @@ public:
 		return m_romDirectory;
 	}
 
+	MachineMode getMachineMode() const {
+		return m_machineMode;
+	}
+
+	void setMachineMode(MachineMode value) {
+		m_machineMode = value;
+	}
+
+	uint16_t getStartAddress() const {
+		return m_startAddress;
+	}
+
+	void setStartAddress(uint16_t value) {
+		m_startAddress = value;
+	}
+
 private:
 	bool m_debugMode;
 
@@ -54,4 +84,7 @@ private:
 	int m_cyclesPerSecond;
 
 	std::string m_romDirectory;
+
+	MachineMode m_machineMode;
+	uint16_t m_startAddress;
 };

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Game.h"
-#include "Disassembler.h"
 
 Game::Game(const Configuration& configuration)
 :	m_configuration(configuration),
@@ -70,9 +69,6 @@ void Game::initialise() {
 
 	configureBackground();
 	createBitmapTexture();
-
-	m_board.getIO().WrittenPort.connect(std::bind(&Game::Board_PortWritten, this, std::placeholders::_1));
-	m_board.getCPU().ExecutingInstruction.connect(std::bind(&Game::Cpu_ExecutingInstruction, this, std::placeholders::_1));
 }
 
 void Game::configureBackground() const {
@@ -94,12 +90,14 @@ void Game::runLoop() {
 	m_frames = 0UL;
 	m_startTicks = ::SDL_GetTicks();
 
-	while (!m_finished) {
+	auto& cpu = m_board.getCPUMutable();
+
+	while (!cpu.isHalted()) {
 		::SDL_Event e;
 		while (::SDL_PollEvent(&e)) {
 			switch (e.type) {
 			case SDL_QUIT:
-				m_finished = true;
+				cpu.halt();
 				break;
 			case SDL_KEYDOWN:
 				//handleKeyDown(e.key.keysym.sym);
@@ -118,9 +116,15 @@ void Game::runLoop() {
 			}
 		}
 
-		update();
+		runRasterScan();
 
-		if (!m_vsync) {
+		m_board.getCPUMutable().interrupt(1);	// beginning of the vertical blank
+
+		drawFrame();
+
+		if (m_vsync) {
+			::SDL_RenderPresent(m_renderer);
+		} else {
 			const auto elapsedTicks = ::SDL_GetTicks() - m_startTicks;
 			const auto neededTicks = (++m_frames / (float)m_fps) * 1000.0;
 			auto sleepNeeded = (int)(neededTicks - elapsedTicks);
@@ -128,64 +132,56 @@ void Game::runLoop() {
 				::SDL_Delay(sleepNeeded);
 			}
 		}
+
+		runVerticalBlank();
+
+		m_board.getCPUMutable().interrupt(2);	// end of the vertical blank
 	}
 }
 
-void Game::update() {
-	runFrame();
-	draw();
+void Game::runRasterScan() {
+	runToLimit(m_configuration.getCyclesDuringRasterScan());
 }
 
-void Game::runFrame() {
-	for (int cycles = 0; !finishedCycling(cycles); ++cycles) {
-		m_board.getCPU().step();
+void Game::runVerticalBlank() {
+	runToLimit(m_configuration.getCyclesDuringVerticalBlank());
+}
+
+void Game::runToLimit(int limit) {
+	for (int cycles = 0; !finishedCycling(limit, cycles); ++cycles) {
+		m_board.getCPUMutable().step();
 	}
 }
 
-bool Game::finishedCycling(int cycles) const {
-	auto limit = m_configuration.getCyclesPerFrame();
+bool Game::finishedCycling(int limit, int cycles) const {
 	auto exhausted = cycles > limit;
-	return exhausted || m_finished;
+	return exhausted || m_board.getCPU().isHalted();
 }
 
 void Game::stop() {
-	m_finished = true;
-}
-
-void Game::draw() {
-	drawFrame();
-	if (m_vsync) {
-		::SDL_RenderPresent(m_renderer);
-	}
+	m_board.getCPUMutable().halt();
 }
 
 void Game::drawFrame() {
 
-	for (int y = 0; y < DisplayHeight; y++) {
-		auto rowOffset = y * DisplayWidth;
-		for (int x = 0; x < DisplayWidth; x++) {
-			auto pixelIndex = x + rowOffset;
-			int colourIndex = 1;
-			m_pixels[pixelIndex] = m_colours.getColour(colourIndex);
+	auto memory = m_board.getMemory();
+	int address = Memory::VideoRam;
+
+	auto pixelIndex = 0;
+
+	auto bytesPerScanLine = DisplayWidth / 8;
+	for (int y = 0; y < DisplayHeight; ++y) {
+		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
+			std::bitset<8> source = memory.get(++address);
+			for (int bit = 0; bit < 8; ++bit) {
+				const bool& pixel = source[bit];
+				m_pixels[pixelIndex++] = m_colours.getColour(pixel);
+			}
 		}
 	}
-
+	
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 	verifySDLCall(::SDL_RenderCopy(m_renderer, m_bitmapTexture, NULL, NULL), "Unable to copy texture to renderer");
-}
-
-void Game::Board_PortWritten(const PortEventArgs& portEvent) {
-	auto port = portEvent.getPort();
-	auto value = m_board.getIO().readOutputPort(port);
-	std::cout << "Port written: Port: " << (int)port << ", value: " << (int)value << std::endl;
-}
-
-void Game::Cpu_ExecutingInstruction(const CpuEventArgs& cpuEvent) {
-	std::cout
-		<< Disassembler::state(cpuEvent.getCpu())
-		<< "\t"
-		<< Disassembler::disassemble(cpuEvent.getCpu())
-		<< std::endl;
 }
 
 void Game::dumpRendererInformation() {
