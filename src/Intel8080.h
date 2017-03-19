@@ -59,8 +59,12 @@ public:
 		return m_interrupt;
 	}
 
+	void disableInterrupts() { m_interrupt = false; }
+	void enableInterrupts() { m_interrupt = true; }
+
 	void interrupt(int vector) {
 		if (isInterruptable()) {
+			disableInterrupts();
 			restart(vector);
 		}
 	}
@@ -175,7 +179,8 @@ private:
 
 	void restart(uint8_t position) {
 		auto address = position << 3;
-		callAddress(address);
+		pushWord(pc);
+		pc = address;
 	}
 
 	void callConditional(int condition) {
@@ -846,8 +851,8 @@ private:
 
 	// control
 
-	void ei() { m_interrupt = true; }
-	void di() { m_interrupt = false; }
+	void ei() { enableInterrupts(); }
+	void di() { disableInterrupts(); }
 
 	void nop() {}
 
