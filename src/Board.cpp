@@ -4,7 +4,22 @@
 
 Board::Board(const Configuration& configuration)
 : m_configuration(configuration),
-  m_cpu(Intel8080(m_memory, m_ports)) {
+  m_cpu(Intel8080(m_memory, m_ports)),
+  m_ships(Three),
+  m_extraLife(OneThousandFiveHundred),
+  m_demoCoinInfo(On),
+  m_shiftAmount(0),
+  m_shiftData(0),
+  m_credit(true),
+  m_onePlayerStart(false),
+  m_onePlayerShot(false),
+  m_onePlayerLeft(false),
+  m_onePlayerRight(false),
+  m_twoPlayerStart(false),
+  m_twoPlayerShot(false),
+  m_twoPlayerLeft(false),
+  m_twoPlayerRight(false),
+  m_tilt(false) {
 }
 
 void Board::initialise() {
@@ -76,16 +91,44 @@ void Board::bdos() {
 void Board::Board_PortWritten(const PortEventArgs& portEvent) {
 	auto port = portEvent.getPort();
 	auto value = m_ports.readOutputPort(port);
-	std::cout
-		<< "Port written: Port: "
-		<< Disassembler::hex(port) << ", value: " << Disassembler::hex(value)
-		<< '\t'
-		<< uint8_t(value + 'A') << std::endl;
+	switch (port) {
+	case SHFTAMNT:
+		m_shiftAmount = value & 0x7;
+		break;
+	case SHFT_DATA:
+		m_shiftData = value;
+		break;
+	}
 }
 
 void Board::Board_PortRead(const PortEventArgs& portEvent) {
 	auto port = portEvent.getPort();
-	std::cout << "Port read: Port: " << (int)port << std::endl;
+	switch (port) {
+	case INP1:
+		m_ports.writeInputPort(port,
+			m_credit
+			& (m_twoPlayerStart << 1)
+			& (m_onePlayerStart << 2)
+			& (1 << 3)
+			& (m_onePlayerShot << 4)
+			& (m_onePlayerLeft << 5)
+			& (m_onePlayerRight << 6)
+		);
+	case INP2:
+		m_ports.writeInputPort(port,
+			m_ships
+			& (m_tilt << 2)
+			& (m_extraLife << 3)
+			& (m_twoPlayerShot << 4)
+			& (m_twoPlayerLeft << 5)
+			& (m_twoPlayerRight << 6)
+			& (m_demoCoinInfo << 7)
+		);
+	case SHFT_IN:
+		m_ports.writeInputPort(port,
+			(m_shiftData << m_shiftAmount) >> 8);
+		break;
+	}
 }
 
 void Board::Cpu_ExecutingInstruction_Debug(const CpuEventArgs& cpuEvent) {

@@ -10,6 +10,38 @@
 
 class Board {
 public:
+	enum InputPorts {
+		INP0 = 0,
+		INP1 = 1,
+		INP2 = 2,
+		SHFT_IN = 3
+	};
+
+	enum OutputPorts {
+		SHFTAMNT = 2,
+		SOUND1 = 3,
+		SHFT_DATA = 4,
+		SOUND2 = 5,
+		WATCHDOG = 6
+	};
+
+	enum ShipSwitch {
+		Three = 0b00,
+		Four = 0b01,
+		Five = 0b10,
+		Six = 0b11,
+	};
+
+	enum ExtraShipSwitch {
+		OneThousandFiveHundred = 0,
+		OneThousand = 1,
+	};
+
+	enum DemoCoinInfoSwitch {
+		On = 0,
+		Off = 1,
+	};
+
 	Board(const Configuration& configuration);
 
 	const Configuration& getConfiguration() const { return m_configuration; }
@@ -26,6 +58,27 @@ private:
 	InputOutput m_ports;
 	Intel8080 m_cpu;
 	Profiler m_profiler;
+
+	ShipSwitch m_ships;
+	ExtraShipSwitch m_extraLife;
+	DemoCoinInfoSwitch m_demoCoinInfo;
+
+	uint8_t m_shiftAmount;
+	uint8_t m_shiftData;
+
+	bool m_credit;
+
+	bool m_onePlayerStart;
+	bool m_onePlayerShot;
+	bool m_onePlayerLeft;
+	bool m_onePlayerRight;
+
+	bool m_twoPlayerStart;
+	bool m_twoPlayerShot;
+	bool m_twoPlayerLeft;
+	bool m_twoPlayerRight;
+
+	bool m_tilt;
 
 	void Cpu_ExecutingInstruction_Cpm(const CpuEventArgs& cpuEvent);
 
