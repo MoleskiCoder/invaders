@@ -59,6 +59,12 @@ public:
 		return m_interrupt;
 	}
 
+	void interrupt(int vector) {
+		if (isInterruptable()) {
+			restart(vector);
+		}
+	}
+
 	bool isHalted() const { return m_halted; }
 	void halt() { m_halted = true; }
 
@@ -831,6 +837,11 @@ private:
 	void out() {
 		auto port = fetchByte();
 		m_ports.write(port, a);
+	}
+
+	void in() {
+		auto port = fetchByte();
+		a = m_ports.read(port);
 	}
 
 	// control
