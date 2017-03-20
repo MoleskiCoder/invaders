@@ -2,7 +2,8 @@
 #include "Configuration.h"
 
 Configuration::Configuration()
-:	m_debugMode(true),
+:	m_debugMode(false),
+	m_profileMode(false),
 	m_vsyncLocked(true),
 	m_framesPerSecond(60),
 	m_cyclesPerSecond(2000000),

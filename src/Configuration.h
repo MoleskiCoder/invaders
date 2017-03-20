@@ -20,6 +20,14 @@ public:
 		m_debugMode = value;
 	}
 
+	bool isProfileMode() const {
+		return m_profileMode;
+	}
+
+	void setProfileMode(bool value) {
+		m_profileMode = value;
+	}
+
 	bool getVsyncLocked() const {
 		return m_vsyncLocked;
 	}
@@ -78,6 +86,7 @@ public:
 
 private:
 	bool m_debugMode;
+	bool m_profileMode;
 
 	bool m_vsyncLocked;
 	int m_framesPerSecond;
