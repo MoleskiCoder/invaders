@@ -51,6 +51,10 @@ void Board::initialise() {
 	}
 
 	if (m_configuration.isProfileMode()) {
+		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
+	}
+
+	if (m_configuration.isDebugMode()) {
 		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
 	}
 
@@ -138,16 +142,20 @@ void Board::Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent) {
 	}
 }
 
+void Board::Cpu_ExecutingInstruction_Profile(const CpuEventArgs& cpuEvent) {
+
+	const auto& cpu = cpuEvent.getCpu();
+	const auto pc = cpu.getProgramCounter();
+
+	m_profiler.addAddress(pc);
+	m_profiler.addInstruction(m_memory.get(pc));
+}
+
 void Board::Cpu_ExecutingInstruction_Debug(const CpuEventArgs& cpuEvent) {
 
 	const auto& cpu = cpuEvent.getCpu();
 	const auto pc = cpu.getProgramCounter();
 	const auto instruction = cpu.getMemory().get(pc);
-	if ((instruction == 0x3c) || (instruction == 0xc2))
-		return;
-
-	m_profiler.addAddress(pc);
-	m_profiler.addInstruction(m_memory.get(pc));
 
 	std::cerr
 		<< Disassembler::state(cpuEvent.getCpu())

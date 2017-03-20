@@ -95,6 +95,7 @@ private:
 	void Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent);
 
 	void Cpu_ExecutingInstruction_Debug(const CpuEventArgs& cpuEvent);
+	void Cpu_ExecutingInstruction_Profile(const CpuEventArgs& cpuEvent);
 
 	void bdos();
 };
