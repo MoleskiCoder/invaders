@@ -190,8 +190,21 @@ void Game::drawFrame() {
 	}
 	
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
-	verifySDLCall(::SDL_RenderCopy(m_renderer, m_bitmapTexture, NULL, NULL), "Unable to copy texture to renderer");
+
+	verifySDLCall(
+		::SDL_RenderCopyEx(
+			m_renderer,				// SDL_Renderer * renderer
+			m_bitmapTexture,		// SDL_Texture * texture
+			nullptr,				// const SDL_Rect * srcrect
+			nullptr,				// const SDL_Rect * dstrect
+			270.0,					// const double angle
+			nullptr,				// const SDL_Point *center
+			SDL_FLIP_NONE			// const SDL_RendererFlip flip
+		),
+		"Unable to copy texture to renderer");
 }
+
+
 
 void Game::dumpRendererInformation() {
 	auto count = ::SDL_GetNumRenderDrivers();
