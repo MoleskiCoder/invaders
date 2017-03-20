@@ -10,6 +10,17 @@
 
 class Board {
 public:
+	Board(const Configuration& configuration);
+
+	const Configuration& getConfiguration() const { return m_configuration; }
+	Memory& getMemory() { return m_memory; }
+	const Intel8080& getCPU() const { return m_cpu; }
+	Intel8080& getCPUMutable() { return m_cpu; }
+	InputOutput& getIO() { return m_ports; }
+
+	void initialise();
+
+private:
 	enum InputPorts {
 		INP0 = 0,
 		INP1 = 1,
@@ -42,17 +53,15 @@ public:
 		Off = 1,
 	};
 
-	Board(const Configuration& configuration);
+	std::array<char, 42> m_characterSet = {
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+		'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+		'Y', 'Z', '0', '1', '2', '3', '4', '5',
+		'6', '7', '8', '9', '<', '>', ' ', '=',
+		'*', '^'
+	};
 
-	const Configuration& getConfiguration() const { return m_configuration; }
-	Memory& getMemory() { return m_memory; }
-	const Intel8080& getCPU() const { return m_cpu; }
-	Intel8080& getCPUMutable() { return m_cpu; }
-	InputOutput& getIO() { return m_ports; }
-
-	void initialise();
-
-private:
 	const Configuration& m_configuration;
 	Memory m_memory;
 	InputOutput m_ports;
@@ -82,8 +91,8 @@ private:
 
 	void Cpu_ExecutingInstruction_Cpm(const CpuEventArgs& cpuEvent);
 
-	void Board_PortWritten(const PortEventArgs& portEvent);
-	void Board_PortRead(const PortEventArgs& portEvent);
+	void Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent);
+	void Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent);
 
 	void Cpu_ExecutingInstruction_Debug(const CpuEventArgs& cpuEvent);
 
