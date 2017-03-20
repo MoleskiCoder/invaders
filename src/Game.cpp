@@ -3,7 +3,16 @@
 
 Game::Game(const Configuration& configuration)
 :	m_configuration(configuration),
-	m_board(configuration) {
+	m_board(configuration),
+	m_window(nullptr),
+	m_renderer(nullptr),
+	m_bitmapTexture(nullptr),
+	m_pixelType(SDL_PIXELFORMAT_ARGB8888),
+	m_pixelFormat(nullptr),
+	m_fps(configuration.getFramesPerSecond()),
+	m_startTicks(0),
+	m_frames(0),
+	m_vsync(false) {
 }
 
 void Game::initialise() {
