@@ -22,7 +22,7 @@ public:
 
 	static uint16_t makeWord(uint8_t low, uint8_t high) { return (high << 8) + low; }
 
-	Memory();
+	Memory(int addressMask);
 
 	const std::vector<uint8_t>& getBus() const;
 	std::vector<uint8_t>& getBusMutable();
@@ -38,4 +38,7 @@ public:
 
 private:
 	std::vector<uint8_t> m_bus;
+	std::vector<bool> m_locked;
+
+	int m_addressMask;		// Mirror
 };

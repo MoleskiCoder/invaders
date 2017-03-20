@@ -4,6 +4,7 @@
 
 Board::Board(const Configuration& configuration)
 : m_configuration(configuration),
+  m_memory(0x3fff),
   m_cpu(Intel8080(m_memory, m_ports)),
   m_ships(Three),
   m_extraLife(OneThousandFiveHundred),

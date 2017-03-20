@@ -3,9 +3,12 @@
 
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
-Memory::Memory()
-: m_bus(0x10000) {}
+Memory::Memory(int addressMask)
+: m_bus(0x10000),
+  m_locked(m_bus.size()),
+  m_addressMask(addressMask) {}
 
 const std::vector<uint8_t>& Memory::getBus() const {
 	return m_bus;
@@ -16,7 +19,7 @@ std::vector<uint8_t>& Memory::getBusMutable() {
 }
 
 uint8_t Memory::get(int address) const {
-	return m_bus[address];
+	return m_bus[address & m_addressMask];
 }
 
 uint16_t Memory::getWord(int address) const {
@@ -26,7 +29,8 @@ uint16_t Memory::getWord(int address) const {
 }
 
 void Memory::set(int address, uint8_t value) {
-	m_bus[address] = value;
+	if (!m_locked[address & m_addressMask])
+		m_bus[address & m_addressMask] = value;
 }
 
 void Memory::setWord(int address, uint16_t value) {
@@ -54,4 +58,6 @@ void Memory::loadRom(std::string path, uint16_t offset) {
 
 	file.read((char*)&m_bus[offset], size);
 	file.close();
+
+	std::fill(m_locked.begin() + offset, m_locked.begin() + offset + size, true);
 }
