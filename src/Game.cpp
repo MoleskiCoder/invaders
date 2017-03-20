@@ -178,13 +178,17 @@ void Game::drawFrame() {
 
 	auto pixelIndex = 0;
 
+	auto black = m_colours.getColour(0);
+	auto white = m_colours.getColour(1);
+
 	auto bytesPerScanLine = DisplayWidth / 8;
 	for (int y = 0; y < DisplayHeight; ++y) {
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
-			std::bitset<8> source = memory.get(++address);
+			auto video = memory.get(++address);
 			for (int bit = 0; bit < 8; ++bit) {
-				const bool& pixel = source[bit];
-				m_pixels[pixelIndex++] = m_colours.getColour(pixel);
+				auto mask = 1 << bit;
+				auto pixel = video & mask;
+				m_pixels[pixelIndex++] = pixel ? white : black;
 			}
 		}
 	}
