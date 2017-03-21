@@ -4,14 +4,18 @@
 #include <SDL.h>
 
 ColourPalette::ColourPalette()
-: m_colours(2) {
+: m_colours(4) {
 }
 
 void ColourPalette::load(SDL_PixelFormat* hardware) {
 
 	auto black = ::SDL_MapRGBA(hardware, 0x00, 0x00, 0x00, SDL_ALPHA_OPAQUE);
 	auto white = ::SDL_MapRGBA(hardware, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+	auto red = ::SDL_MapRGBA(hardware, 0xff, 0x00, 0x00, SDL_ALPHA_OPAQUE);
+	auto green = ::SDL_MapRGBA(hardware, 0x00, 0xff, 0x00, SDL_ALPHA_OPAQUE);
 
-	m_colours[0] = black;
-	m_colours[1] = white;
+	m_colours[Black] = black;
+	m_colours[White] = white;
+	m_colours[Red] = red;
+	m_colours[Green] = green;
 }

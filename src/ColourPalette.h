@@ -7,6 +7,29 @@ struct SDL_PixelFormat;
 
 class ColourPalette {
 public:
+	enum {
+		Black,
+		White,
+		Red,
+		Green
+	};
+
+	static int calculateColour(int x, int y) {
+		if (y < 32)
+			return White;
+		if (y < (32 + 32))
+			return Red;
+		if (y < (32 + 32 + 120))
+			return White;
+		if (y < (32 + 32 + 120 + 56))
+			return Green;
+		if (x < 16)
+			return White;
+		if (x < (16 + 118))
+			return Green;
+		return White;
+	}
+
 	ColourPalette();
 
 	const std::vector<uint32_t>& getColours() const {

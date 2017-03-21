@@ -187,20 +187,22 @@ void Game::drawFrame() {
 	auto memory = m_board.getMemory();
 	int address = Memory::VideoRam;
 
-	auto black = m_colours.getColour(0);
-	auto white = m_colours.getColour(1);
+	auto black = m_colours.getColour(ColourPalette::Black);
 
 	// This code handles the display rotation
 	auto bytesPerScanLine = Board::RasterWidth / 8;
-	for (int y = 0; y < Board::RasterHeight; ++y) {
+	for (int inputY = 0; inputY < Board::RasterHeight; ++inputY) {
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
 			auto video = memory.get(++address);
 			for (int bit = 0; bit < 8; ++bit) {
-				auto x = byte * 8 + bit;
-				auto outputPixel = (Board::RasterWidth - x - 1) * DisplayWidth + y;
+				auto inputX = byte * 8 + bit;
+				auto outputX = inputY;
+				auto outputY = (Board::RasterWidth - inputX - 1);
+				auto outputPixel = outputX + outputY * DisplayWidth;
 				auto mask = 1 << bit;
 				auto inputPixel = video & mask;
-				m_pixels[outputPixel] = inputPixel ? white : black;
+				auto colour = inputPixel ? m_colours.getColour(ColourPalette::calculateColour(outputX, outputY)) : black;
+				m_pixels[outputPixel] = colour;
 			}
 		}
 	}
