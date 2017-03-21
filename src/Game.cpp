@@ -119,10 +119,10 @@ void Game::runLoop() {
 				cpu.halt();
 				break;
 			case SDL_KEYDOWN:
-				//handleKeyDown(e.key.keysym.sym);
+				handleKeyDown(e.key.keysym.sym);
 				break;
 			case SDL_KEYUP:
-				//handleKeyUp(e.key.keysym.sym);
+				handleKeyUp(e.key.keysym.sym);
 				break;
 			case SDL_JOYDEVICEADDED:
 				SDL_Log("Joystick device added");
@@ -156,6 +156,52 @@ void Game::runLoop() {
 		runVerticalBlank();
 
 		m_board.getCPUMutable().interrupt(2);	// end of the vertical blank
+	}
+}
+
+void Game::handleKeyDown(SDL_Keycode key) {
+	switch (key) {
+	case SDLK_1:
+		m_board.press1P();
+		break;
+	case SDLK_2:
+		m_board.press2P();
+		break;
+	case SDLK_3:
+		m_board.pressCredit();
+		break;
+	case SDLK_z:
+		m_board.pressLeft1P();
+		break;
+	case SDLK_x:
+		m_board.pressRight1P();
+		break;
+	case SDLK_BACKSLASH:
+		m_board.pressShoot1P();
+		break;
+	}
+}
+
+void Game::handleKeyUp(SDL_Keycode key) {
+	switch (key) {
+	case SDLK_1:
+		m_board.release1P();
+		break;
+	case SDLK_2:
+		m_board.release2P();
+		break;
+	case SDLK_3:
+		m_board.releaseCredit();
+		break;
+	case SDLK_z:
+		m_board.releaseLeft1P();
+		break;
+	case SDLK_x:
+		m_board.releaseRight1P();
+		break;
+	case SDLK_BACKSLASH:
+		m_board.releaseShoot1P();
+		break;
 	}
 }
 

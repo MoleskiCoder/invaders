@@ -83,6 +83,9 @@ private:
 	void Board_Walk4Sound(const EventArgs& event);
 	void Board_UfoDieSound(const EventArgs& event);
 
+	void handleKeyDown(SDL_Keycode key);
+	void handleKeyUp(SDL_Keycode key);
+
 	static void dumpRendererInformation();
 	static void dumpRendererInformation(::SDL_RendererInfo info);
 };

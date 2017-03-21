@@ -26,6 +26,29 @@ public:
 
 	void initialise();
 
+	void pressCredit() { m_credit = true; }
+	void releaseCredit() { m_credit = false; }
+
+	void press1P() { m_onePlayerStart = true; }
+	void pressShoot1P() { m_onePlayerShot = true; }
+	void pressLeft1P() { m_onePlayerLeft = true; }
+	void pressRight1P() { m_onePlayerRight = true; }
+
+	void release1P() { m_onePlayerStart = false; }
+	void releaseShoot1P() { m_onePlayerShot = false; }
+	void releaseLeft1P() { m_onePlayerLeft = false; }
+	void releaseRight1P() { m_onePlayerRight = false; }
+
+	void press2P() { m_twoPlayerStart = true; }
+	void pressShoot2P() { m_twoPlayerShot = true; }
+	void pressLeft2P() { m_twoPlayerLeft = true; }
+	void pressRight2P() { m_twoPlayerRight = true; }
+
+	void release2P() { m_twoPlayerStart = false; }
+	void releaseShoot2P() { m_twoPlayerShot = false; }
+	void releaseLeft2P() { m_twoPlayerLeft = false; }
+	void releaseRight2P() { m_twoPlayerRight = false; }
+
 	Signal<EventArgs> UfoSound;
 	Signal<EventArgs> ShotSound;
 	Signal<EventArgs> PlayerDieSound;

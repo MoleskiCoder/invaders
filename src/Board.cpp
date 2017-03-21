@@ -12,7 +12,7 @@ Board::Board(const Configuration& configuration)
   m_shiftAmount(0),
   m_shiftDataLow(0),
   m_shiftDataHigh(0),
-  m_credit(true),
+  m_credit(false),
   m_onePlayerStart(false),
   m_onePlayerShot(false),
   m_onePlayerLeft(false),
@@ -174,7 +174,7 @@ void Board::Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent) {
 	switch (port) {
 	case INP1:
 		m_ports.writeInputPort(port,
-			(int)m_credit
+			(int)!m_credit
 			| (m_twoPlayerStart << 1)
 			| (m_onePlayerStart << 2)
 			| (1 << 3)
