@@ -11,6 +11,11 @@
 
 class Board {
 public:
+	enum {
+		RasterWidth = 256,
+		RasterHeight = 224
+	};
+
 	Board(const Configuration& configuration);
 
 	const Configuration& getConfiguration() const { return m_configuration; }
