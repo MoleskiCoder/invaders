@@ -10,7 +10,8 @@ Board::Board(const Configuration& configuration)
   m_extraLife(OneThousandFiveHundred),
   m_demoCoinInfo(On),
   m_shiftAmount(0),
-  m_shiftData(0),
+  m_shiftDataLow(0),
+  m_shiftDataHigh(0),
   m_credit(true),
   m_onePlayerStart(false),
   m_onePlayerShot(false),
@@ -36,6 +37,7 @@ void Board::initialise() {
 		m_memory.loadRom(romDirectory + "/invaders.g", 0x0800);
 		m_memory.loadRom(romDirectory + "/invaders.h", 0x0000);
 
+	m_ports.WritingPort.connect(std::bind(&Board::Board_PortWriting_SpaceInvaders, this, std::placeholders::_1));
 		m_ports.WrittenPort.connect(std::bind(&Board::Board_PortWritten_SpaceInvaders, this, std::placeholders::_1));
 		m_ports.ReadingPort.connect(std::bind(&Board::Board_PortReading_SpaceInvaders, this, std::placeholders::_1));
 		break;
@@ -95,6 +97,19 @@ void Board::bdos() {
 	}
 }
 
+void Board::Board_PortWriting_SpaceInvaders(const PortEventArgs& portEvent) {
+	auto port = portEvent.getPort();
+	auto value = m_ports.readOutputPort(port);
+	switch (port) {
+	case SOUND1:
+		m_preSound1 = value;
+		break;
+	case SOUND2:
+		m_preSound2 = value;
+		break;
+	}
+}
+
 void Board::Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent) {
 	auto port = portEvent.getPort();
 	auto value = m_ports.readOutputPort(port);
@@ -103,10 +118,53 @@ void Board::Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent) {
 		m_shiftAmount = value & 0x7;
 		break;
 	case SHFT_DATA:
-		m_shiftData = value;
+		m_shiftDataLow = m_shiftDataHigh;
+		m_shiftDataHigh = value;
 		break;
 	case WATCHDOG:
-		std::cout << (value < 42 ? m_characterSet[value] : '_');
+		if (m_configuration.isShowWatchdogOutput())
+			std::cout << (value < 64 ? m_characterSet[value] : '_');
+		break;
+	case SOUND1: {
+			auto soundUfo = ((value & 1) != 0);
+			if (soundUfo)
+				UfoSound.fire(EventArgs());
+
+			auto soundShot = ((value & 2) != 0) && ((m_preSound1 & 2) == 0);
+			if (soundShot)
+				ShotSound.fire(EventArgs());
+
+			auto soundPlayerDie = ((value & 4) != 0) && ((m_preSound1 & 4) == 0);
+			if (soundPlayerDie)
+				PlayerDieSound.fire(EventArgs());
+	
+			auto soundInvaderDie = ((value & 8) != 0) && ((m_preSound1 & 8) == 0);
+			if (soundInvaderDie)
+				InvaderDieSound.fire(EventArgs());
+		}
+		break;
+
+	case SOUND2: {
+			auto soundWalk1 = ((value & 1) != 0) && ((m_preSound2 & 1) == 0);
+			if (soundWalk1)
+				Walk1Sound.fire(EventArgs());
+
+			auto soundWalk2 = ((value & 2) != 0) && ((m_preSound2 & 2) == 0);
+			if (soundWalk2)
+				Walk2Sound.fire(EventArgs());
+
+			auto soundWalk3 = ((value & 4) != 0) && ((m_preSound2 & 4) == 0);
+			if (soundWalk3)
+				Walk3Sound.fire(EventArgs());
+
+			auto soundWalk4 = ((value & 8) != 0) && ((m_preSound2 & 8) == 0);
+			if (soundWalk4)
+				Walk4Sound.fire(EventArgs());
+
+			auto soundUfoDie = ((value & 0x10) != 0) && ((m_preSound2 & 0x10) == 0);
+			if (soundUfoDie)
+				UfoDieSound.fire(EventArgs());
+		}
 		break;
 	}
 }
@@ -138,7 +196,7 @@ void Board::Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent) {
 		break;
 	case SHFT_IN:
 		m_ports.writeInputPort(port,
-			(m_shiftData << m_shiftAmount) >> 8);
+			((((m_shiftDataHigh << 8) | m_shiftDataLow) << m_shiftAmount) >> 8));
 		break;
 	}
 }

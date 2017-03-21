@@ -8,6 +8,9 @@ int main(int argc, char* argv[]) {
 
 #ifdef _DEBUG
 	configuration.setDebugMode(true);
+	configuration.setProfileMode(true);
+	configuration.setDrawGraphics(false);
+	configuration.setShowWatchdogOutput(true);
 #endif
 
 	Game game(configuration);

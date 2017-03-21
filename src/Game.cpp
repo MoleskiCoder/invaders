@@ -21,6 +21,17 @@ void Game::initialise() {
 
 	m_board.initialise();
 
+	m_board.UfoSound.connect(std::bind(&Game::Board_UfoSound, this, std::placeholders::_1));
+	m_board.ShotSound.connect(std::bind(&Game::Board_ShotSound, this, std::placeholders::_1));
+	m_board.PlayerDieSound.connect(std::bind(&Game::Board_PlayerDieSound, this, std::placeholders::_1));
+	m_board.InvaderDieSound.connect(std::bind(&Game::Board_InvaderDieSound, this, std::placeholders::_1));
+
+	m_board.Walk1Sound.connect(std::bind(&Game::Board_Walk1Sound, this, std::placeholders::_1));
+	m_board.Walk2Sound.connect(std::bind(&Game::Board_Walk2Sound, this, std::placeholders::_1));
+	m_board.Walk3Sound.connect(std::bind(&Game::Board_Walk3Sound, this, std::placeholders::_1));
+	m_board.Walk4Sound.connect(std::bind(&Game::Board_Walk4Sound, this, std::placeholders::_1));
+	m_board.UfoDieSound.connect(std::bind(&Game::Board_UfoDieSound, this, std::placeholders::_1));
+
 	auto windowWidth = getScreenWidth();
 	auto windowHeight = getScreenHeight();
 
@@ -129,7 +140,8 @@ void Game::runLoop() {
 
 		m_board.getCPUMutable().interrupt(1);	// beginning of the vertical blank
 
-		drawFrame();
+		if (m_configuration.isDrawGraphics())
+			drawFrame();
 
 		if (m_vsync) {
 			::SDL_RenderPresent(m_renderer);
@@ -227,4 +239,40 @@ void Game::dumpRendererInformation(::SDL_RendererInfo info) {
 	int vsync = (flags & SDL_RENDERER_PRESENTVSYNC) != 0;
 	int targetTexture = (flags & SDL_RENDERER_TARGETTEXTURE) != 0;
 	::SDL_Log("%s: software=%d, accelerated=%d, vsync=%d, target texture=%d", name, software, accelerated, vsync, targetTexture);
+}
+
+void Game::Board_UfoSound(const EventArgs& event) {
+	std::cout << "*UFO*" << std::endl;
+}
+
+void Game::Board_ShotSound(const EventArgs& event) {
+	std::cout << "*SHOT*" << std::endl;
+}
+
+void Game::Board_PlayerDieSound(const EventArgs& event) {
+	std::cout << "*Player Die*" << std::endl;
+}
+
+void Game::Board_InvaderDieSound(const EventArgs& event) {
+	std::cout << "*Invader Die*" << std::endl;
+}
+
+void Game::Board_Walk1Sound(const EventArgs& event) {
+	std::cout << "*Walk 1*" << std::endl;
+}
+
+void Game::Board_Walk2Sound(const EventArgs& event) {
+	std::cout << "*Walk 2*" << std::endl;
+}
+
+void Game::Board_Walk3Sound(const EventArgs& event) {
+	std::cout << "*Walk 3*" << std::endl;
+}
+
+void Game::Board_Walk4Sound(const EventArgs& event) {
+	std::cout << "*Walk 4*" << std::endl;
+}
+
+void Game::Board_UfoDieSound(const EventArgs& event) {
+	std::cout << "*UFO Die*" << std::endl;
 }

@@ -7,6 +7,7 @@
 #include "Configuration.h"
 #include "Intel8080.h"
 #include "Profiler.h"
+#include "EventArgs.h"
 
 class Board {
 public:
@@ -19,6 +20,17 @@ public:
 	InputOutput& getIO() { return m_ports; }
 
 	void initialise();
+
+	Signal<EventArgs> UfoSound;
+	Signal<EventArgs> ShotSound;
+	Signal<EventArgs> PlayerDieSound;
+	Signal<EventArgs> InvaderDieSound;
+
+	Signal<EventArgs> Walk1Sound;
+	Signal<EventArgs> Walk2Sound;
+	Signal<EventArgs> Walk3Sound;
+	Signal<EventArgs> Walk4Sound;
+	Signal<EventArgs> UfoDieSound;
 
 private:
 	enum InputPorts {
@@ -53,13 +65,15 @@ private:
 		Off = 1,
 	};
 
-	std::array<char, 42> m_characterSet = {
+	std::array<char, 64> m_characterSet = {
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
 		'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
 		'Y', 'Z', '0', '1', '2', '3', '4', '5',
 		'6', '7', '8', '9', '<', '>', ' ', '=',
-		'*', '^'
+		'*', '^', '_', '_', '_', '_', '_', '_',
+		'Y', '%', '_', '_', '_', '_', 'Y', '&',
+		'?', '_', '_', '_', '_', '_', '_', '-',
 	};
 
 	const Configuration& m_configuration;
@@ -73,7 +87,8 @@ private:
 	DemoCoinInfoSwitch m_demoCoinInfo;
 
 	uint8_t m_shiftAmount;
-	uint8_t m_shiftData;
+	uint8_t m_shiftDataLow;
+	uint8_t m_shiftDataHigh;
 
 	bool m_credit;
 
@@ -89,8 +104,12 @@ private:
 
 	bool m_tilt;
 
+	uint8_t m_preSound1;
+	uint8_t m_preSound2;
+
 	void Cpu_ExecutingInstruction_Cpm(const CpuEventArgs& cpuEvent);
 
+	void Board_PortWriting_SpaceInvaders(const PortEventArgs& portEvent);
 	void Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent);
 	void Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent);
 

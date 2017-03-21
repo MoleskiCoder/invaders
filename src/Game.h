@@ -72,6 +72,17 @@ private:
 		return DisplayHeight * DisplayScale;
 	}
 
+	void Board_UfoSound(const EventArgs& event);
+	void Board_ShotSound(const EventArgs& event);
+	void Board_PlayerDieSound(const EventArgs& event);
+	void Board_InvaderDieSound(const EventArgs& event);
+
+	void Board_Walk1Sound(const EventArgs& event);
+	void Board_Walk2Sound(const EventArgs& event);
+	void Board_Walk3Sound(const EventArgs& event);
+	void Board_Walk4Sound(const EventArgs& event);
+	void Board_UfoDieSound(const EventArgs& event);
+
 	static void dumpRendererInformation();
 	static void dumpRendererInformation(::SDL_RendererInfo info);
 };

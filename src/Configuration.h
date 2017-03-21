@@ -28,6 +28,22 @@ public:
 		m_profileMode = value;
 	}
 
+	bool isDrawGraphics() const {
+		return m_drawGraphics;
+	}
+
+	void setDrawGraphics(bool value) {
+		m_drawGraphics = value;
+	}
+
+	bool isShowWatchdogOutput() const {
+		return m_showWatchdogOutput;
+	}
+
+	void setShowWatchdogOutput(bool value) {
+		m_showWatchdogOutput = value;
+	}
+
 	bool getVsyncLocked() const {
 		return m_vsyncLocked;
 	}
@@ -87,6 +103,8 @@ public:
 private:
 	bool m_debugMode;
 	bool m_profileMode;
+	bool m_drawGraphics;
+	bool m_showWatchdogOutput;
 
 	bool m_vsyncLocked;
 	int m_framesPerSecond;
