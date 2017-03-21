@@ -55,8 +55,7 @@ void Game::initialise() {
 		if (required == mode.refresh_rate) {
 			rendererFlags |= SDL_RENDERER_PRESENTVSYNC;
 			::SDL_Log("Attempting to use SDL_RENDERER_PRESENTVSYNC");
-		}
-		else {
+		} else {
 			m_vsync = false;
 			::SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Display refresh rate is incompatible with required rate (%d)", required);
 		}
@@ -188,19 +187,20 @@ void Game::drawFrame() {
 	auto memory = m_board.getMemory();
 	int address = Memory::VideoRam;
 
-	auto pixelIndex = 0;
-
 	auto black = m_colours.getColour(0);
 	auto white = m_colours.getColour(1);
 
-	auto bytesPerScanLine = DisplayWidth / 8;
-	for (int y = 0; y < DisplayHeight; ++y) {
+	// This code handles the display rotation
+	auto bytesPerScanLine = Board::RasterWidth / 8;
+	for (int y = 0; y < Board::RasterHeight; ++y) {
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
 			auto video = memory.get(++address);
 			for (int bit = 0; bit < 8; ++bit) {
+				auto x = byte * 8 + bit;
+				auto outputPixel = (Board::RasterWidth - x - 1) * DisplayWidth + y;
 				auto mask = 1 << bit;
-				auto pixel = video & mask;
-				m_pixels[pixelIndex++] = pixel ? white : black;
+				auto inputPixel = video & mask;
+				m_pixels[outputPixel] = inputPixel ? white : black;
 			}
 		}
 	}
@@ -208,15 +208,7 @@ void Game::drawFrame() {
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 
 	verifySDLCall(
-		::SDL_RenderCopyEx(
-			m_renderer,				// SDL_Renderer * renderer
-			m_bitmapTexture,		// SDL_Texture * texture
-			nullptr,				// const SDL_Rect * srcrect
-			nullptr,				// const SDL_Rect * dstrect
-			270.0,					// const double angle
-			nullptr,				// const SDL_Point *center
-			SDL_FLIP_NONE			// const SDL_RendererFlip flip
-		),
+		::SDL_RenderCopy(m_renderer, m_bitmapTexture, nullptr, nullptr), 
 		"Unable to copy texture to renderer");
 }
 

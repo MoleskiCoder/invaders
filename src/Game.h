@@ -30,8 +30,8 @@ public:
 private:
 	enum {
 		DisplayScale = 2,
-		DisplayWidth = 256,
-		DisplayHeight = 224
+		DisplayWidth = Board::RasterHeight,
+		DisplayHeight = Board::RasterWidth
 	};
 
 	const Configuration& m_configuration;
