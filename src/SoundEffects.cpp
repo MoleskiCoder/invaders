@@ -2,31 +2,12 @@
 #include "SoundEffects.h"
 #include "Configuration.h"
 
-/* set this to any of 512,1024,2048,4096              */
-/* the lower it is, the more FPS shown and CPU needed */
-//#define BUFFER 1024
-//#define W 640 /* NEVER make this be less than BUFFER! */
-//#define H 480
-//#define H2 (H/2)
-//#define H4 (H/4)
-//#define Y(sample) (((sample)*H)/4/0x7fff)
-//
-//Sint16 stream[2][BUFFER * 2 * 2];
-//int len = BUFFER * 2 * 2, done = 0, need_refresh = 0, bits = 0, which = 0,
-//sample_size = 0, position = 0, rate = 0;
-//SDL_Surface *s = NULL;
-//Uint32 flips = 0;
-//Uint32 black, white;
-//float dy;
-
-
 SoundEffects::SoundEffects(const Configuration& configuration)
 :	m_configuration(configuration) {
 
-	auto available = ::Mix_Init(~0);
+	::Mix_Init(~0);
 
-
-	auto mix_open = ::Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+	::Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 
 	m_ufoChunk = loadEffect("Ufo");
 	m_shotChunk = loadEffect("Shot");
