@@ -180,6 +180,15 @@ void Game::handleKeyDown(SDL_Keycode key) {
 	case SDLK_BACKSLASH:
 		m_board.pressShoot1P();
 		break;
+	case SDLK_COMMA:
+		m_board.pressLeft2P();
+		break;
+	case SDLK_PERIOD:
+		m_board.pressRight2P();
+		break;
+	case SDLK_SLASH:
+		m_board.pressShoot2P();
+		break;
 	}
 }
 
@@ -202,6 +211,15 @@ void Game::handleKeyUp(SDL_Keycode key) {
 		break;
 	case SDLK_BACKSLASH:
 		m_board.releaseShoot1P();
+		break;
+	case SDLK_COMMA:
+		m_board.releaseLeft2P();
+		break;
+	case SDLK_PERIOD:
+		m_board.releaseRight2P();
+		break;
+	case SDLK_SLASH:
+		m_board.releaseShoot2P();
 		break;
 	}
 }
@@ -260,8 +278,6 @@ void Game::drawFrame() {
 		::SDL_RenderCopy(m_renderer, m_bitmapTexture, nullptr, nullptr), 
 		"Unable to copy texture to renderer");
 }
-
-
 
 void Game::dumpRendererInformation() {
 	auto count = ::SDL_GetNumRenderDrivers();
