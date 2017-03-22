@@ -6,9 +6,11 @@
 #include <cstdint>
 #include <stdexcept>
 #include <functional>
+#include <algorithm>
 
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 #include <array>
 #include <vector>
