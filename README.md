@@ -2,7 +2,7 @@
 
 Space Invaders Emulator written in C++
 
-Uses SDL2 to provide graphics and audio processing.
+Uses SDL2 to provide graphics and SDL_mixer for sound effects.
 
 ## Compiling
 
