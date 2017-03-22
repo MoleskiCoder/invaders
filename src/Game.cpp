@@ -12,7 +12,8 @@ Game::Game(const Configuration& configuration)
 	m_fps(configuration.getFramesPerSecond()),
 	m_startTicks(0),
 	m_frames(0),
-	m_vsync(false) {
+	m_vsync(false),
+	m_effects(configuration) {
 }
 
 void Game::initialise() {
@@ -282,37 +283,37 @@ void Game::dumpRendererInformation(::SDL_RendererInfo info) {
 }
 
 void Game::Board_UfoSound(const EventArgs& event) {
-	std::cout << "*UFO*" << std::endl;
+	m_effects.playUfo();
 }
 
 void Game::Board_ShotSound(const EventArgs& event) {
-	std::cout << "*SHOT*" << std::endl;
+	m_effects.playShot();
 }
 
 void Game::Board_PlayerDieSound(const EventArgs& event) {
-	std::cout << "*Player Die*" << std::endl;
+	m_effects.playPlayerDie();
 }
 
 void Game::Board_InvaderDieSound(const EventArgs& event) {
-	std::cout << "*Invader Die*" << std::endl;
+	m_effects.playInvaderDie();
 }
 
 void Game::Board_Walk1Sound(const EventArgs& event) {
-	std::cout << "*Walk 1*" << std::endl;
+	m_effects.playWalk1();
 }
 
 void Game::Board_Walk2Sound(const EventArgs& event) {
-	std::cout << "*Walk 2*" << std::endl;
+	m_effects.playWalk2();
 }
 
 void Game::Board_Walk3Sound(const EventArgs& event) {
-	std::cout << "*Walk 3*" << std::endl;
+	m_effects.playWalk3();
 }
 
 void Game::Board_Walk4Sound(const EventArgs& event) {
-	std::cout << "*Walk 4*" << std::endl;
+	m_effects.playWalk4();
 }
 
 void Game::Board_UfoDieSound(const EventArgs& event) {
-	std::cout << "*UFO Die*" << std::endl;
+	m_effects.playUfoDie();
 }

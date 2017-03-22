@@ -6,6 +6,7 @@
 
 #include "Board.h"
 #include "ColourPalette.h"
+#include "SoundEffects.h"
 
 class Configuration;
 
@@ -51,6 +52,8 @@ private:
 	Uint32 m_startTicks;
 	Uint32 m_frames;
 	bool m_vsync;
+
+	SoundEffects m_effects;
 
 	void runRasterScan();
 	void runVerticalBlank();

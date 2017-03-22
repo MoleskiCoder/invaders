@@ -165,6 +165,7 @@
     <ClInclude Include="PortEventArgs.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="Signal.h" />
+    <ClInclude Include="SoundEffects.h" />
     <ClInclude Include="StatusFlags.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -180,6 +181,7 @@
     <ClCompile Include="invaders.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Profiler.cpp" />
+    <ClCompile Include="SoundEffects.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

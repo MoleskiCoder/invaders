@@ -84,6 +84,10 @@ public:
 		return m_romDirectory;
 	}
 
+	std::string getSoundDirectory() const {
+		return m_soundDirectory;
+	}
+
 	MachineMode getMachineMode() const {
 		return m_machineMode;
 	}
@@ -111,6 +115,7 @@ private:
 	int m_cyclesPerSecond;
 
 	std::string m_romDirectory;
+	std::string m_soundDirectory;
 
 	MachineMode m_machineMode;
 	uint16_t m_startAddress;
