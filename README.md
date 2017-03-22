@@ -1,4 +1,4 @@
-#Invaders
+## Invaders
 
 Space Invaders Emulator written in C++
 
