@@ -12,14 +12,9 @@ Intel8080::Intel8080(Memory& memory, InputOutput& ports)
 	sp(0),
 	a(0),
 	f(0),
-	b(0),
-	c(0),
-	d(0),
-	e(0),
-	h(0),
-	l(0),
 	m_interrupt(false),
 	m_halted(false) {
+	bc.word = de.word = hl.word = 0;
 	installInstructions();
 }
 
@@ -73,8 +68,8 @@ void Intel8080::reset() {
 }
 
 void Intel8080::initialise() {
-	sp = 0;
-	a = f = b = c = d = e = h = l = 0;
+	sp = bc.word = de.word = hl.word = 0;
+	a = f = 0;
 	reset();
 }
 

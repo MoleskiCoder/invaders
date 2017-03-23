@@ -81,16 +81,15 @@ void Board::Cpu_ExecutingInstruction_Cpm(const CpuEventArgs& cpuEvent) {
 }
 
 void Board::bdos() {
-	auto c = m_cpu.getC();
+	auto c = m_cpu.getBC().low;
 	switch (c) {
 	case 0x2: {
-		auto character = m_cpu.getE();
+		auto character = m_cpu.getDE().low;
 		std::cout << character;
 		break;
 	}
 	case 0x9:
-		auto de = Memory::makeWord(m_cpu.getE(), m_cpu.getD());
-		for (uint16_t i = de; m_memory.get(i) != '$'; ++i) {
+		for (uint16_t i = m_cpu.getDE().word; m_memory.get(i) != '$'; ++i) {
 			std::cout << m_memory.get(i);
 		}
 		break;

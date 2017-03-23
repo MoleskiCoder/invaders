@@ -20,14 +20,14 @@ std::string Disassembler::state(const Intel8080& cpu) {
 	auto a = cpu.getA();
 	auto f = cpu.getF();
 
-	auto b = cpu.getB();
-	auto c = cpu.getC();
+	auto b = cpu.getBC().high;
+	auto c = cpu.getBC().low;
 
-	auto d = cpu.getD();
-	auto e = cpu.getE();
+	auto d = cpu.getDE().high;
+	auto e = cpu.getDE().low;
 
-	auto h = cpu.getH();
-	auto l = cpu.getL();
+	auto h = cpu.getHL().high;
+	auto l = cpu.getHL().low;
 
 	std::ostringstream output;
 

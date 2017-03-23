@@ -15,6 +15,20 @@
 class Intel8080 {
 public:
 
+	typedef union {
+		struct {
+#ifdef HOST_LITTLE_ENDIAN
+			uint8_t low;
+			uint8_t high;
+#endif
+#ifdef HOST_BIG_ENDIAN
+			uint8_t high;
+			uint8_t low;
+#endif
+		};
+		uint16_t word;
+	} register16_t;
+
 	typedef std::function<void()> instruction_t;
 
 	enum AddressingMode {
@@ -46,14 +60,9 @@ public:
 	uint8_t getA() const { return a; }
 	StatusFlags getF() const { return f; }
 
-	uint8_t getB() const { return b; }
-	uint8_t getC() const { return c; }
-
-	uint8_t getD() const { return d; }
-	uint8_t getE() const { return e; }
-
-	uint8_t getH() const { return h; }
-	uint8_t getL() const { return l; }
+	const register16_t& getBC() const { return bc; }
+	const register16_t& getDE() const { return de; }
+	const register16_t& getHL() const { return hl; }
 
 	bool isInterruptable() const {
 		return m_interrupt;
@@ -94,14 +103,9 @@ private:
 	uint8_t a;
 	StatusFlags f;
 
-	uint8_t b;
-	uint8_t c;
-
-	uint8_t d;
-	uint8_t e;
-
-	uint8_t h;
-	uint8_t l;
+	register16_t bc;
+	register16_t de;
+	register16_t hl;
 
 	bool m_interrupt;
 	bool m_halted;
@@ -234,11 +238,9 @@ private:
 	}
 
 	void dad(uint16_t value) {
-		auto hl = Memory::makeWord(l, h);
-		uint32_t sum = hl + value;
+		uint32_t sum = hl.word + value;
 		f.C = sum > 0xffff;
-		h = Memory::highByte(sum);
-		l = Memory::lowByte(sum);
+		hl.word = sum;
 	}
 
 	void sub(uint8_t value) {
@@ -254,13 +256,11 @@ private:
 	}
 
 	void mov_m_r(uint8_t value) {
-		auto hl = Memory::makeWord(l, h);
-		m_memory.set(hl, value);
+		m_memory.set(hl.word, value);
 	}
 
 	uint8_t mov_r_m() {
-		auto hl = Memory::makeWord(l, h);
-		return m_memory.get(hl);
+		return m_memory.get(hl.word);
 	}
 
 	//
@@ -269,126 +269,100 @@ private:
 
 	// Move, load, and store
 
-	void mov_a_a() { a = a; }
-	void mov_a_b() { a = b; }
-	void mov_a_c() { a = c; }
-	void mov_a_d() { a = d; }
-	void mov_a_e() { a = e; }
-	void mov_a_h() { a = h; }
-	void mov_a_l() { a = l; }
+	void mov_a_a() { }
+	void mov_a_b() { a = bc.high; }
+	void mov_a_c() { a = bc.low; }
+	void mov_a_d() { a = de.high; }
+	void mov_a_e() { a = de.low; }
+	void mov_a_h() { a = hl.high; }
+	void mov_a_l() { a = hl.low; }
 
-	void mov_b_a() { b = a; }
-	void mov_b_b() { b = b; }
-	void mov_b_c() { b = c; }
-	void mov_b_d() { b = d; }
-	void mov_b_e() { b = e; }
-	void mov_b_h() { b = h; }
-	void mov_b_l() { b = l; }
+	void mov_b_a() { bc.high = a; }
+	void mov_b_b() { }
+	void mov_b_c() { bc.high = bc.low; }
+	void mov_b_d() { bc.high = de.high; }
+	void mov_b_e() { bc.high = de.low; }
+	void mov_b_h() { bc.high = hl.high; }
+	void mov_b_l() { bc.high = hl.low; }
 
-	void mov_c_a() { c = a; }
-	void mov_c_b() { c = b; }
-	void mov_c_c() { c = c; }
-	void mov_c_d() { c = d; }
-	void mov_c_e() { c = e; }
-	void mov_c_h() { c = h; }
-	void mov_c_l() { c = l; }
+	void mov_c_a() { bc.low = a; }
+	void mov_c_b() { bc.low = bc.high; }
+	void mov_c_c() { }
+	void mov_c_d() { bc.low = de.high; }
+	void mov_c_e() { bc.low = de.low; }
+	void mov_c_h() { bc.low = hl.high; }
+	void mov_c_l() { bc.low = hl.low; }
 
-	void mov_d_a() { d = a; }
-	void mov_d_b() { d = b; }
-	void mov_d_c() { d = c; }
-	void mov_d_d() { d = d; }
-	void mov_d_e() { d = e; }
-	void mov_d_h() { d = h; }
-	void mov_d_l() { d = l; }
+	void mov_d_a() { de.high = a; }
+	void mov_d_b() { de.high = bc.high; }
+	void mov_d_c() { de.high = bc.low; }
+	void mov_d_d() { }
+	void mov_d_e() { de.high = de.low; }
+	void mov_d_h() { de.high = hl.high; }
+	void mov_d_l() { de.high = hl.low; }
 
-	void mov_e_a() { e = a; }
-	void mov_e_b() { e = b; }
-	void mov_e_c() { e = c; }
-	void mov_e_d() { e = d; }
-	void mov_e_e() { e = e; }
-	void mov_e_h() { e = h; }
-	void mov_e_l() { e = l; }
+	void mov_e_a() { de.low = a; }
+	void mov_e_b() { de.low = bc.high; }
+	void mov_e_c() { de.low = bc.low; }
+	void mov_e_d() { de.low = de.high; }
+	void mov_e_e() { }
+	void mov_e_h() { de.low = hl.high; }
+	void mov_e_l() { de.low = hl.low; }
 
-	void mov_h_a() { h = a; }
-	void mov_h_b() { h = b; }
-	void mov_h_c() { h = c; }
-	void mov_h_d() { h = d; }
-	void mov_h_e() { h = e; }
-	void mov_h_h() { h = h; }
-	void mov_h_l() { h = l; }
+	void mov_h_a() { hl.high = a; }
+	void mov_h_b() { hl.high = bc.high; }
+	void mov_h_c() { hl.high = bc.low; }
+	void mov_h_d() { hl.high = de.high; }
+	void mov_h_e() { hl.high = de.low; }
+	void mov_h_h() { }
+	void mov_h_l() { hl.high = hl.low; }
 
-	void mov_l_a() { l = a; }
-	void mov_l_b() { l = b; }
-	void mov_l_c() { l = c; }
-	void mov_l_d() { l = d; }
-	void mov_l_e() { l = e; }
-	void mov_l_h() { l = h; }
-	void mov_l_l() { l = l; }
+	void mov_l_a() { hl.low = a; }
+	void mov_l_b() { hl.low = bc.high; }
+	void mov_l_c() { hl.low = bc.low; }
+	void mov_l_d() { hl.low = de.high; }
+	void mov_l_e() { hl.low = de.low; }
+	void mov_l_h() { hl.low = hl.high; }
+	void mov_l_l() { }
 
 	void mov_m_a() { mov_m_r(a); }
-	void mov_m_b() { mov_m_r(b); }
-	void mov_m_c() { mov_m_r(c); }
-	void mov_m_d() { mov_m_r(d); }
-	void mov_m_e() { mov_m_r(e); }
-	void mov_m_h() { mov_m_r(h); }
-	void mov_m_l() { mov_m_r(l); }
+	void mov_m_b() { mov_m_r(bc.high); }
+	void mov_m_c() { mov_m_r(bc.low); }
+	void mov_m_d() { mov_m_r(de.high); }
+	void mov_m_e() { mov_m_r(de.low); }
+	void mov_m_h() { mov_m_r(hl.high); }
+	void mov_m_l() { mov_m_r(hl.low); }
 
 	void mov_a_m() { a = mov_r_m(); }
-	void mov_b_m() { b = mov_r_m(); }
-	void mov_c_m() { c = mov_r_m(); }
-	void mov_d_m() { d = mov_r_m(); }
-	void mov_e_m() { e = mov_r_m(); }
-	void mov_h_m() { h = mov_r_m(); }
-	void mov_l_m() { l = mov_r_m(); }
+	void mov_b_m() { bc.high = mov_r_m(); }
+	void mov_c_m() { bc.low = mov_r_m(); }
+	void mov_d_m() { de.high = mov_r_m(); }
+	void mov_e_m() { de.low = mov_r_m(); }
+	void mov_h_m() { hl.high = mov_r_m(); }
+	void mov_l_m() { hl.low = mov_r_m(); }
 
 	void mvi_a() { a = fetchByte(); }
-	void mvi_b() { b = fetchByte(); }
-	void mvi_c() { c = fetchByte(); }
-	void mvi_d() { d = fetchByte(); }
-	void mvi_e() { e = fetchByte(); }
-	void mvi_h() { h = fetchByte(); }
-	void mvi_l() { l = fetchByte(); }
+	void mvi_b() { bc.high = fetchByte(); }
+	void mvi_c() { bc.low = fetchByte(); }
+	void mvi_d() { de.high = fetchByte(); }
+	void mvi_e() { de.low = fetchByte(); }
+	void mvi_h() { hl.high = fetchByte(); }
+	void mvi_l() { hl.low = fetchByte(); }
 
 	void mvi_m() {
 		auto data = fetchByte();
-		auto hl = Memory::makeWord(l, h);
-		m_memory.set(hl, data);
+		m_memory.set(hl.word, data);
 	}
 
-	void lxi_b() {
-		c = fetchByte();
-		b = fetchByte();
-	}
+	void lxi_b() { bc.word = fetchWord(); }
+	void lxi_d() { de.word = fetchWord(); }
+	void lxi_h() { hl.word = fetchWord(); }
 
-	void lxi_d() {
-		e = fetchByte();
-		d = fetchByte();
-	}
+	void stax_b() { m_memory.set(bc.word, a); }
+	void stax_d() { m_memory.set(de.word, a); }
 
-	void lxi_h() {
-		l = fetchByte();
-		h = fetchByte();
-	}
-
-	void stax_b() {
-		auto bc = Memory::makeWord(c, b);
-		m_memory.set(bc, a);
-	}
-
-	void stax_d() {
-		auto de = Memory::makeWord(e, d);
-		m_memory.set(de, a);
-	}
-
-	void ldax_b() {
-		auto bc = Memory::makeWord(c, b);
-		a = m_memory.get(bc);
-	}
-
-	void ldax_d() {
-		auto de = Memory::makeWord(e, d);
-		a = m_memory.get(de);
-	}
+	void ldax_b() { a = m_memory.get(bc.word); }
+	void ldax_d() { a = m_memory.get(de.word); }
 
 	void sta() {
 		auto destination = fetchWord();
@@ -402,61 +376,32 @@ private:
 
 	void shld() {
 		auto destination = fetchWord();
-		auto hl = Memory::makeWord(l, h);
-		m_memory.setWord(destination, hl);
+		m_memory.setWord(destination, hl.word);
 	}
 
 	void lhld() {
 		auto source = fetchWord();
-		auto hl = m_memory.getWord(source);
-		h = Memory::highByte(hl);
-		l = Memory::lowByte(hl);
+		hl.word = m_memory.getWord(source);
 	}
 
 	void xchg() {
-		std::swap(d, h);
-		std::swap(e, l);
+		std::swap(de, hl);
 	}
 
 	// stack ops
 
-	void push_b() {
-		auto pair = Memory::makeWord(c, b);
-		pushWord(pair);
-	}
-
-	void push_d() {
-		auto pair = Memory::makeWord(e, d);
-		pushWord(pair);
-	}
-
-	void push_h() {
-		auto pair = Memory::makeWord(l, h);
-		pushWord(pair);
-	}
+	void push_b() { pushWord(bc.word); }
+	void push_d() { pushWord(de.word); }
+	void push_h() { pushWord(hl.word); }
 
 	void push_psw() {
 		auto pair = Memory::makeWord(f, a);
 		pushWord(pair);
 	}
 
-	void pop_b() {
-		auto bc = popWord();
-		b = Memory::highByte(bc);
-		c = Memory::lowByte(bc);
-	}
-
-	void pop_d() {
-		auto de = popWord();
-		d = Memory::highByte(de);
-		e = Memory::lowByte(de);
-	}
-
-	void pop_h() {
-		auto hl = popWord();
-		h = Memory::highByte(hl);
-		l = Memory::lowByte(hl);
-	}
+	void pop_b() { bc.word = popWord(); }
+	void pop_d() { de.word = popWord(); }
+	void pop_h() { hl.word = popWord(); }
 
 	void pop_psw() {
 		auto af = popWord();
@@ -466,15 +411,12 @@ private:
 
 	void xhtl() {
 		auto tos = m_memory.getWord(sp);
-		auto hl = Memory::makeWord(l, h);
-		m_memory.setWord(sp, hl);
-		h = Memory::highByte(tos);
-		l = Memory::lowByte(tos);
+		m_memory.setWord(sp, hl.word);
+		hl.word = tos;
 	}
 
 	void sphl() {
-		auto hl = Memory::makeWord(l, h);
-		sp = hl;
+		sp = hl.word;
 	}
 
 	void lxi_sp() {
@@ -501,7 +443,7 @@ private:
 	void jp() { jmpConditional(!f.S); }
 	
 	void pchl() {
-		pc = Memory::makeWord(l, h);
+		pc = hl.word;
 	}
 
 	// call
@@ -555,151 +497,103 @@ private:
 	// increment and decrement
 
 	void inr_a() { postIncrement(++a); }
-	void inr_b() { postIncrement(++b); }
-	void inr_c() { postIncrement(++c); }
-	void inr_d() { postIncrement(++d); }
-	void inr_e() { postIncrement(++e); }
-	void inr_h() { postIncrement(++h); }
-	void inr_l() { postIncrement(++l); }
+	void inr_b() { postIncrement(++bc.high); }
+	void inr_c() { postIncrement(++bc.low); }
+	void inr_d() { postIncrement(++de.high); }
+	void inr_e() { postIncrement(++de.low); }
+	void inr_h() { postIncrement(++hl.high); }
+	void inr_l() { postIncrement(++hl.low); }
 
 	void inr_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		postIncrement(++value);
-		m_memory.set(hl, value);
+		m_memory.set(hl.word, value);
 	}
 
 	void dcr_a() { postDecrement(--a); }
-	void dcr_b() { postDecrement(--b); }
-	void dcr_c() { postDecrement(--c); }
-	void dcr_d() { postDecrement(--d); }
-	void dcr_e() { postDecrement(--e); }
-	void dcr_h() { postDecrement(--h); }
-	void dcr_l() { postDecrement(--l); }
+	void dcr_b() { postDecrement(--bc.high); }
+	void dcr_c() { postDecrement(--bc.low); }
+	void dcr_d() { postDecrement(--de.high); }
+	void dcr_e() { postDecrement(--de.low); }
+	void dcr_h() { postDecrement(--hl.high); }
+	void dcr_l() { postDecrement(--hl.low); }
 
 	void dcr_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		postDecrement(--value);
-		m_memory.set(hl, value);
+		m_memory.set(hl.word, value);
 	}
 
-	void inx_b() {
-		auto bc = Memory::makeWord(c, b);
-		c = Memory::lowByte(++bc);
-		b = Memory::highByte(bc);
-	}
+	void inx_b() { ++bc.word; }
+	void inx_d() { ++de.word; }
+	void inx_h() { ++hl.word; }
 
-	void inx_d() {
-		auto de = Memory::makeWord(e, d);
-		e = Memory::lowByte(++de);
-		d = Memory::highByte(de);
-	}
-
-	void inx_h() {
-		auto hl = Memory::makeWord(l, h);
-		l = Memory::lowByte(++hl);
-		h = Memory::highByte(hl);
-	}
-
-	void dcx_b() {
-		auto bc = Memory::makeWord(c, b);
-		c = Memory::lowByte(--bc);
-		b = Memory::highByte(bc);
-	}
-
-	void dcx_d() {
-		auto de = Memory::makeWord(e, d);
-		e = Memory::lowByte(--de);
-		d = Memory::highByte(de);
-	}
-
-	void dcx_h() {
-		auto hl = Memory::makeWord(l, h);
-		l = Memory::lowByte(--hl);
-		h = Memory::highByte(hl);
-	}
+	void dcx_b() { --bc.word; }
+	void dcx_d() { --de.word; }
+	void dcx_h() { --hl.word; }
 
 	// add
 
 	void add_a() { add(a); }
-	void add_b() { add(b); }
-	void add_c() { add(c); }
-	void add_d() { add(d); }
-	void add_e() { add(e); }
-	void add_h() { add(h); }
-	void add_l() { add(l); }
+	void add_b() { add(bc.high); }
+	void add_c() { add(bc.low); }
+	void add_d() { add(de.high); }
+	void add_e() { add(de.low); }
+	void add_h() { add(hl.high); }
+	void add_l() { add(hl.low); }
 
 	void add_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		add(value);
 	}
 
 	void adi() { add(fetchByte()); }
 
 	void adc_a() { adc(a); }
-	void adc_b() { adc(b); }
-	void adc_c() { adc(c); }
-	void adc_d() { adc(d); }
-	void adc_e() { adc(e); }
-	void adc_h() { adc(h); }
-	void adc_l() { adc(l); }
+	void adc_b() { adc(bc.high); }
+	void adc_c() { adc(bc.low); }
+	void adc_d() { adc(de.high); }
+	void adc_e() { adc(de.low); }
+	void adc_h() { adc(hl.high); }
+	void adc_l() { adc(hl.low); }
 
 	void adc_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		adc(value);
 	}
 
 	void aci() { adc(fetchByte()); }
 
-	void dad_b() {
-		auto bc = Memory::makeWord(c, b);
-		dad(bc);
-	}
-
-	void dad_d() {
-		auto de = Memory::makeWord(e, d);
-		dad(de);
-	}
-
-	void dad_h() {
-		auto hl = Memory::makeWord(l, h);
-		dad(hl);
-	}
-
-	void dad_sp() {
-		dad(sp);
-	}
+	void dad_b() { dad(bc.word); }
+	void dad_d() { dad(de.word); }
+	void dad_h() { dad(hl.word); }
+	void dad_sp() { dad(sp); }
 
 	// subtract
 
 	void sub_a() { sub(a); }
-	void sub_b() { sub(b); }
-	void sub_c() { sub(c); }
-	void sub_d() { sub(d); }
-	void sub_e() { sub(e); }
-	void sub_h() { sub(h); }
-	void sub_l() { sub(l); }
+	void sub_b() { sub(bc.high); }
+	void sub_c() { sub(bc.low); }
+	void sub_d() { sub(de.high); }
+	void sub_e() { sub(de.low); }
+	void sub_h() { sub(hl.high); }
+	void sub_l() { sub(hl.low); }
 
 	void sub_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		sub(value);
 	}
 
 	void sbb_a() { sbb(a); }
-	void sbb_b() { sbb(b); }
-	void sbb_c() { sbb(c); }
-	void sbb_d() { sbb(d); }
-	void sbb_e() { sbb(e); }
-	void sbb_h() { sbb(h); }
-	void sbb_l() { sbb(l); }
+	void sbb_b() { sbb(bc.high); }
+	void sbb_c() { sbb(bc.low); }
+	void sbb_d() { sbb(de.high); }
+	void sbb_e() { sbb(de.low); }
+	void sbb_h() { sbb(hl.high); }
+	void sbb_l() { sbb(hl.low); }
 
 	void sbb_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		sbb(value);
 	}
 
@@ -716,64 +610,60 @@ private:
 	// logical
 
 	void ana_a() { and(a); }
-	void ana_b() { and(b); }
-	void ana_c() { and(c); }
-	void ana_d() { and(d); }
-	void ana_e() { and(e); }
-	void ana_h() { and(h); }
-	void ana_l() { and(l); }
+	void ana_b() { and(bc.high); }
+	void ana_c() { and(bc.low); }
+	void ana_d() { and(de.high); }
+	void ana_e() { and(de.low); }
+	void ana_h() { and(hl.high); }
+	void ana_l() { and(hl.low); }
 
 	void ana_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		and(value);
 	}
 
 	void ani() { and(fetchByte()); }
 
 	void xra_a() { xra(a); }
-	void xra_b() { xra(b); }
-	void xra_c() { xra(c); }
-	void xra_d() { xra(d); }
-	void xra_e() { xra(e); }
-	void xra_h() { xra(h); }
-	void xra_l() { xra(l); }
+	void xra_b() { xra(bc.high); }
+	void xra_c() { xra(bc.low); }
+	void xra_d() { xra(de.high); }
+	void xra_e() { xra(de.low); }
+	void xra_h() { xra(hl.high); }
+	void xra_l() { xra(hl.low); }
 
 	void xra_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		xra(value);
 	}
 
 	void xri() { xra(fetchByte()); }
 
 	void ora_a() { ora(a); }
-	void ora_b() { ora(b); }
-	void ora_c() { ora(c); }
-	void ora_d() { ora(d); }
-	void ora_e() { ora(e); }
-	void ora_h() { ora(h); }
-	void ora_l() { ora(l); }
+	void ora_b() { ora(bc.high); }
+	void ora_c() { ora(bc.low); }
+	void ora_d() { ora(de.high); }
+	void ora_e() { ora(de.low); }
+	void ora_h() { ora(hl.high); }
+	void ora_l() { ora(hl.low); }
 
 	void ora_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		ora(value);
 	}
 
 	void ori() { ora(fetchByte()); }
 
 	void cmp_a() { compare(a); }
-	void cmp_b() { compare(b); }
-	void cmp_c() { compare(c); }
-	void cmp_d() { compare(d); }
-	void cmp_e() { compare(e); }
-	void cmp_h() { compare(h); }
-	void cmp_l() { compare(l); }
+	void cmp_b() { compare(bc.high); }
+	void cmp_c() { compare(bc.low); }
+	void cmp_d() { compare(de.high); }
+	void cmp_e() { compare(de.low); }
+	void cmp_h() { compare(hl.high); }
+	void cmp_l() { compare(hl.low); }
 
 	void cmp_m() {
-		auto hl = Memory::makeWord(l, h);
-		auto value = m_memory.get(hl);
+		auto value = m_memory.get(hl.word);
 		compare(value);
 	}
 
