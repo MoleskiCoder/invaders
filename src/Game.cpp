@@ -144,9 +144,8 @@ void Game::runLoop() {
 		if (m_configuration.isDrawGraphics())
 			drawFrame();
 
-		if (m_vsync) {
-			::SDL_RenderPresent(m_renderer);
-		} else {
+		::SDL_RenderPresent(m_renderer);
+		if (!m_vsync) {
 			const auto elapsedTicks = ::SDL_GetTicks() - m_startTicks;
 			const auto neededTicks = (++m_frames / (float)m_fps) * 1000.0;
 			auto sleepNeeded = (int)(neededTicks - elapsedTicks);
