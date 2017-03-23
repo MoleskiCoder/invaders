@@ -10,10 +10,6 @@ Memory::Memory(int addressMask)
   m_locked(m_bus.size()),
   m_addressMask(addressMask) {}
 
-const std::vector<uint8_t>& Memory::getBus() const {
-	return m_bus;
-}
-
 std::vector<uint8_t>& Memory::getBusMutable() {
 	return m_bus;
 }

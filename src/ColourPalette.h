@@ -32,10 +32,6 @@ public:
 
 	ColourPalette();
 
-	const std::vector<uint32_t>& getColours() const {
-		return m_colours;
-	}
-
 	uint32_t getColour(size_t index) const {
 		return m_colours[index];
 	}

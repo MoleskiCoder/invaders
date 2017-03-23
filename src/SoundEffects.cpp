@@ -5,7 +5,7 @@
 SoundEffects::SoundEffects(const Configuration& configuration)
 :	m_configuration(configuration) {
 
-	::Mix_Init(~0);
+	::Mix_Init(0);
 
 	::Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 
@@ -20,7 +20,7 @@ SoundEffects::SoundEffects(const Configuration& configuration)
 	m_walk4Chunk = loadEffect("Walk4");
 }
 
-Mix_Chunk* SoundEffects::loadEffect(std::string name) const {
+Mix_Chunk* SoundEffects::loadEffect(const std::string& name) const {
 	auto soundDirectory = m_configuration.getSoundDirectory();
 	auto extension = ".wav";
 	auto path = soundDirectory + "/" + name + extension;

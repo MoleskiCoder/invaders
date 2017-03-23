@@ -24,7 +24,6 @@ public:
 
 	Memory(int addressMask);
 
-	const std::vector<uint8_t>& getBus() const;
 	std::vector<uint8_t>& getBusMutable();
 
 	uint8_t get(int address) const;

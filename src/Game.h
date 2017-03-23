@@ -62,7 +62,6 @@ private:
 
 	void runToLimit(int limit);
 	bool finishedCycling(int limit, int cycles) const;
-	void stop();
 
 	void configureBackground() const;
 	void createBitmapTexture();

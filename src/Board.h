@@ -18,11 +18,9 @@ public:
 
 	Board(const Configuration& configuration);
 
-	const Configuration& getConfiguration() const { return m_configuration; }
 	Memory& getMemory() { return m_memory; }
 	const Intel8080& getCPU() const { return m_cpu; }
 	Intel8080& getCPUMutable() { return m_cpu; }
-	InputOutput& getIO() { return m_ports; }
 
 	void initialise();
 

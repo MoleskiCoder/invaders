@@ -31,5 +31,5 @@ private:
 	Mix_Chunk* m_walk3Chunk;
 	Mix_Chunk* m_walk4Chunk;
 
-	Mix_Chunk* loadEffect(std::string name) const;
+	Mix_Chunk* loadEffect(const std::string& name) const;
 };

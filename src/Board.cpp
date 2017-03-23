@@ -21,7 +21,9 @@ Board::Board(const Configuration& configuration)
   m_twoPlayerShot(false),
   m_twoPlayerLeft(false),
   m_twoPlayerRight(false),
-  m_tilt(false) {
+  m_tilt(false),
+  m_preSound1(0),
+  m_preSound2(0) {
 }
 
 void Board::initialise() {

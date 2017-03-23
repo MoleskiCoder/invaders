@@ -244,10 +244,6 @@ bool Game::finishedCycling(int limit, int cycles) const {
 	return exhausted || m_board.getCPU().isHalted();
 }
 
-void Game::stop() {
-	m_board.getCPUMutable().halt();
-}
-
 void Game::drawFrame() {
 
 	auto memory = m_board.getMemory();
