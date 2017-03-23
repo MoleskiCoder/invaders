@@ -89,8 +89,8 @@ public:
 private:
 	std::array<Instruction, 0x100> instructions;
 
-	std::array<bool, 8> m_halfCarryTableAdd = { false, false, true, false, true, false, true, true };
-	std::array<bool, 8> m_halfCarryTableSub = { false, true, true, true, false, false, false, true };
+	std::array<bool, 8> m_halfCarryTableAdd = { { false, false, true, false, true, false, true, true } };
+	std::array<bool, 8> m_halfCarryTableSub = { { false, true, true, true, false, false, false, true } };
 
 	Memory& m_memory;
 	InputOutput& m_ports;
@@ -209,7 +209,7 @@ private:
 			pc = destination;
 	}
 
-	void and(uint8_t value) {
+	void anda(uint8_t value) {
 		f.AC = (((a | value) & 0x8) != 0);
 		f.C = false;
 		adjustSZP(a &= value);
@@ -609,20 +609,20 @@ private:
 
 	// logical
 
-	void ana_a() { and(a); }
-	void ana_b() { and(bc.high); }
-	void ana_c() { and(bc.low); }
-	void ana_d() { and(de.high); }
-	void ana_e() { and(de.low); }
-	void ana_h() { and(hl.high); }
-	void ana_l() { and(hl.low); }
+	void ana_a() { anda(a); }
+	void ana_b() { anda(bc.high); }
+	void ana_c() { anda(bc.low); }
+	void ana_d() { anda(de.high); }
+	void ana_e() { anda(de.low); }
+	void ana_h() { anda(hl.high); }
+	void ana_l() { anda(hl.low); }
 
 	void ana_m() {
 		auto value = m_memory.get(hl.word);
-		and(value);
+		anda(value);
 	}
 
-	void ani() { and(fetchByte()); }
+	void ani() { anda(fetchByte()); }
 
 	void xra_a() { xra(a); }
 	void xra_b() { xra(bc.high); }

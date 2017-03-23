@@ -93,7 +93,7 @@ private:
 		Off = 1,
 	};
 
-	std::array<char, 64> m_characterSet = {
+	std::array<char, 64> m_characterSet = { {
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
 		'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
@@ -102,7 +102,7 @@ private:
 		'*', '^', '_', '_', '_', '_', '_', '_',
 		'Y', '%', '_', '_', '_', '_', 'Y', '&',
 		'?', '_', '_', '_', '_', '_', '_', '-',
-	};
+	} };
 
 	const Configuration& m_configuration;
 	Memory m_memory;

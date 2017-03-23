@@ -51,6 +51,9 @@ void Board::initialise() {
 		m_memory.set(5, 0xc9);	// ret
 		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Cpm, this, std::placeholders::_1));
 		break;
+
+	default:
+		throw std::logic_error("Unhandled machine type");
 	}
 
 	if (m_configuration.isProfileMode()) {
@@ -210,10 +213,6 @@ void Board::Cpu_ExecutingInstruction_Profile(const CpuEventArgs& cpuEvent) {
 }
 
 void Board::Cpu_ExecutingInstruction_Debug(const CpuEventArgs& cpuEvent) {
-
-	const auto& cpu = cpuEvent.getCpu();
-	const auto pc = cpu.getProgramCounter();
-	const auto instruction = cpu.getMemory().get(pc);
 
 	std::cerr
 		<< Disassembler::state(cpuEvent.getCpu())
