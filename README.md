@@ -1,5 +1,7 @@
 ## Invaders
 
+[![Build Status](https://travis-ci.org/MoleskiCoder/invaders.svg?branch=master)](https://travis-ci.org/MoleskiCoder/invaders)
+
 Space Invaders Emulator written in C++
 
 Uses SDL2 to provide graphics and SDL_mixer for sound effects.
@@ -24,7 +26,19 @@ Uses SDL2 to provide graphics and SDL_mixer for sound effects.
 
 Compile with Visual Studio 2015 (via the solution)
 
+#### Prerequisites
+
+### Linux
+
+make opt
+
+#### Prerequisites
+
+apt-get install build-essential libsdl2-dev libsdl2-mixer-dev
+
 ## Running
+
+src/invaders
 
 ### Keyboard Controls
 
