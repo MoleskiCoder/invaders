@@ -33,7 +33,7 @@ Compile with Visual Studio 2015 (via the solution)
 * 2: 2P Start
 * z: Left 1P
 * x: Right 1P
-* \: Fire 1P
+* \\: Fire 1P
 * ,: Left 2P
 * .: Right 2P
 * /: Fire 2P
