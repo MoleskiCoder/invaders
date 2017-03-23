@@ -1,0 +1,11 @@
+language: cpp
+sudo: required
+compiler:
+- gcc
+os:
+- linux
+dist: xenial
+script: make -j 4 all
+
+before_install:
+  - sudo apt-get install -y build-essential libsdl2-dev libsdl2-mixer-dev
