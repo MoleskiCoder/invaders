@@ -97,11 +97,7 @@ public:
 	}
 
 	uint16_t getStartAddress() const {
-		return m_startAddress;
-	}
-
-	void setStartAddress(uint16_t value) {
-		m_startAddress = value;
+		return getMachineMode() == CPM ? 0x100 : 0;
 	}
 
 private:
@@ -118,5 +114,4 @@ private:
 	std::string m_soundDirectory;
 
 	MachineMode m_machineMode;
-	uint16_t m_startAddress;
 };

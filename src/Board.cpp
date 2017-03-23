@@ -37,7 +37,7 @@ void Board::initialise() {
 		m_memory.loadRom(romDirectory + "/invaders.g", 0x0800);
 		m_memory.loadRom(romDirectory + "/invaders.h", 0x0000);
 
-	m_ports.WritingPort.connect(std::bind(&Board::Board_PortWriting_SpaceInvaders, this, std::placeholders::_1));
+		m_ports.WritingPort.connect(std::bind(&Board::Board_PortWriting_SpaceInvaders, this, std::placeholders::_1));
 		m_ports.WrittenPort.connect(std::bind(&Board::Board_PortWritten_SpaceInvaders, this, std::placeholders::_1));
 		m_ports.ReadingPort.connect(std::bind(&Board::Board_PortReading_SpaceInvaders, this, std::placeholders::_1));
 		break;

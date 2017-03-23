@@ -138,7 +138,8 @@ void Game::runLoop() {
 
 		runRasterScan();
 
-		m_board.getCPUMutable().interrupt(1);	// beginning of the vertical blank
+		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
+			m_board.getCPUMutable().interrupt(1);	// beginning of the vertical blank
 
 		if (m_configuration.isDrawGraphics())
 			drawFrame();
@@ -156,7 +157,8 @@ void Game::runLoop() {
 
 		runVerticalBlank();
 
-		m_board.getCPUMutable().interrupt(2);	// end of the vertical blank
+		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
+			m_board.getCPUMutable().interrupt(2);	// end of the vertical blank
 	}
 }
 
