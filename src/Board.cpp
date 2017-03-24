@@ -70,7 +70,7 @@ void Board::initialise() {
 	m_cpu.setProgramCounter(m_configuration.getStartAddress());
 }
 
-void Board::Cpu_ExecutingInstruction_Cpm(const CpuEventArgs& cpuEvent) {
+void Board::Cpu_ExecutingInstruction_Cpm(const CpuEventArgs&) {
 	auto pc = m_cpu.getProgramCounter();
 	switch (pc) {
 	case 0x0:	// CP/M warm start

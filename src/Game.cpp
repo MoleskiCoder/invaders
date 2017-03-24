@@ -295,38 +295,38 @@ void Game::dumpRendererInformation(::SDL_RendererInfo info) {
 	::SDL_Log("%s: software=%d, accelerated=%d, vsync=%d, target texture=%d", name, software, accelerated, vsync, targetTexture);
 }
 
-void Game::Board_UfoSound(const EventArgs& event) {
+void Game::Board_UfoSound(const EventArgs&) {
 	m_effects.playUfo();
 }
 
-void Game::Board_ShotSound(const EventArgs& event) {
+void Game::Board_ShotSound(const EventArgs&) {
 	m_effects.playShot();
 }
 
-void Game::Board_PlayerDieSound(const EventArgs& event) {
+void Game::Board_PlayerDieSound(const EventArgs&) {
 	m_effects.playPlayerDie();
 }
 
-void Game::Board_InvaderDieSound(const EventArgs& event) {
+void Game::Board_InvaderDieSound(const EventArgs&) {
 	m_effects.playInvaderDie();
 }
 
-void Game::Board_Walk1Sound(const EventArgs& event) {
+void Game::Board_Walk1Sound(const EventArgs&) {
 	m_effects.playWalk1();
 }
 
-void Game::Board_Walk2Sound(const EventArgs& event) {
+void Game::Board_Walk2Sound(const EventArgs&) {
 	m_effects.playWalk2();
 }
 
-void Game::Board_Walk3Sound(const EventArgs& event) {
+void Game::Board_Walk3Sound(const EventArgs&) {
 	m_effects.playWalk3();
 }
 
-void Game::Board_Walk4Sound(const EventArgs& event) {
+void Game::Board_Walk4Sound(const EventArgs&) {
 	m_effects.playWalk4();
 }
 
-void Game::Board_UfoDieSound(const EventArgs& event) {
+void Game::Board_UfoDieSound(const EventArgs&) {
 	m_effects.playUfoDie();
 }
