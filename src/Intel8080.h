@@ -71,7 +71,7 @@ public:
 	void disableInterrupts() { m_interrupt = false; }
 	void enableInterrupts() { m_interrupt = true; }
 
-	void interrupt(int vector) {
+	void interrupt(uint8_t vector) {
 		if (isInterruptable()) {
 			disableInterrupts();
 			restart(vector);
@@ -182,7 +182,7 @@ private:
 	}
 
 	void restart(uint8_t position) {
-		auto address = position << 3;
+		uint16_t address = position << 3;
 		pushWord(pc);
 		pc = address;
 	}
@@ -240,7 +240,7 @@ private:
 	void dad(uint16_t value) {
 		uint32_t sum = hl.word + value;
 		f.C = sum > 0xffff;
-		hl.word = sum;
+		hl.word = (uint16_t)sum;
 	}
 
 	void sub(uint8_t value) {
