@@ -7,7 +7,9 @@ SoundEffects::SoundEffects(const Configuration& configuration)
 
 	::Mix_Init(0);
 
-	::Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+	verifyMixCall(
+		::Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 6, 512),
+		"Unable to open audio: ");
 
 	m_ufoChunk = loadEffect("Ufo");
 	m_shotChunk = loadEffect("Shot");
@@ -20,62 +22,61 @@ SoundEffects::SoundEffects(const Configuration& configuration)
 	m_walk4Chunk = loadEffect("Walk4");
 }
 
-Mix_Chunk* SoundEffects::loadEffect(const std::string& name) const {
+std::shared_ptr<Mix_Chunk> SoundEffects::loadEffect(const std::string& name) const {
 	auto soundDirectory = m_configuration.getSoundDirectory();
 	auto extension = ".wav";
 	auto path = soundDirectory + "/" + name + extension;
-	return Mix_LoadWAV(path.c_str());
+	auto chunk = Mix_LoadWAV(path.c_str());
+	if (chunk == nullptr) {
+		auto message = "Unable to load mix chunk (" + name + "): ";
+		throwMixException(message);
+	}
+	return std::shared_ptr<Mix_Chunk>(chunk, ::Mix_FreeChunk);
+}
+
+void SoundEffects::playEffect(int channel, Mix_Chunk* effect) {
+	verifyMixCall(
+		Mix_PlayChannel(channel, effect, 0),
+		"Unable to play sound effect: ");
 }
 
 SoundEffects::~SoundEffects() {
-
 	::Mix_CloseAudio();
-
-	::Mix_FreeChunk(m_ufoChunk);
-	::Mix_FreeChunk(m_shotChunk);
-	::Mix_FreeChunk(m_ufoDieChunk);
-	::Mix_FreeChunk(m_playerDieChunk);
-	::Mix_FreeChunk(m_InvaderDieChunk);
-	::Mix_FreeChunk(m_walk1Chunk);
-	::Mix_FreeChunk(m_walk2Chunk);
-	::Mix_FreeChunk(m_walk3Chunk);
-	::Mix_FreeChunk(m_walk4Chunk);
-
 	::Mix_Quit();
 }
 
 void SoundEffects::playUfo() {
-	Mix_PlayChannel(-1, m_ufoChunk, 0);
+	playEffect(1, m_ufoChunk.get());
 }
 
 void SoundEffects::playShot() {
-	Mix_PlayChannel(-1, m_shotChunk, 0);
+	playEffect(2, m_shotChunk.get());
 }
 
 void SoundEffects::playUfoDie() {
-	Mix_PlayChannel(-1, m_ufoDieChunk, 0);
+	playEffect(3, m_ufoDieChunk.get());
 }
 
 void SoundEffects::playPlayerDie() {
-	Mix_PlayChannel(-1, m_playerDieChunk, 0);
+	playEffect(4, m_playerDieChunk.get());
 }
 
 void SoundEffects::playInvaderDie() {
-	Mix_PlayChannel(-1, m_InvaderDieChunk, 0);
+	playEffect(5, m_InvaderDieChunk.get());
 }
 
 void SoundEffects::playWalk1() {
-	Mix_PlayChannel(-1, m_walk1Chunk, 0);
+	playEffect(0, m_walk1Chunk.get());
 }
 
 void SoundEffects::playWalk2() {
-	Mix_PlayChannel(-1, m_walk2Chunk, 0);
+	playEffect(0, m_walk2Chunk.get());
 }
 
 void SoundEffects::playWalk3() {
-	Mix_PlayChannel(-1, m_walk3Chunk, 0);
+	playEffect(0, m_walk3Chunk.get());
 }
 
 void SoundEffects::playWalk4() {
-	Mix_PlayChannel(-1, m_walk4Chunk, 0);
+	playEffect(0, m_walk4Chunk.get());
 }

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <stdexcept>
+
 class Configuration;
 struct Mix_Chunk;
 
@@ -21,15 +24,27 @@ public:
 private:
 	const Configuration& m_configuration;
 
-	Mix_Chunk* m_ufoChunk;
-	Mix_Chunk* m_shotChunk;
-	Mix_Chunk* m_ufoDieChunk;
-	Mix_Chunk* m_playerDieChunk;
-	Mix_Chunk* m_InvaderDieChunk;
-	Mix_Chunk* m_walk1Chunk;
-	Mix_Chunk* m_walk2Chunk;
-	Mix_Chunk* m_walk3Chunk;
-	Mix_Chunk* m_walk4Chunk;
+	std::shared_ptr<Mix_Chunk> m_ufoChunk;
+	std::shared_ptr<Mix_Chunk> m_shotChunk;
+	std::shared_ptr<Mix_Chunk> m_ufoDieChunk;
+	std::shared_ptr<Mix_Chunk> m_playerDieChunk;
+	std::shared_ptr<Mix_Chunk> m_InvaderDieChunk;
+	std::shared_ptr<Mix_Chunk> m_walk1Chunk;
+	std::shared_ptr<Mix_Chunk> m_walk2Chunk;
+	std::shared_ptr<Mix_Chunk> m_walk3Chunk;
+	std::shared_ptr<Mix_Chunk> m_walk4Chunk;
 
-	Mix_Chunk* loadEffect(const std::string& name) const;
+	static void throwMixException(std::string failure) {
+		throw std::runtime_error(failure + ::Mix_GetError());
+	}
+
+	static void verifyMixCall(int returned, std::string failure) {
+		if (returned < 0) {
+			throwMixException(failure);
+		}
+	}
+
+	static void playEffect(int channel, Mix_Chunk* effect);
+
+	std::shared_ptr<Mix_Chunk> loadEffect(const std::string& name) const;
 };
