@@ -34,11 +34,11 @@ private:
 	std::shared_ptr<Mix_Chunk> m_walk3Chunk;
 	std::shared_ptr<Mix_Chunk> m_walk4Chunk;
 
-	static void throwMixException(std::string failure) {
+	static void throwMixException(const std::string& failure) {
 		throw std::runtime_error(failure + ::Mix_GetError());
 	}
 
-	static void verifyMixCall(int returned, std::string failure) {
+	static void verifyMixCall(int returned, const std::string& failure) {
 		if (returned < 0) {
 			throwMixException(failure);
 		}
