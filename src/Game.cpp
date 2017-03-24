@@ -127,11 +127,13 @@ void Game::runLoop() {
 				break;
 			case SDL_JOYDEVICEADDED:
 				SDL_Log("Joystick device added");
-				//m_gameController.open();
+				if (m_gameController == nullptr)
+					m_gameController = std::make_shared<GameController>(e.jdevice.which);
 				break;
 			case SDL_JOYDEVICEREMOVED:
 				SDL_Log("Joystick device removed");
-				//m_gameController.close();
+				if (m_gameController != nullptr)
+					m_gameController.reset();
 				break;
 			}
 		}
@@ -225,6 +227,18 @@ void Game::handleKeyUp(SDL_Keycode key) {
 	}
 }
 
+int Game::whichPlayer() {
+	auto playerId = m_board.getMemory().get(0x2067);	// player MSB
+	switch (playerId) {
+	case 0x21:
+		return 1;
+	case 0x22:
+		return 2;
+	default:
+		return 0;
+	}
+}
+
 void Game::runRasterScan() {
 	runToLimit(m_configuration.getCyclesDuringRasterScan());
 }
@@ -305,6 +319,8 @@ void Game::Board_ShotSound(const EventArgs&) {
 
 void Game::Board_PlayerDieSound(const EventArgs&) {
 	m_effects.playPlayerDie();
+	if (m_gameController != nullptr)
+		m_gameController->startRumble();
 }
 
 void Game::Board_InvaderDieSound(const EventArgs&) {

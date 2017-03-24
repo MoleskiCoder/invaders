@@ -3,10 +3,12 @@
 #include <stdexcept>
 #include <string>
 #include <SDL.h>
+#include <memory>
 
 #include "Board.h"
 #include "ColourPalette.h"
 #include "SoundEffects.h"
+#include "GameController.h"
 
 class Configuration;
 
@@ -55,6 +57,8 @@ private:
 
 	SoundEffects m_effects;
 
+	std::shared_ptr<GameController> m_gameController;
+
 	void runRasterScan();
 	void runVerticalBlank();
 	
@@ -73,6 +77,8 @@ private:
 	int getScreenHeight() const {
 		return DisplayHeight * DisplayScale;
 	}
+
+	int whichPlayer();
 
 	void Board_UfoSound(const EventArgs& event);
 	void Board_ShotSound(const EventArgs& event);
