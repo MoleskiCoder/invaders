@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <functional>
 #include <algorithm>
+#include <memory>
 
 #include <iostream>
 #include <fstream>
