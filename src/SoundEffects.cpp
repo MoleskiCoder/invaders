@@ -8,7 +8,7 @@ SoundEffects::SoundEffects(const Configuration& configuration)
 	::Mix_Init(0);
 
 	verifyMixCall(
-		::Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 6, 512),
+		::Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 6, 4096),
 		"Unable to open audio: ");
 
 	m_ufoChunk = loadEffect("Ufo");
