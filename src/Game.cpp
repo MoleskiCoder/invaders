@@ -126,20 +126,32 @@ void Game::runLoop() {
 				handleKeyUp(e.key.keysym.sym);
 				break;
 			case SDL_JOYBUTTONDOWN:
-				handleJoyButton(e.jbutton);
+				handleJoyButtonDown(e.jbutton);
 				break;
 			case SDL_JOYBUTTONUP:
-				handleJoyButton(e.jbutton);
+				handleJoyButtonUp(e.jbutton);
 				break;
-			case SDL_JOYDEVICEADDED:
-				SDL_Log("Joystick device added");
-				if (m_gameController == nullptr)
-					m_gameController = std::make_shared<GameController>(e.jdevice.which);
+			case SDL_JOYDEVICEADDED: {
+					auto which = e.jdevice.which;
+					SDL_assert(m_gameControllers.find(which) == m_gameControllers.end());
+					auto controller = std::make_shared<GameController>(which);
+					auto joystickId = controller->getJoystickId();
+					m_gameControllers[which] = controller;
+					SDL_assert(m_mappedControllers.find(joystickId) == m_mappedControllers.end());
+					m_mappedControllers[joystickId] = which;
+					SDL_Log("Joystick device %d added (%d controllers)", which, m_gameControllers.size());
+				}
 				break;
-			case SDL_JOYDEVICEREMOVED:
-				SDL_Log("Joystick device removed");
-				if (m_gameController != nullptr)
-					m_gameController.reset();
+			case SDL_JOYDEVICEREMOVED: {
+					auto which = e.jdevice.which;
+					auto found = m_gameControllers.find(which);
+					SDL_assert(found != m_gameControllers.end());
+					auto controller = found->second;
+					auto joystickId = controller->getJoystickId();
+					m_mappedControllers.erase(joystickId);
+					m_gameControllers.erase(which);
+					SDL_Log("Joystick device %d removed (%d controllers)", which, m_gameControllers.size());
+				}
 				break;
 			}
 		}
@@ -169,56 +181,91 @@ void Game::runLoop() {
 	}
 }
 
-void Game::handleJoyButton(SDL_JoyButtonEvent event) {
-	auto joystick = event.which;
-	auto type = event.type;
+// -1 if no controllers, otherwise index
+int Game::chooseControllerIndex(int who) const {
+	auto count = m_gameControllers.size();
+	if (count == 0)
+		return -1;
+	auto firstController = m_gameControllers.cbegin();
+	if (count == 1 || (who == 1))
+		return firstController->first;
+	auto secondController = (++firstController)->first;
+	return secondController;
+}
+
+std::shared_ptr<GameController> Game::chooseController(int who) const {
+	auto which = chooseControllerIndex(who);
+	if (which == -1)
+		return nullptr;
+	auto found = m_gameControllers.find(which);
+	SDL_assert(found != m_gameControllers.cend());
+	return found->second;
+}
+
+void Game::handleJoyButtonDown(SDL_JoyButtonEvent event) {
+	auto joystickId = event.which;
+	auto controllerIndex = m_mappedControllers[joystickId];
 	auto value = event.button;
+	auto who = whichPlayer();
 	switch (value) {
 	case SDL_CONTROLLER_BUTTON_A:
-		if (type == SDL_JOYBUTTONDOWN)
-			handleJoyFirePress(joystick);
-		if (type == SDL_JOYBUTTONUP)
-			handleJoyFireRelease(joystick);
+		handleJoyFirePress(who, controllerIndex);
 		break;
-
 	case SDL_CONTROLLER_BUTTON_BACK:
-		if (type == SDL_JOYBUTTONDOWN)
-			handleJoyLeftPress(joystick);
-		if (type == SDL_JOYBUTTONUP)
-			handleJoyLeftRelease(joystick);
+		handleJoyLeftPress(who, controllerIndex);
 		break;
-
 	case SDL_CONTROLLER_BUTTON_GUIDE:
-		if (type == SDL_JOYBUTTONDOWN)
-			handleJoyRightPress(joystick);
-		if (type == SDL_JOYBUTTONUP)
-			handleJoyRightRelease(joystick);
+		handleJoyRightPress(who, controllerIndex);
 		break;
 	}
 }
 
-void Game::handleJoyLeftPress(int joystick) {
-	m_board.pressLeft1P();
+void Game::handleJoyButtonUp(SDL_JoyButtonEvent event) {
+	auto joystickId = event.which;
+	auto controllerIndex = m_mappedControllers[joystickId];
+	auto value = event.button;
+	auto who = whichPlayer();
+	switch (value) {
+	case SDL_CONTROLLER_BUTTON_A:
+		handleJoyFireRelease(who, controllerIndex);
+		break;
+	case SDL_CONTROLLER_BUTTON_BACK:
+		handleJoyLeftRelease(who, controllerIndex);
+		break;
+	case SDL_CONTROLLER_BUTTON_GUIDE:
+		handleJoyRightRelease(who, controllerIndex);
+		break;
+	}
 }
 
-void Game::handleJoyRightPress(int joystick) {
-	m_board.pressRight1P();
+void Game::handleJoyLeftPress(int who, int joystick) {
+	if (chooseControllerIndex(who) == joystick)
+		m_board.pressLeft1P();
 }
 
-void Game::handleJoyFirePress(int joystick) {
-	m_board.pressShoot1P();
+void Game::handleJoyRightPress(int who, int joystick) {
+	if (chooseControllerIndex(who) == joystick)
+		m_board.pressRight1P();
 }
 
-void Game::handleJoyLeftRelease(int joystick) {
-	m_board.releaseLeft1P();
+void Game::handleJoyFirePress(int who, int joystick) {
+	if (chooseControllerIndex(who) == joystick)
+		m_board.pressShoot1P();
 }
 
-void Game::handleJoyRightRelease(int joystick) {
-	m_board.releaseRight1P();
+void Game::handleJoyLeftRelease(int who, int joystick) {
+	if (chooseControllerIndex(who) == joystick)
+		m_board.releaseLeft1P();
 }
 
-void Game::handleJoyFireRelease(int joystick) {
-	m_board.releaseShoot1P();
+void Game::handleJoyRightRelease(int who, int joystick) {
+	if (chooseControllerIndex(who) == joystick)
+		m_board.releaseRight1P();
+}
+
+void Game::handleJoyFireRelease(int who, int joystick) {
+	if (chooseControllerIndex(who) == joystick)
+		m_board.releaseShoot1P();
 }
 
 void Game::handleKeyDown(SDL_Keycode key) {
@@ -285,7 +332,7 @@ void Game::handleKeyUp(SDL_Keycode key) {
 	}
 }
 
-int Game::whichPlayer() {
+int Game::whichPlayer() const {
 	auto playerId = m_board.getMemory().get(0x2067);	// player MSB
 	switch (playerId) {
 	case 0x21:
@@ -377,8 +424,9 @@ void Game::Board_ShotSound(const EventArgs&) {
 
 void Game::Board_PlayerDieSound(const EventArgs&) {
 	m_effects.playPlayerDie();
-	if (m_gameController != nullptr)
-		m_gameController->startRumble();
+	auto controller = chooseController(whichPlayer());
+	if (controller != nullptr)
+		controller->startRumble();
 }
 
 void Game::Board_InvaderDieSound(const EventArgs&) {

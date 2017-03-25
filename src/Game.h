@@ -2,8 +2,10 @@
 
 #include <stdexcept>
 #include <string>
-#include <SDL.h>
 #include <memory>
+#include <map>
+
+#include <SDL.h>
 
 #include "Board.h"
 #include "ColourPalette.h"
@@ -38,7 +40,7 @@ private:
 	};
 
 	const Configuration& m_configuration;
-	Board m_board;
+	mutable Board m_board;
 	ColourPalette m_colours;
 
 	SDL_Window* m_window;
@@ -57,7 +59,8 @@ private:
 
 	SoundEffects m_effects;
 
-	std::shared_ptr<GameController> m_gameController;
+	std::map<int, std::shared_ptr<GameController>> m_gameControllers;
+	std::map<SDL_JoystickID, int> m_mappedControllers;
 
 	void runRasterScan();
 	void runVerticalBlank();
@@ -78,7 +81,7 @@ private:
 		return DisplayHeight * DisplayScale;
 	}
 
-	int whichPlayer();
+	int whichPlayer() const;
 
 	void Board_UfoSound(const EventArgs& event);
 	void Board_ShotSound(const EventArgs& event);
@@ -94,15 +97,19 @@ private:
 	void handleKeyDown(SDL_Keycode key);
 	void handleKeyUp(SDL_Keycode key);
 
-	void handleJoyButton(SDL_JoyButtonEvent event);
+	void handleJoyButtonDown(SDL_JoyButtonEvent event);
+	void handleJoyButtonUp(SDL_JoyButtonEvent event);
 
-	void handleJoyLeftPress(int joystick);
-	void handleJoyRightPress(int joystick);
-	void handleJoyFirePress(int joystick);
+	int chooseControllerIndex(int who) const;
+	std::shared_ptr<GameController> chooseController(int who) const;
 
-	void handleJoyLeftRelease(int joystick);
-	void handleJoyRightRelease(int joystick);
-	void handleJoyFireRelease(int joystick);
+	void handleJoyLeftPress(int who, int joystick);
+	void handleJoyRightPress(int who, int joystick);
+	void handleJoyFirePress(int who, int joystick);
+
+	void handleJoyLeftRelease(int who, int joystick);
+	void handleJoyRightRelease(int who, int joystick);
+	void handleJoyFireRelease(int who, int joystick);
 
 	static void dumpRendererInformation();
 	static void dumpRendererInformation(::SDL_RendererInfo info);

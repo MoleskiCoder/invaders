@@ -12,6 +12,15 @@ public:
 	void startRumble();
 	void stopRumble();
 
+	SDL_JoystickID getJoystickId() const {
+		return buildJoystickId(m_gameController);
+	}
+
+	static SDL_JoystickID buildJoystickId(SDL_GameController* controller) {
+		auto joystick = ::SDL_GameControllerGetJoystick(controller);
+		return ::SDL_JoystickInstanceID(joystick);
+	}
+
 private:
 	int m_index;
 	SDL_GameController* m_gameController;
