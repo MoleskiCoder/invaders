@@ -20,7 +20,8 @@ Uses SDL2 to provide graphics and SDL_mixer for sound effects.
 
 ### To be done
 
-* SDL Game Controller
+* AppVeyor integration
+* 8080 test cases. Maybe...
 
 ## Compiling
 
@@ -30,9 +31,14 @@ Compile with Visual Studio 2015 (via the solution)
 
 #### Prerequisites
 
+* SDL_Mixer
+* Visual Studio 2015
+
 ### Linux
 
-make opt
+* make opt
+* make debug
+* make coverage
 
 #### Prerequisites
 
@@ -53,3 +59,10 @@ src/invaders
 * ,: Left 2P
 * .: Right 2P
 * /: Fire 2P
+
+### XBox360 Controller
+
+* Left Bumper: Left
+* Right Bumper: Right
+* A Button: Fire
+
