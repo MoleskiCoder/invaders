@@ -3,7 +3,7 @@ EXE = invaders
 CXXFLAGS = -Wall `sdl2-config --cflags` -std=c++11 -pipe
 LDFLAGS  = `sdl2-config --libs` -lSDL2_mixer
 
-CXXFILES = Board.cpp ColourPalette.cpp Configuration.cpp CpuEventArgs.cpp Disassembler.cpp Game.cpp InputOutput.cpp Intel8080.cpp invaders.cpp Memory.cpp Profiler.cpp SoundEffects.cpp
+CXXFILES = Board.cpp ColourPalette.cpp Configuration.cpp CpuEventArgs.cpp Disassembler.cpp Game.cpp GameController.cpp InputOutput.cpp Intel8080.cpp invaders.cpp Memory.cpp Profiler.cpp SoundEffects.cpp
 
 CXXOBJECTS = $(CXXFILES:.cpp=.o)
 
