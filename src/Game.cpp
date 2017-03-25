@@ -139,7 +139,7 @@ void Game::runLoop() {
 					m_gameControllers[which] = controller;
 					SDL_assert(m_mappedControllers.find(joystickId) == m_mappedControllers.end());
 					m_mappedControllers[joystickId] = which;
-					SDL_Log("Joystick device %d added (%d controllers)", which, m_gameControllers.size());
+					SDL_Log("Joystick device %d added (%zd controllers)", which, m_gameControllers.size());
 				}
 				break;
 			case SDL_JOYDEVICEREMOVED: {
@@ -150,7 +150,7 @@ void Game::runLoop() {
 					auto joystickId = controller->getJoystickId();
 					m_mappedControllers.erase(joystickId);
 					m_gameControllers.erase(which);
-					SDL_Log("Joystick device %d removed (%d controllers)", which, m_gameControllers.size());
+					SDL_Log("Joystick device %d removed (%zd controllers)", which, m_gameControllers.size());
 				}
 				break;
 			}
