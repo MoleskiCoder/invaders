@@ -125,6 +125,12 @@ void Game::runLoop() {
 			case SDL_KEYUP:
 				handleKeyUp(e.key.keysym.sym);
 				break;
+			case SDL_JOYBUTTONDOWN:
+				handleJoyButton(e.jbutton);
+				break;
+			case SDL_JOYBUTTONUP:
+				handleJoyButton(e.jbutton);
+				break;
 			case SDL_JOYDEVICEADDED:
 				SDL_Log("Joystick device added");
 				if (m_gameController == nullptr)
@@ -161,6 +167,58 @@ void Game::runLoop() {
 		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
 			m_board.getCPUMutable().interrupt(2);	// end of the vertical blank
 	}
+}
+
+void Game::handleJoyButton(SDL_JoyButtonEvent event) {
+	auto joystick = event.which;
+	auto type = event.type;
+	auto value = event.button;
+	switch (value) {
+	case SDL_CONTROLLER_BUTTON_A:
+		if (type == SDL_JOYBUTTONDOWN)
+			handleJoyFirePress(joystick);
+		if (type == SDL_JOYBUTTONUP)
+			handleJoyFireRelease(joystick);
+		break;
+
+	case SDL_CONTROLLER_BUTTON_BACK:
+		if (type == SDL_JOYBUTTONDOWN)
+			handleJoyLeftPress(joystick);
+		if (type == SDL_JOYBUTTONUP)
+			handleJoyLeftRelease(joystick);
+		break;
+
+	case SDL_CONTROLLER_BUTTON_GUIDE:
+		if (type == SDL_JOYBUTTONDOWN)
+			handleJoyRightPress(joystick);
+		if (type == SDL_JOYBUTTONUP)
+			handleJoyRightRelease(joystick);
+		break;
+	}
+}
+
+void Game::handleJoyLeftPress(int joystick) {
+	m_board.pressLeft1P();
+}
+
+void Game::handleJoyRightPress(int joystick) {
+	m_board.pressRight1P();
+}
+
+void Game::handleJoyFirePress(int joystick) {
+	m_board.pressShoot1P();
+}
+
+void Game::handleJoyLeftRelease(int joystick) {
+	m_board.releaseLeft1P();
+}
+
+void Game::handleJoyRightRelease(int joystick) {
+	m_board.releaseRight1P();
+}
+
+void Game::handleJoyFireRelease(int joystick) {
+	m_board.releaseShoot1P();
 }
 
 void Game::handleKeyDown(SDL_Keycode key) {

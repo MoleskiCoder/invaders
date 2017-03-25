@@ -94,6 +94,16 @@ private:
 	void handleKeyDown(SDL_Keycode key);
 	void handleKeyUp(SDL_Keycode key);
 
+	void handleJoyButton(SDL_JoyButtonEvent event);
+
+	void handleJoyLeftPress(int joystick);
+	void handleJoyRightPress(int joystick);
+	void handleJoyFirePress(int joystick);
+
+	void handleJoyLeftRelease(int joystick);
+	void handleJoyRightRelease(int joystick);
+	void handleJoyFireRelease(int joystick);
+
 	static void dumpRendererInformation();
 	static void dumpRendererInformation(::SDL_RendererInfo info);
 };
