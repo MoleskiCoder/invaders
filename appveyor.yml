@@ -1,0 +1,8 @@
+version: 1.0.{build}
+before_build:
+- cmd: >-
+    nuget restore
+    git submodule update --init --recursive
+build:
+  project: invaders.sln
+  verbosity: minimal
