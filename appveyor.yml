@@ -4,6 +4,13 @@ before_build:
     nuget restore
 
     git submodule update --init --recursive
+
+    appveyor download https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-VC.zip
+
+    dir
+
+    cd
+
 build:
   project: invaders.sln
   verbosity: minimal
