@@ -39,6 +39,15 @@ void Memory::clear() {
 }
 
 void Memory::loadRom(std::string path, uint16_t offset) {
+	auto size = loadMemory(path, offset);
+	std::fill(m_locked.begin() + offset, m_locked.begin() + offset + size, true);
+}
+
+void Memory::loadRam(std::string path, uint16_t offset) {
+	loadMemory(path, offset);
+}
+
+int Memory::loadMemory(std::string path, uint16_t offset) {
 	std::ifstream file;
 	file.exceptions(std::ios::failbit | std::ios::badbit);
 
@@ -55,5 +64,5 @@ void Memory::loadRom(std::string path, uint16_t offset) {
 	file.read((char*)&m_bus[offset], size);
 	file.close();
 
-	std::fill(m_locked.begin() + offset, m_locked.begin() + offset + size, true);
+	return size;
 }

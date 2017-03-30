@@ -34,10 +34,13 @@ public:
 
 	void clear();
 	void loadRom(std::string path, uint16_t offset);
+	void loadRam(std::string path, uint16_t offset);
 
 private:
 	std::vector<uint8_t> m_bus;
 	std::vector<bool> m_locked;
 
 	int m_addressMask;		// Mirror
+
+	int loadMemory(std::string path, uint16_t offset);
 };
