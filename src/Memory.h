@@ -33,8 +33,8 @@ public:
 	void setWord(int address, uint16_t value);
 
 	void clear();
-	void loadRom(std::string path, uint16_t offset);
-	void loadRam(std::string path, uint16_t offset);
+	void loadRom(const std::string& path, uint16_t offset);
+	void loadRam(const std::string& path, uint16_t offset);
 
 private:
 	std::vector<uint8_t> m_bus;
@@ -42,5 +42,5 @@ private:
 
 	int m_addressMask;		// Mirror
 
-	int loadMemory(std::string path, uint16_t offset);
+	int loadMemory(const std::string& path, uint16_t offset);
 };
