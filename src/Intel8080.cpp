@@ -102,5 +102,5 @@ uint16_t Intel8080::popWord() {
 void Intel8080::___() {
 	auto opcode = m_memory.get(pc - 1);
 	auto message = Disassembler::invalid(opcode);
-	throw new std::domain_error(message);
+	throw std::domain_error(message);
 }

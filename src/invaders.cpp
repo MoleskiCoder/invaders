@@ -18,7 +18,7 @@ int main(int, char*[]) {
 
 	try {
 		game.runLoop();
-	} catch (std::exception& error) {
+	} catch (const std::exception& error) {
 		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "%s", error.what());
 		return 2;
 	}
