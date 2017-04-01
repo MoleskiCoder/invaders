@@ -158,11 +158,11 @@ void Game::runLoop() {
 
 		runRasterScan();
 
-		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
-			m_board.getCPUMutable().interrupt(0xcf);	// beginning of the vertical blank, RST 1
-
 		if (m_configuration.isDrawGraphics())
 			drawFrame();
+
+		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
+			m_board.triggerBeginVerticalBlank();
 
 		::SDL_RenderPresent(m_renderer);
 		if (!m_vsync) {
@@ -177,7 +177,7 @@ void Game::runLoop() {
 		runVerticalBlank();
 
 		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
-			m_board.getCPUMutable().interrupt(0xd7);	// end of the vertical blank, RST 2
+			m_board.triggerEndVerticalBlank();
 	}
 }
 

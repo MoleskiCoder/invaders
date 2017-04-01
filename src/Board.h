@@ -24,6 +24,14 @@ public:
 
 	void initialise();
 
+	void triggerBeginVerticalBlank() {
+		m_cpu.interrupt(0xcf);	// RST 1
+	}
+
+	void triggerEndVerticalBlank() {
+		m_cpu.interrupt(0xd7);	// RST 2
+	}
+
 	void pressCredit() { m_credit = true; }
 	void releaseCredit() { m_credit = false; }
 
