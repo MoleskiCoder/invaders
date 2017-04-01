@@ -76,11 +76,12 @@ void Intel8080::initialise() {
 void Intel8080::step() {
 
 	ExecutingInstruction.fire(CpuEventArgs(*this));
+	execute(fetchByte());
+}
 
-	auto opcode = m_memory.get(pc++);
+void Intel8080::execute(uint8_t opcode) {
 	const auto& instruction = instructions[opcode];
-	instruction.vector();
-	cycles += instruction.count;
+	execute(instruction);
 }
 
 //

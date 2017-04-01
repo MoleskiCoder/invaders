@@ -71,10 +71,10 @@ public:
 	void disableInterrupts() { m_interrupt = false; }
 	void enableInterrupts() { m_interrupt = true; }
 
-	void interrupt(uint8_t vector) {
+	void interrupt(uint8_t value) {
 		if (isInterruptable()) {
 			disableInterrupts();
-			restart(vector);
+			execute(value);
 		}
 	}
 
@@ -109,6 +109,13 @@ private:
 
 	bool m_interrupt;
 	bool m_halted;
+
+	void execute(uint8_t opcode);
+
+	void execute(const Instruction& instruction) {
+		instruction.vector();
+		cycles += instruction.count;
+	}
 
 	void adjustSign(uint8_t value) { f.S = ((value & 0x80) != 0); }
 	void adjustZero(uint8_t value) { f.Z = (value == 0); }
