@@ -74,7 +74,6 @@ void Intel8080::initialise() {
 }
 
 void Intel8080::step() {
-
 	ExecutingInstruction.fire(CpuEventArgs(*this));
 	execute(fetchByte());
 }
