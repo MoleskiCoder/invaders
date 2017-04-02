@@ -86,6 +86,17 @@ public:
 	void reset();
 	void step();
 
+	uint16_t getWord(int address) const {
+		auto low = m_memory.get(address);
+		auto high = m_memory.get(address + 1);
+		return makeWord(low, high);
+	}
+
+	void setWord(int address, uint16_t value) {
+		m_memory.set(address, Memory::lowByte(value));
+		m_memory.set(address + 1, Memory::highByte(value));
+	}
+
 private:
 	std::array<Instruction, 0x100> instructions;
 
@@ -156,6 +167,10 @@ private:
 		f.AC = (value & 0x0f) != 0xf;
 	}
 
+	static uint16_t makeWord(uint8_t low, uint8_t high) {
+		return (high << 8) + low;
+	}
+
 	void pushWord(uint16_t value);
 	uint16_t popWord();
 
@@ -164,7 +179,7 @@ private:
 	}
 
 	uint16_t fetchWord() {
-		auto value = m_memory.getWord(pc);
+		auto value = getWord(pc);
 		pc += 2;
 		return value;
 	}
@@ -383,12 +398,12 @@ private:
 
 	void shld() {
 		auto destination = fetchWord();
-		m_memory.setWord(destination, hl.word);
+		setWord(destination, hl.word);
 	}
 
 	void lhld() {
 		auto source = fetchWord();
-		hl.word = m_memory.getWord(source);
+		hl.word = getWord(source);
 	}
 
 	void xchg() {
@@ -402,7 +417,7 @@ private:
 	void push_h() { pushWord(hl.word); }
 
 	void push_psw() {
-		auto pair = Memory::makeWord(f, a);
+		auto pair = makeWord(f, a);
 		pushWord(pair);
 	}
 
@@ -417,8 +432,8 @@ private:
 	}
 
 	void xhtl() {
-		auto tos = m_memory.getWord(sp);
-		m_memory.setWord(sp, hl.word);
+		auto tos = getWord(sp);
+		setWord(sp, hl.word);
 		hl.word = tos;
 	}
 
@@ -456,7 +471,7 @@ private:
 	// call
 
 	void call() {
-		auto destination = m_memory.getWord(pc);
+		auto destination = getWord(pc);
 		callAddress(destination);
 	}
 

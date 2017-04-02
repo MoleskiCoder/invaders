@@ -16,6 +16,11 @@ public:
 		RasterHeight = 224
 	};
 
+	enum {
+		WorkRam = 0x2000,
+		VideoRam = 0x2400
+	};
+
 	Board(const Configuration& configuration);
 
 	Memory& getMemory() { return m_memory; }

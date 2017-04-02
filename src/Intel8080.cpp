@@ -87,11 +87,11 @@ void Intel8080::execute(uint8_t opcode) {
 
 void Intel8080::pushWord(uint16_t value) {
 	sp -= 2;
-	m_memory.setWord(sp, value);
+	setWord(sp, value);
 }
 
 uint16_t Intel8080::popWord() {
-	auto value = m_memory.getWord(sp);
+	auto value = getWord(sp);
 	sp += 2;
 	return value;
 }

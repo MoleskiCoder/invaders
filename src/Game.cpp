@@ -366,7 +366,7 @@ bool Game::finishedCycling(int limit, int cycles) const {
 void Game::drawFrame() {
 
 	auto memory = m_board.getMemory();
-	int address = Memory::VideoRam;
+	int address = Board::VideoRam;
 
 	auto black = m_colours.getColour(ColourPalette::Black);
 
