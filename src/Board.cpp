@@ -23,7 +23,8 @@ Board::Board(const Configuration& configuration)
   m_twoPlayerRight(false),
   m_tilt(false),
   m_preSound1(0),
-  m_preSound2(0) {
+  m_preSound2(0),
+  m_cocktailModeControl(false) {
 }
 
 void Board::initialise() {
@@ -168,6 +169,8 @@ void Board::Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent) {
 			auto soundUfoDie = ((value & 0x10) != 0) && ((m_preSound2 & 0x10) == 0);
 			if (soundUfoDie)
 				UfoDieSound.fire(EventArgs());
+
+			m_cocktailModeControl = (value & 0x20) != 0;
 		}
 		break;
 	}

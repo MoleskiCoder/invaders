@@ -368,6 +368,8 @@ void Game::drawFrame() {
 	auto memory = m_board.getMemory();
 	int address = Board::VideoRam;
 
+	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
+
 	auto black = m_colours.getColour(ColourPalette::Black);
 
 	// This code handles the display rotation
@@ -377,8 +379,8 @@ void Game::drawFrame() {
 			auto video = memory.get(++address);
 			for (int bit = 0; bit < 8; ++bit) {
 				auto inputX = byte * 8 + bit;
-				auto outputX = inputY;
-				auto outputY = (Board::RasterWidth - inputX - 1);
+				auto outputX = flip ? Board::RasterHeight - inputY - 1 : inputY;
+				auto outputY = flip ? inputX : Board::RasterWidth - inputX - 1;
 				auto outputPixel = outputX + outputY * DisplayWidth;
 				auto mask = 1 << bit;
 				auto inputPixel = video & mask;

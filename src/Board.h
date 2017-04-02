@@ -37,6 +37,10 @@ public:
 		m_cpu.interrupt(0xd7);	// RST 2
 	}
 
+	bool getCocktailModeControl() const {
+		return m_cocktailModeControl;
+	}
+
 	void pressCredit() { m_credit = true; }
 	void releaseCredit() { m_credit = false; }
 
@@ -145,6 +149,8 @@ private:
 
 	uint8_t m_preSound1;
 	uint8_t m_preSound2;
+
+	bool m_cocktailModeControl;
 
 	void Cpu_ExecutingInstruction_Cpm(const CpuEventArgs& cpuEvent);
 

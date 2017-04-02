@@ -80,6 +80,14 @@ public:
 		m_cyclesPerSecond = value;
 	}
 
+	bool getCocktailTable() const {
+		return m_cocktailTable;
+	}
+
+	void getCocktailTable(bool value) {
+		m_cocktailTable = value;
+	}
+
 	std::string getRomDirectory() const {
 		return m_romDirectory;
 	}
@@ -109,6 +117,7 @@ private:
 	bool m_vsyncLocked;
 	int m_framesPerSecond;
 	int m_cyclesPerSecond;
+	bool m_cocktailTable;
 
 	std::string m_romDirectory;
 	std::string m_soundDirectory;
