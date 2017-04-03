@@ -23,7 +23,8 @@ Board::Board(const Configuration& configuration)
   m_twoPlayerRight(false),
   m_tilt(false),
   m_preSound1(0),
-  m_preSound2(0) {
+  m_preSound2(0),
+  m_cocktailModeControl(false) {
 }
 
 void Board::initialise() {
@@ -45,10 +46,10 @@ void Board::initialise() {
 		break;
 
 	case Configuration::CPM:
-		//m_memory.loadRom(romDirectory + "/TEST.COM", 0x100);		// Microcosm
-		//m_memory.loadRom(romDirectory + "/8080PRE.COM", 0x100);	// Bartholomew preliminary
-		m_memory.loadRom(romDirectory + "/8080EX1.COM", 0x100);	// Cringle/Bartholomew
-		//m_memory.loadRom(romDirectory + "/CPUTEST.COM", 0x100);	// SuperSoft diagnostics
+		//m_memory.loadRam(romDirectory + "/TEST.COM", 0x100);		// Microcosm
+		//m_memory.loadRam(romDirectory + "/8080PRE.COM", 0x100);	// Bartholomew preliminary
+		m_memory.loadRam(romDirectory + "/8080EX1.COM", 0x100);	// Cringle/Bartholomew
+		//m_memory.loadRam(romDirectory + "/CPUTEST.COM", 0x100);	// SuperSoft diagnostics
 
 		m_memory.set(5, 0xc9);	// ret
 		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Cpm, this, std::placeholders::_1));
@@ -70,7 +71,7 @@ void Board::initialise() {
 	m_cpu.setProgramCounter(m_configuration.getStartAddress());
 }
 
-void Board::Cpu_ExecutingInstruction_Cpm(const CpuEventArgs&) {
+void Board::Cpu_ExecutingInstruction_Cpm(const Intel8080&) {
 	auto pc = m_cpu.getProgramCounter();
 	switch (pc) {
 	case 0x0:	// CP/M warm start
@@ -145,6 +146,18 @@ void Board::Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent) {
 			auto soundInvaderDie = ((value & 8) != 0) && ((m_preSound1 & 8) == 0);
 			if (soundInvaderDie)
 				InvaderDieSound.fire(EventArgs());
+
+			auto extend = ((value & 0x10) != 0) && ((m_preSound1 & 0x10) == 0);
+			if (extend)
+				ExtendSound.fire(EventArgs());
+
+			auto ampenable = ((value & 0x20) != 0) && ((m_preSound1 & 0x20) == 0);
+			if (ampenable)
+				EnableAmplifier.fire(EventArgs());
+
+			auto ampdisable = ((value & 0x20) == 0) && ((m_preSound1 & 0x20) != 0);
+			if (ampdisable)
+				DisableAmplifier.fire(EventArgs());
 		}
 		break;
 
@@ -168,6 +181,8 @@ void Board::Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent) {
 			auto soundUfoDie = ((value & 0x10) != 0) && ((m_preSound2 & 0x10) == 0);
 			if (soundUfoDie)
 				UfoDieSound.fire(EventArgs());
+
+			m_cocktailModeControl = (value & 0x20) != 0;
 		}
 		break;
 	}
@@ -205,20 +220,19 @@ void Board::Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent) {
 	}
 }
 
-void Board::Cpu_ExecutingInstruction_Profile(const CpuEventArgs& cpuEvent) {
+void Board::Cpu_ExecutingInstruction_Profile(const Intel8080& cpu) {
 
-	const auto& cpu = cpuEvent.getCpu();
 	const auto pc = cpu.getProgramCounter();
 
 	m_profiler.addAddress(pc);
 	m_profiler.addInstruction(m_memory.get(pc));
 }
 
-void Board::Cpu_ExecutingInstruction_Debug(const CpuEventArgs& cpuEvent) {
+void Board::Cpu_ExecutingInstruction_Debug(const Intel8080& cpu) {
 
 	std::cerr
-		<< Disassembler::state(cpuEvent.getCpu())
+		<< Disassembler::state(cpu)
 		<< "\t"
-		<< Disassembler::disassemble(cpuEvent.getCpu())
+		<< Disassembler::disassemble(cpu)
 		<< '\n';
 }

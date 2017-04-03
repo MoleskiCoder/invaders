@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Game.h"
 
+#include <algorithm>
+
 Game::Game(const Configuration& configuration)
 :	m_configuration(configuration),
 	m_board(configuration),
@@ -26,12 +28,16 @@ void Game::initialise() {
 	m_board.ShotSound.connect(std::bind(&Game::Board_ShotSound, this, std::placeholders::_1));
 	m_board.PlayerDieSound.connect(std::bind(&Game::Board_PlayerDieSound, this, std::placeholders::_1));
 	m_board.InvaderDieSound.connect(std::bind(&Game::Board_InvaderDieSound, this, std::placeholders::_1));
+	m_board.ExtendSound.connect(std::bind(&Game::Board_ExtendSound, this, std::placeholders::_1));
 
 	m_board.Walk1Sound.connect(std::bind(&Game::Board_Walk1Sound, this, std::placeholders::_1));
 	m_board.Walk2Sound.connect(std::bind(&Game::Board_Walk2Sound, this, std::placeholders::_1));
 	m_board.Walk3Sound.connect(std::bind(&Game::Board_Walk3Sound, this, std::placeholders::_1));
 	m_board.Walk4Sound.connect(std::bind(&Game::Board_Walk4Sound, this, std::placeholders::_1));
 	m_board.UfoDieSound.connect(std::bind(&Game::Board_UfoDieSound, this, std::placeholders::_1));
+
+	m_board.EnableAmplifier.connect(std::bind(&Game::Board_EnableAmplifier, this, std::placeholders::_1));
+	m_board.DisableAmplifier.connect(std::bind(&Game::Board_DisableAmplifier, this, std::placeholders::_1));
 
 	auto windowWidth = getScreenWidth();
 	auto windowHeight = getScreenHeight();
@@ -112,6 +118,8 @@ void Game::runLoop() {
 
 	auto& cpu = m_board.getCPUMutable();
 
+	auto graphics = m_configuration.isDrawGraphics();
+
 	while (!cpu.isHalted()) {
 		::SDL_Event e;
 		while (::SDL_PollEvent(&e)) {
@@ -156,28 +164,21 @@ void Game::runLoop() {
 			}
 		}
 
-		runRasterScan();
-
-		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
-			m_board.getCPUMutable().interrupt(1);	// beginning of the vertical blank
-
-		if (m_configuration.isDrawGraphics())
+		if (graphics) {
 			drawFrame();
+			::SDL_RenderPresent(m_renderer);
+		} else {
+			m_board.runFrame();
+		}
 
-		::SDL_RenderPresent(m_renderer);
-		if (!m_vsync) {
+		if (!m_vsync || !graphics) {
 			const auto elapsedTicks = ::SDL_GetTicks() - m_startTicks;
-			const auto neededTicks = (++m_frames / (float)m_fps) * 1000.0;
+			const auto neededTicks = (m_frames / (float)m_fps) * 1000.0;
 			auto sleepNeeded = (int)(neededTicks - elapsedTicks);
 			if (sleepNeeded > 0) {
 				::SDL_Delay(sleepNeeded);
 			}
 		}
-
-		runVerticalBlank();
-
-		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
-			m_board.getCPUMutable().interrupt(2);	// end of the vertical blank
 	}
 }
 
@@ -344,41 +345,39 @@ int Game::whichPlayer() const {
 	}
 }
 
-void Game::runRasterScan() {
-	runToLimit(m_configuration.getCyclesDuringRasterScan());
-}
-
-void Game::runVerticalBlank() {
-	runToLimit(m_configuration.getCyclesDuringVerticalBlank());
-}
-
-void Game::runToLimit(int limit) {
-	for (int cycles = 0; !finishedCycling(limit, cycles); ++cycles) {
-		m_board.getCPUMutable().step();
-	}
-}
-
-bool Game::finishedCycling(int limit, int cycles) const {
-	auto exhausted = cycles > limit;
-	return exhausted || m_board.getCPU().isHalted();
-}
-
 void Game::drawFrame() {
 
 	auto memory = m_board.getMemory();
-	int address = Memory::VideoRam;
+
+	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
+	auto invaders = m_configuration.getMachineMode() == Configuration::SpaceInvaders;
+	auto interlaced = m_configuration.isInterlaced();
+
+	auto renderOdd = interlaced ? m_frames % 2 == 1 : true;
+	auto renderEven = interlaced ? m_frames % 2 == 0 : true;
 
 	auto black = m_colours.getColour(ColourPalette::Black);
+	std::fill(m_pixels.begin(), m_pixels.end(), black);
 
 	// This code handles the display rotation
 	auto bytesPerScanLine = Board::RasterWidth / 8;
 	for (int inputY = 0; inputY < Board::RasterHeight; ++inputY) {
+		if (invaders && (inputY == 96))
+			m_board.triggerInterruptScanLine96();
+		m_board.runScanLine();
+		auto evenScanLine = (inputY % 2 == 0);
+		auto oddScanLine = !evenScanLine;
+		if (oddScanLine && !renderOdd)
+			continue;
+		if (evenScanLine && !renderEven)
+			continue;
+		auto address = Board::VideoRam + bytesPerScanLine * inputY;
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
 			auto video = memory.get(++address);
 			for (int bit = 0; bit < 8; ++bit) {
 				auto inputX = byte * 8 + bit;
-				auto outputX = inputY;
-				auto outputY = (Board::RasterWidth - inputX - 1);
+				auto outputX = flip ? Board::RasterHeight - inputY - 1 : inputY;
+				auto outputY = flip ? inputX : Board::RasterWidth - inputX - 1;
 				auto outputPixel = outputX + outputY * DisplayWidth;
 				auto mask = 1 << bit;
 				auto inputPixel = video & mask;
@@ -387,12 +386,19 @@ void Game::drawFrame() {
 			}
 		}
 	}
-	
+
+	if (invaders)
+		m_board.triggerInterruptScanLine224();
+
+	m_board.runVerticalBlank();
+
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 
 	verifySDLCall(
 		::SDL_RenderCopy(m_renderer, m_bitmapTexture, nullptr, nullptr), 
 		"Unable to copy texture to renderer");
+
+	++m_frames;
 }
 
 void Game::dumpRendererInformation() {
@@ -433,6 +439,10 @@ void Game::Board_InvaderDieSound(const EventArgs&) {
 	m_effects.playInvaderDie();
 }
 
+void Game::Board_ExtendSound(const EventArgs& event) {
+	m_effects.playExtend();
+}
+
 void Game::Board_Walk1Sound(const EventArgs&) {
 	m_effects.playWalk1();
 }
@@ -451,4 +461,12 @@ void Game::Board_Walk4Sound(const EventArgs&) {
 
 void Game::Board_UfoDieSound(const EventArgs&) {
 	m_effects.playUfoDie();
+}
+
+void Game::Board_EnableAmplifier(const EventArgs& event) {
+	m_effects.enable();
+}
+
+void Game::Board_DisableAmplifier(const EventArgs& event) {
+	m_effects.disable();
 }

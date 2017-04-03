@@ -2,33 +2,11 @@
 
 // Auxiliary carry logic from https://github.com/begoon/i8080-core
 
-#include <cstdint>
-#include <array>
-#include <functional>
-
-#include "Memory.h"
+#include "Processor.h"
 #include "StatusFlags.h"
-#include "InputOutput.h"
-#include "Signal.h"
-#include "CpuEventArgs.h"
 
-class Intel8080 {
+class Intel8080 : public Processor {
 public:
-
-	typedef union {
-		struct {
-#ifdef HOST_LITTLE_ENDIAN
-			uint8_t low;
-			uint8_t high;
-#endif
-#ifdef HOST_BIG_ENDIAN
-			uint8_t high;
-			uint8_t low;
-#endif
-		};
-		uint16_t word;
-	} register16_t;
-
 	typedef std::function<void()> instruction_t;
 
 	enum AddressingMode {
@@ -47,15 +25,9 @@ public:
 
 	Intel8080(Memory& memory, InputOutput& ports);
 
-	Signal<CpuEventArgs> ExecutingInstruction;
+	Signal<Intel8080> ExecutingInstruction;
 
 	const std::array<Instruction, 0x100>& getInstructions() const { return instructions;  }
-	const Memory& getMemory() const { return m_memory; }
-
-	uint16_t getProgramCounter() const { return pc; }
-	void setProgramCounter(uint16_t value) { pc = value; }
-
-	uint16_t getStackPointer() const { return sp; }
 
 	uint8_t getA() const { return a; }
 	StatusFlags getF() const { return f; }
@@ -71,19 +43,14 @@ public:
 	void disableInterrupts() { m_interrupt = false; }
 	void enableInterrupts() { m_interrupt = true; }
 
-	void interrupt(uint8_t vector) {
+	void interrupt(uint8_t value) {
 		if (isInterruptable()) {
 			disableInterrupts();
-			restart(vector);
+			execute(value);
 		}
 	}
 
-	bool isHalted() const { return m_halted; }
-	void halt() { m_halted = true; }
-
-	void initialise();
-
-	void reset();
+	virtual void initialise();
 	void step();
 
 private:
@@ -91,14 +58,6 @@ private:
 
 	std::array<bool, 8> m_halfCarryTableAdd = { { false, false, true, false, true, false, true, true } };
 	std::array<bool, 8> m_halfCarryTableSub = { { false, true, true, true, false, false, false, true } };
-
-	Memory& m_memory;
-	InputOutput& m_ports;
-
-	uint64_t cycles;
-
-	uint16_t pc;
-	uint16_t sp;
 
 	uint8_t a;
 	StatusFlags f;
@@ -108,7 +67,13 @@ private:
 	register16_t hl;
 
 	bool m_interrupt;
-	bool m_halted;
+
+	void execute(uint8_t opcode);
+
+	void execute(const Instruction& instruction) {
+		instruction.vector();
+		cycles += instruction.count;
+	}
 
 	void adjustSign(uint8_t value) { f.S = ((value & 0x80) != 0); }
 	void adjustZero(uint8_t value) { f.Z = (value == 0); }
@@ -149,19 +114,6 @@ private:
 		f.AC = (value & 0x0f) != 0xf;
 	}
 
-	void pushWord(uint16_t value);
-	uint16_t popWord();
-
-	uint8_t fetchByte() {
-		return m_memory.get(pc++);
-	}
-
-	uint16_t fetchWord() {
-		auto value = m_memory.getWord(pc);
-		pc += 2;
-		return value;
-	}
-
 	static Instruction INS(instruction_t method, AddressingMode mode, std::string disassembly, uint64_t cycles);
 	Instruction UNKNOWN();
 
@@ -187,6 +139,12 @@ private:
 		pc = address;
 	}
 
+	void jmpConditional(int conditional) {
+		auto destination = fetchWord();
+		if (conditional)
+			pc = destination;
+	}
+
 	void callConditional(int condition) {
 		if (condition) {
 			call();
@@ -201,12 +159,6 @@ private:
 			ret();
 			cycles += 6;
 		}
-	}
-
-	void jmpConditional(int conditional) {
-		auto destination = fetchWord();
-		if (conditional)
-			pc = destination;
 	}
 
 	void anda(uint8_t value) {
@@ -376,12 +328,12 @@ private:
 
 	void shld() {
 		auto destination = fetchWord();
-		m_memory.setWord(destination, hl.word);
+		setWord(destination, hl.word);
 	}
 
 	void lhld() {
 		auto source = fetchWord();
-		hl.word = m_memory.getWord(source);
+		hl.word = getWord(source);
 	}
 
 	void xchg() {
@@ -395,7 +347,7 @@ private:
 	void push_h() { pushWord(hl.word); }
 
 	void push_psw() {
-		auto pair = Memory::makeWord(f, a);
+		auto pair = makeWord(f, a);
 		pushWord(pair);
 	}
 
@@ -410,8 +362,8 @@ private:
 	}
 
 	void xhtl() {
-		auto tos = m_memory.getWord(sp);
-		m_memory.setWord(sp, hl.word);
+		auto tos = getWord(sp);
+		setWord(sp, hl.word);
 		hl.word = tos;
 	}
 
@@ -449,7 +401,7 @@ private:
 	// call
 
 	void call() {
-		auto destination = m_memory.getWord(pc);
+		auto destination = getWord(pc);
 		callAddress(destination);
 	}
 

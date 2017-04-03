@@ -78,7 +78,7 @@ std::string Disassembler::disassemble(const Intel8080& cpu) {
 		output << hex(memory.get(pc + 1));
 		break;
 	case Intel8080::Absolute:
-		output << hex(memory.getWord(pc + 1));
+		output << hex(cpu.getWord(pc + 1));
 		break;
 	default:
 		break;

@@ -16,6 +16,11 @@ public:
 		RasterHeight = 224
 	};
 
+	enum {
+		WorkRam = 0x2000,
+		VideoRam = 0x2400
+	};
+
 	Board(const Configuration& configuration);
 
 	Memory& getMemory() { return m_memory; }
@@ -23,6 +28,50 @@ public:
 	Intel8080& getCPUMutable() { return m_cpu; }
 
 	void initialise();
+
+	void triggerInterruptScanLine224() {
+		m_cpu.interrupt(0xcf);	// RST 1
+	}
+
+	void triggerInterruptScanLine96() {
+		m_cpu.interrupt(0xd7);	// RST 2
+	}
+
+	bool getCocktailModeControl() const {
+		return m_cocktailModeControl;
+	}
+
+	int getCyclesPerScanLine() const {
+		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
+	}
+
+	void runFrame() {
+		runRasterScan();
+		runVerticalBlank();
+	}
+
+	void runScanLine() {
+		runToLimit(getCyclesPerScanLine());
+	}
+
+	void runRasterScan() {
+		runToLimit(m_configuration.getCyclesPerRasterScan());
+	}
+
+	void runVerticalBlank() {
+		runToLimit(m_configuration.getCyclesPerVerticalBlank());
+	}
+
+	void runToLimit(int limit) {
+		for (int cycles = 0; !finishedCycling(limit, cycles); ++cycles) {
+			m_cpu.step();
+		}
+	}
+
+	bool finishedCycling(int limit, int cycles) const {
+		auto exhausted = cycles > limit;
+		return exhausted || m_cpu.isHalted();
+	}
 
 	void pressCredit() { m_credit = true; }
 	void releaseCredit() { m_credit = false; }
@@ -51,12 +100,16 @@ public:
 	Signal<EventArgs> ShotSound;
 	Signal<EventArgs> PlayerDieSound;
 	Signal<EventArgs> InvaderDieSound;
+	Signal<EventArgs> ExtendSound;
 
 	Signal<EventArgs> Walk1Sound;
 	Signal<EventArgs> Walk2Sound;
 	Signal<EventArgs> Walk3Sound;
 	Signal<EventArgs> Walk4Sound;
 	Signal<EventArgs> UfoDieSound;
+
+	Signal<EventArgs> EnableAmplifier;
+	Signal<EventArgs> DisableAmplifier;
 
 private:
 	enum InputPorts {
@@ -133,14 +186,16 @@ private:
 	uint8_t m_preSound1;
 	uint8_t m_preSound2;
 
-	void Cpu_ExecutingInstruction_Cpm(const CpuEventArgs& cpuEvent);
+	bool m_cocktailModeControl;
+
+	void Cpu_ExecutingInstruction_Cpm(const Intel8080& cpu);
 
 	void Board_PortWriting_SpaceInvaders(const PortEventArgs& portEvent);
 	void Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent);
 	void Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent);
 
-	void Cpu_ExecutingInstruction_Debug(const CpuEventArgs& cpuEvent);
-	void Cpu_ExecutingInstruction_Profile(const CpuEventArgs& cpuEvent);
+	void Cpu_ExecutingInstruction_Debug(const Intel8080& cpuEvent);
+	void Cpu_ExecutingInstruction_Profile(const Intel8080& cpuEvent);
 
 	void bdos();
 };

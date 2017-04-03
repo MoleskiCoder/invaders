@@ -62,13 +62,7 @@ private:
 	std::map<int, std::shared_ptr<GameController>> m_gameControllers;
 	std::map<SDL_JoystickID, int> m_mappedControllers;
 
-	void runRasterScan();
-	void runVerticalBlank();
-	
 	void drawFrame();
-
-	void runToLimit(int limit);
-	bool finishedCycling(int limit, int cycles) const;
 
 	void configureBackground() const;
 	void createBitmapTexture();
@@ -87,12 +81,16 @@ private:
 	void Board_ShotSound(const EventArgs& event);
 	void Board_PlayerDieSound(const EventArgs& event);
 	void Board_InvaderDieSound(const EventArgs& event);
+	void Board_ExtendSound(const EventArgs& event);
 
 	void Board_Walk1Sound(const EventArgs& event);
 	void Board_Walk2Sound(const EventArgs& event);
 	void Board_Walk3Sound(const EventArgs& event);
 	void Board_Walk4Sound(const EventArgs& event);
 	void Board_UfoDieSound(const EventArgs& event);
+
+	void Board_EnableAmplifier(const EventArgs& event);
+	void Board_DisableAmplifier(const EventArgs& event);
 
 	void handleKeyDown(SDL_Keycode key);
 	void handleKeyUp(SDL_Keycode key);

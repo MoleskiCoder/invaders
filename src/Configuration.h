@@ -44,6 +44,14 @@ public:
 		m_showWatchdogOutput = value;
 	}
 
+	bool isInterlaced() const {
+		return m_interlaced;
+	}
+
+	void setInterlaced(bool value) {
+		m_interlaced = value;
+	}
+
 	bool getVsyncLocked() const {
 		return m_vsyncLocked;
 	}
@@ -64,11 +72,11 @@ public:
 		return m_cyclesPerSecond / getFramesPerSecond();
 	}
 
-	int getCyclesDuringRasterScan() const {
-		return getCyclesPerFrame() - getCyclesDuringVerticalBlank();
+	int getCyclesPerRasterScan() const {
+		return getCyclesPerFrame() - getCyclesPerVerticalBlank();
 	}
 
-	int getCyclesDuringVerticalBlank() const {
+	int getCyclesPerVerticalBlank() const {
 		return getCyclesPerFrame() / 6;
 	}
 
@@ -78,6 +86,14 @@ public:
 
 	void setCyclesPerSecond(int value) {
 		m_cyclesPerSecond = value;
+	}
+
+	bool getCocktailTable() const {
+		return m_cocktailTable;
+	}
+
+	void getCocktailTable(bool value) {
+		m_cocktailTable = value;
 	}
 
 	std::string getRomDirectory() const {
@@ -106,9 +122,11 @@ private:
 	bool m_drawGraphics;
 	bool m_showWatchdogOutput;
 
+	bool m_interlaced;
 	bool m_vsyncLocked;
 	int m_framesPerSecond;
 	int m_cyclesPerSecond;
+	bool m_cocktailTable;
 
 	std::string m_romDirectory;
 	std::string m_soundDirectory;
