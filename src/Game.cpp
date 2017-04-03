@@ -28,12 +28,16 @@ void Game::initialise() {
 	m_board.ShotSound.connect(std::bind(&Game::Board_ShotSound, this, std::placeholders::_1));
 	m_board.PlayerDieSound.connect(std::bind(&Game::Board_PlayerDieSound, this, std::placeholders::_1));
 	m_board.InvaderDieSound.connect(std::bind(&Game::Board_InvaderDieSound, this, std::placeholders::_1));
+	m_board.ExtendSound.connect(std::bind(&Game::Board_ExtendSound, this, std::placeholders::_1));
 
 	m_board.Walk1Sound.connect(std::bind(&Game::Board_Walk1Sound, this, std::placeholders::_1));
 	m_board.Walk2Sound.connect(std::bind(&Game::Board_Walk2Sound, this, std::placeholders::_1));
 	m_board.Walk3Sound.connect(std::bind(&Game::Board_Walk3Sound, this, std::placeholders::_1));
 	m_board.Walk4Sound.connect(std::bind(&Game::Board_Walk4Sound, this, std::placeholders::_1));
 	m_board.UfoDieSound.connect(std::bind(&Game::Board_UfoDieSound, this, std::placeholders::_1));
+
+	m_board.EnableAmplifier.connect(std::bind(&Game::Board_EnableAmplifier, this, std::placeholders::_1));
+	m_board.DisableAmplifier.connect(std::bind(&Game::Board_DisableAmplifier, this, std::placeholders::_1));
 
 	auto windowWidth = getScreenWidth();
 	auto windowHeight = getScreenHeight();
@@ -435,6 +439,10 @@ void Game::Board_InvaderDieSound(const EventArgs&) {
 	m_effects.playInvaderDie();
 }
 
+void Game::Board_ExtendSound(const EventArgs& event) {
+	m_effects.playExtend();
+}
+
 void Game::Board_Walk1Sound(const EventArgs&) {
 	m_effects.playWalk1();
 }
@@ -453,4 +461,12 @@ void Game::Board_Walk4Sound(const EventArgs&) {
 
 void Game::Board_UfoDieSound(const EventArgs&) {
 	m_effects.playUfoDie();
+}
+
+void Game::Board_EnableAmplifier(const EventArgs& event) {
+	m_effects.enable();
+}
+
+void Game::Board_DisableAmplifier(const EventArgs& event) {
+	m_effects.disable();
 }

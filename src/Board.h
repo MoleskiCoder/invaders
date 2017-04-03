@@ -100,12 +100,16 @@ public:
 	Signal<EventArgs> ShotSound;
 	Signal<EventArgs> PlayerDieSound;
 	Signal<EventArgs> InvaderDieSound;
+	Signal<EventArgs> ExtendSound;
 
 	Signal<EventArgs> Walk1Sound;
 	Signal<EventArgs> Walk2Sound;
 	Signal<EventArgs> Walk3Sound;
 	Signal<EventArgs> Walk4Sound;
 	Signal<EventArgs> UfoDieSound;
+
+	Signal<EventArgs> EnableAmplifier;
+	Signal<EventArgs> DisableAmplifier;
 
 private:
 	enum InputPorts {

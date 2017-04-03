@@ -146,6 +146,18 @@ void Board::Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent) {
 			auto soundInvaderDie = ((value & 8) != 0) && ((m_preSound1 & 8) == 0);
 			if (soundInvaderDie)
 				InvaderDieSound.fire(EventArgs());
+
+			auto extend = ((value & 0x10) != 0) && ((m_preSound1 & 0x10) == 0);
+			if (extend)
+				ExtendSound.fire(EventArgs());
+
+			auto ampenable = ((value & 0x20) != 0) && ((m_preSound1 & 0x20) == 0);
+			if (ampenable)
+				EnableAmplifier.fire(EventArgs());
+
+			auto ampdisable = ((value & 0x20) == 0) && ((m_preSound1 & 0x20) != 0);
+			if (ampdisable)
+				DisableAmplifier.fire(EventArgs());
 		}
 		break;
 
