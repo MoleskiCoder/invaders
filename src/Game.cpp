@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Game.h"
 
+#include <algorithm>
+
 Game::Game(const Configuration& configuration)
 :	m_configuration(configuration),
 	m_board(configuration),
@@ -167,7 +169,7 @@ void Game::runLoop() {
 
 		if (!m_vsync || !graphics) {
 			const auto elapsedTicks = ::SDL_GetTicks() - m_startTicks;
-			const auto neededTicks = (++m_frames / (float)m_fps) * 1000.0;
+			const auto neededTicks = (m_frames / (float)m_fps) * 1000.0;
 			auto sleepNeeded = (int)(neededTicks - elapsedTicks);
 			if (sleepNeeded > 0) {
 				::SDL_Delay(sleepNeeded);
@@ -342,12 +344,16 @@ int Game::whichPlayer() const {
 void Game::drawFrame() {
 
 	auto memory = m_board.getMemory();
-	int address = Board::VideoRam;
 
 	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
 	auto invaders = m_configuration.getMachineMode() == Configuration::SpaceInvaders;
+	auto interlaced = m_configuration.isInterlaced();
+
+	auto renderOdd = interlaced ? m_frames % 2 == 1 : true;
+	auto renderEven = interlaced ? m_frames % 2 == 0 : true;
 
 	auto black = m_colours.getColour(ColourPalette::Black);
+	std::fill(m_pixels.begin(), m_pixels.end(), black);
 
 	// This code handles the display rotation
 	auto bytesPerScanLine = Board::RasterWidth / 8;
@@ -355,6 +361,13 @@ void Game::drawFrame() {
 		if (invaders && (inputY == 96))
 			m_board.triggerInterruptScanLine96();
 		m_board.runScanLine();
+		auto evenScanLine = (inputY % 2 == 0);
+		auto oddScanLine = !evenScanLine;
+		if (oddScanLine && !renderOdd)
+			continue;
+		if (evenScanLine && !renderEven)
+			continue;
+		auto address = Board::VideoRam + bytesPerScanLine * inputY;
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
 			auto video = memory.get(++address);
 			for (int bit = 0; bit < 8; ++bit) {
@@ -380,6 +393,8 @@ void Game::drawFrame() {
 	verifySDLCall(
 		::SDL_RenderCopy(m_renderer, m_bitmapTexture, nullptr, nullptr), 
 		"Unable to copy texture to renderer");
+
+	++m_frames;
 }
 
 void Game::dumpRendererInformation() {
