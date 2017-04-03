@@ -25,6 +25,8 @@ public:
 
 	Intel8080(Memory& memory, InputOutput& ports);
 
+	Signal<Intel8080> ExecutingInstruction;
+
 	const std::array<Instruction, 0x100>& getInstructions() const { return instructions;  }
 
 	uint8_t getA() const { return a; }
@@ -124,6 +126,23 @@ private:
 		adjustSZP((uint8_t)subtraction);
 		adjustAuxiliaryCarrySub(value, subtraction);
 		f.C = subtraction > 0xff;
+	}
+
+	void callAddress(uint16_t address) {
+		pushWord(pc + 2);
+		pc = address;
+	}
+
+	void restart(uint8_t position) {
+		uint16_t address = position << 3;
+		pushWord(pc);
+		pc = address;
+	}
+
+	void jmpConditional(int conditional) {
+		auto destination = fetchWord();
+		if (conditional)
+			pc = destination;
 	}
 
 	void callConditional(int condition) {

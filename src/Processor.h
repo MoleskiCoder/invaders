@@ -7,7 +7,6 @@
 #include "Memory.h"
 #include "InputOutput.h"
 #include "Signal.h"
-#include "CpuEventArgs.h"
 
 class Processor {
 public:
@@ -26,8 +25,6 @@ public:
 	} register16_t;
 
 	Processor(Memory& memory, InputOutput& ports);
-
-	Signal<CpuEventArgs> ExecutingInstruction;
 
 	const Memory& getMemory() const { return m_memory; }
 
@@ -81,22 +78,4 @@ protected:
 		pc += 2;
 		return value;
 	}
-
-	void callAddress(uint16_t address) {
-		pushWord(pc + 2);
-		pc = address;
-	}
-
-	void restart(uint8_t position) {
-		uint16_t address = position << 3;
-		pushWord(pc);
-		pc = address;
-	}
-
-	void jmpConditional(int conditional) {
-		auto destination = fetchWord();
-		if (conditional)
-			pc = destination;
-	}
 };
-

@@ -71,7 +71,7 @@ void Board::initialise() {
 	m_cpu.setProgramCounter(m_configuration.getStartAddress());
 }
 
-void Board::Cpu_ExecutingInstruction_Cpm(const CpuEventArgs&) {
+void Board::Cpu_ExecutingInstruction_Cpm(const Intel8080&) {
 	auto pc = m_cpu.getProgramCounter();
 	switch (pc) {
 	case 0x0:	// CP/M warm start
@@ -208,20 +208,19 @@ void Board::Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent) {
 	}
 }
 
-void Board::Cpu_ExecutingInstruction_Profile(const CpuEventArgs& cpuEvent) {
+void Board::Cpu_ExecutingInstruction_Profile(const Intel8080& cpu) {
 
-	const auto& cpu = cpuEvent.getCpu();
 	const auto pc = cpu.getProgramCounter();
 
 	m_profiler.addAddress(pc);
 	m_profiler.addInstruction(m_memory.get(pc));
 }
 
-void Board::Cpu_ExecutingInstruction_Debug(const CpuEventArgs& cpuEvent) {
+void Board::Cpu_ExecutingInstruction_Debug(const Intel8080& cpu) {
 
 	std::cerr
-		<< Disassembler::state(cpuEvent.getCpu())
+		<< Disassembler::state(cpu)
 		<< "\t"
-		<< Disassembler::disassemble(cpuEvent.getCpu())
+		<< Disassembler::disassemble(cpu)
 		<< '\n';
 }
