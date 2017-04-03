@@ -5,15 +5,10 @@
 #include "Disassembler.h"
 
 Intel8080::Intel8080(Memory& memory, InputOutput& ports)
-:	m_memory(memory),
-	m_ports(ports),
-	cycles(0),
-	pc(0),
-	sp(0),
+:	Processor(memory, ports),
 	a(0),
 	f(0),
-	m_interrupt(false),
-	m_halted(false) {
+	m_interrupt(false) {
 	bc.word = de.word = hl.word = 0;
 	installInstructions();
 }
@@ -63,14 +58,10 @@ void Intel8080::installInstructions() {
 	};
 }
 
-void Intel8080::reset() {
-	pc = 0;
-}
-
 void Intel8080::initialise() {
-	sp = bc.word = de.word = hl.word = 0;
+	Processor::initialise();
+	bc.word = de.word = hl.word = 0;
 	a = f = 0;
-	reset();
 }
 
 void Intel8080::step() {
@@ -81,19 +72,6 @@ void Intel8080::step() {
 void Intel8080::execute(uint8_t opcode) {
 	const auto& instruction = instructions[opcode];
 	execute(instruction);
-}
-
-//
-
-void Intel8080::pushWord(uint16_t value) {
-	sp -= 2;
-	setWord(sp, value);
-}
-
-uint16_t Intel8080::popWord() {
-	auto value = getWord(sp);
-	sp += 2;
-	return value;
 }
 
 //
