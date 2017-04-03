@@ -112,6 +112,8 @@ void Game::runLoop() {
 
 	auto& cpu = m_board.getCPUMutable();
 
+	auto graphics = m_configuration.isDrawGraphics();
+
 	while (!cpu.isHalted()) {
 		::SDL_Event e;
 		while (::SDL_PollEvent(&e)) {
@@ -156,15 +158,14 @@ void Game::runLoop() {
 			}
 		}
 
-		if (m_configuration.isDrawGraphics()) {
+		if (graphics) {
 			drawFrame();
+			::SDL_RenderPresent(m_renderer);
 		} else {
-			runRasterScan();
-			runVerticalBlank();
+			m_board.runFrame();
 		}
 
-		::SDL_RenderPresent(m_renderer);
-		if (!m_vsync) {
+		if (!m_vsync || !graphics) {
 			const auto elapsedTicks = ::SDL_GetTicks() - m_startTicks;
 			const auto neededTicks = (++m_frames / (float)m_fps) * 1000.0;
 			auto sleepNeeded = (int)(neededTicks - elapsedTicks);
@@ -338,25 +339,6 @@ int Game::whichPlayer() const {
 	}
 }
 
-void Game::runRasterScan() {
-	runToLimit(m_configuration.getCyclesPerRasterScan());
-}
-
-void Game::runVerticalBlank() {
-	runToLimit(m_configuration.getCyclesPerVerticalBlank());
-}
-
-void Game::runToLimit(int limit) {
-	for (int cycles = 0; !finishedCycling(limit, cycles); ++cycles) {
-		m_board.getCPUMutable().step();
-	}
-}
-
-bool Game::finishedCycling(int limit, int cycles) const {
-	auto exhausted = cycles > limit;
-	return exhausted || m_board.getCPU().isHalted();
-}
-
 void Game::drawFrame() {
 
 	auto memory = m_board.getMemory();
@@ -372,7 +354,7 @@ void Game::drawFrame() {
 	for (int inputY = 0; inputY < Board::RasterHeight; ++inputY) {
 		if (invaders && (inputY == 96))
 			m_board.triggerInterruptScanLine96();
-		runToLimit(m_board.getCyclesPerScanLine());
+		m_board.runScanLine();
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
 			auto video = memory.get(++address);
 			for (int bit = 0; bit < 8; ++bit) {
@@ -391,7 +373,7 @@ void Game::drawFrame() {
 	if (invaders)
 		m_board.triggerInterruptScanLine224();
 
-	runVerticalBlank();
+	m_board.runVerticalBlank();
 
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 

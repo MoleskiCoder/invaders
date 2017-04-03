@@ -45,6 +45,34 @@ public:
 		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
 	}
 
+	void runFrame() {
+		runRasterScan();
+		runVerticalBlank();
+	}
+
+	void runScanLine() {
+		runToLimit(getCyclesPerScanLine());
+	}
+
+	void runRasterScan() {
+		runToLimit(m_configuration.getCyclesPerRasterScan());
+	}
+
+	void runVerticalBlank() {
+		runToLimit(m_configuration.getCyclesPerVerticalBlank());
+	}
+
+	void runToLimit(int limit) {
+		for (int cycles = 0; !finishedCycling(limit, cycles); ++cycles) {
+			m_cpu.step();
+		}
+	}
+
+	bool finishedCycling(int limit, int cycles) const {
+		auto exhausted = cycles > limit;
+		return exhausted || m_cpu.isHalted();
+	}
+
 	void pressCredit() { m_credit = true; }
 	void releaseCredit() { m_credit = false; }
 

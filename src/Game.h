@@ -62,13 +62,7 @@ private:
 	std::map<int, std::shared_ptr<GameController>> m_gameControllers;
 	std::map<SDL_JoystickID, int> m_mappedControllers;
 
-	void runRasterScan();
-	void runVerticalBlank();
-	
 	void drawFrame();
-
-	void runToLimit(int limit);
-	bool finishedCycling(int limit, int cycles) const;
 
 	void configureBackground() const;
 	void createBitmapTexture();
