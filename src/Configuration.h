@@ -64,11 +64,11 @@ public:
 		return m_cyclesPerSecond / getFramesPerSecond();
 	}
 
-	int getCyclesDuringRasterScan() const {
-		return getCyclesPerFrame() - getCyclesDuringVerticalBlank();
+	int getCyclesPerRasterScan() const {
+		return getCyclesPerFrame() - getCyclesPerVerticalBlank();
 	}
 
-	int getCyclesDuringVerticalBlank() const {
+	int getCyclesPerVerticalBlank() const {
 		return getCyclesPerFrame() / 6;
 	}
 

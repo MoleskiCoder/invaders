@@ -29,16 +29,20 @@ public:
 
 	void initialise();
 
-	void triggerBeginVerticalBlank() {
+	void triggerInterruptScanLine224() {
 		m_cpu.interrupt(0xcf);	// RST 1
 	}
 
-	void triggerEndVerticalBlank() {
+	void triggerInterruptScanLine96() {
 		m_cpu.interrupt(0xd7);	// RST 2
 	}
 
 	bool getCocktailModeControl() const {
 		return m_cocktailModeControl;
+	}
+
+	int getCyclesPerScanLine() const {
+		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
 	}
 
 	void pressCredit() { m_credit = true; }

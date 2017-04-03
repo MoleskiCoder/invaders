@@ -156,13 +156,12 @@ void Game::runLoop() {
 			}
 		}
 
-		runRasterScan();
-
-		if (m_configuration.isDrawGraphics())
+		if (m_configuration.isDrawGraphics()) {
 			drawFrame();
-
-		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
-			m_board.triggerBeginVerticalBlank();
+		} else {
+			runRasterScan();
+			runVerticalBlank();
+		}
 
 		::SDL_RenderPresent(m_renderer);
 		if (!m_vsync) {
@@ -173,11 +172,6 @@ void Game::runLoop() {
 				::SDL_Delay(sleepNeeded);
 			}
 		}
-
-		runVerticalBlank();
-
-		if (m_configuration.getMachineMode() == Configuration::SpaceInvaders)
-			m_board.triggerEndVerticalBlank();
 	}
 }
 
@@ -345,11 +339,11 @@ int Game::whichPlayer() const {
 }
 
 void Game::runRasterScan() {
-	runToLimit(m_configuration.getCyclesDuringRasterScan());
+	runToLimit(m_configuration.getCyclesPerRasterScan());
 }
 
 void Game::runVerticalBlank() {
-	runToLimit(m_configuration.getCyclesDuringVerticalBlank());
+	runToLimit(m_configuration.getCyclesPerVerticalBlank());
 }
 
 void Game::runToLimit(int limit) {
@@ -369,12 +363,16 @@ void Game::drawFrame() {
 	int address = Board::VideoRam;
 
 	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
+	auto invaders = m_configuration.getMachineMode() == Configuration::SpaceInvaders;
 
 	auto black = m_colours.getColour(ColourPalette::Black);
 
 	// This code handles the display rotation
 	auto bytesPerScanLine = Board::RasterWidth / 8;
 	for (int inputY = 0; inputY < Board::RasterHeight; ++inputY) {
+		if (invaders && (inputY == 96))
+			m_board.triggerInterruptScanLine96();
+		runToLimit(m_board.getCyclesPerScanLine());
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
 			auto video = memory.get(++address);
 			for (int bit = 0; bit < 8; ++bit) {
@@ -389,7 +387,12 @@ void Game::drawFrame() {
 			}
 		}
 	}
-	
+
+	if (invaders)
+		m_board.triggerInterruptScanLine224();
+
+	runVerticalBlank();
+
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 
 	verifySDLCall(
