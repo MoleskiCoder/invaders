@@ -21,7 +21,7 @@ SoundEffects::SoundEffects(const Configuration& configuration)
 	m_playerDieChunk = loadEffect("BaseHit");
 	m_ufoDieChunk = loadEffect("UfoHit");
 	m_invaderDieChunk = loadEffect("InvHit");
-	//m_extendChunk = loadEffect("Extend");
+	m_extendChunk = loadEffect("Extend");
 	m_walk1Chunk = loadEffect("Walk1");
 	m_walk2Chunk = loadEffect("Walk2");
 	m_walk3Chunk = loadEffect("Walk3");
@@ -102,14 +102,13 @@ void SoundEffects::playInvaderDie() {
 }
 
 void SoundEffects::playExtend() {
-	//if (m_enabled)
-	//	playEffect(5, m_extendChunk.get());
+	if (m_enabled)
+		playEffect(5, m_extendChunk.get());
 }
 
 void SoundEffects::playWalk1() {
-	if (m_enabled) {
+	if (m_enabled)
 		playEffect(0, m_walk1Chunk.get());
-	}
 }
 
 void SoundEffects::playWalk2() {
