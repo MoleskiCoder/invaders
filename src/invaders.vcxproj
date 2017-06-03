@@ -175,6 +175,7 @@
     <ClCompile Include="ColourPalette.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Disassembler.cpp" />
+    <ClCompile Include="EventArgs.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="InputOutput.cpp" />

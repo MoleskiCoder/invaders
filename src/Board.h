@@ -194,8 +194,8 @@ private:
 	void Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent);
 	void Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent);
 
-	void Cpu_ExecutingInstruction_Debug(const Intel8080& cpuEvent);
-	void Cpu_ExecutingInstruction_Profile(const Intel8080& cpuEvent);
+	void Cpu_ExecutingInstruction_Debug(const Intel8080& cpu);
+	void Cpu_ExecutingInstruction_Profile(const Intel8080& cpu);
 
 	void bdos();
 };

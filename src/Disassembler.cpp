@@ -12,22 +12,22 @@
 Disassembler::Disassembler() {
 }
 
-std::string Disassembler::state(const Intel8080& cpu) {
+std::string Disassembler::state(Intel8080& cpu) {
 
 	auto pc = cpu.getProgramCounter();
 	auto sp = cpu.getStackPointer();
 
-	auto a = cpu.getA();
-	auto f = cpu.getF();
+	auto a = cpu.A();
+	auto f = cpu.F();
 
-	auto b = cpu.getBC().high;
-	auto c = cpu.getBC().low;
+	auto b = cpu.B();
+	auto c = cpu.C();
 
-	auto d = cpu.getDE().high;
-	auto e = cpu.getDE().low;
+	auto d = cpu.D();
+	auto e = cpu.E();
 
-	auto h = cpu.getHL().high;
-	auto l = cpu.getHL().low;
+	auto h = cpu.H();
+	auto l = cpu.L();
 
 	std::ostringstream output;
 
@@ -43,11 +43,11 @@ std::string Disassembler::state(const Intel8080& cpu) {
 	return output.str();
 }
 
-std::string Disassembler::disassemble(const Intel8080& cpu) {
+std::string Disassembler::disassemble(Intel8080& cpu) {
 
 	const auto& memory = cpu.getMemory();
 	auto pc = cpu.getProgramCounter();
-	auto opcode = memory.get(pc);
+	auto opcode = memory.peek(pc);
 	const auto& instruction = cpu.getInstructions()[opcode];
 
 	std::ostringstream output;
@@ -58,11 +58,11 @@ std::string Disassembler::disassemble(const Intel8080& cpu) {
 	// hex raw operand
 	switch (instruction.mode) {
 	case Intel8080::Immediate:
-		output << hex(memory.get(pc + 1));
+		output << hex(memory.peek(pc + 1));
 		break;
 	case Intel8080::Absolute:
-		output << hex(memory.get(pc + 1));
-		output << hex(memory.get(pc + 2));
+		output << hex(memory.peek(pc + 1));
+		output << hex(memory.peek(pc + 2));
 		break;
 	default:
 		break;
@@ -75,7 +75,7 @@ std::string Disassembler::disassemble(const Intel8080& cpu) {
 	// disassembly operand
 	switch (instruction.mode) {
 	case Intel8080::Immediate:
-		output << hex(memory.get(pc + 1));
+		output << hex(memory.peek(pc + 1));
 		break;
 	case Intel8080::Absolute:
 		output << hex(cpu.getWord(pc + 1));

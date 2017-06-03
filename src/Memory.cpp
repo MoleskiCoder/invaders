@@ -1,24 +1,71 @@
 #include "stdafx.h"
 #include "Memory.h"
+#include "Processor.h"
 
 #include <iostream>
 #include <fstream>
 #include <algorithm>
 
-Memory::Memory(int addressMask)
-: m_addressMask(addressMask) {}
+Memory::Memory(uint16_t addressMask)
+	: m_address(0),
+	m_addressMask(addressMask),
+	m_data(&(m_bus[m_address])) {}
 
-uint8_t Memory::get(int address) const {
-	return m_bus[address & m_addressMask];
+uint8_t Memory::peek(uint16_t address) const {
+	return m_bus[address];
 }
 
-void Memory::set(int address, uint8_t value) {
-	if (!m_locked[address & m_addressMask])
-		m_bus[address & m_addressMask] = value;
+uint16_t Memory::peekWord(uint16_t address) const {
+	auto low = peek(address);
+	auto high = peek(address + 1);
+	return Processor::makeWord(low, high);
+}
+
+uint8_t Memory::get(uint16_t address) {
+	ADDRESS() = address;
+	return reference();
+}
+
+uint16_t Memory::getWord(uint16_t address) {
+	auto low = get(address);
+	auto high = get(address + 1);
+	return Processor::makeWord(low, high);
+}
+
+void Memory::set(uint16_t address, uint8_t value) {
+	ADDRESS() = address;
+	reference() = value;
+}
+
+void Memory::setWord(uint16_t address, uint16_t value) {
+	set(address, lowByte(value));
+	set(address + 1, highByte(value));
+}
+
+uint8_t& Memory::reference() {
+	uint16_t effective = ADDRESS() & m_addressMask;
+	return m_locked[effective] ? placeDATA(m_bus[effective]) : referenceDATA(m_bus[effective]);
+}
+
+uint8_t& Memory::placeDATA(uint8_t value) {
+	m_temporary = value;
+	m_data = &m_temporary;
+	return DATA();
+}
+
+uint8_t& Memory::referenceDATA(uint8_t& value) {
+	m_data = &value;
+	return DATA();
+}
+
+uint8_t& Memory::reference(uint16_t address) {
+	ADDRESS() = address;
+	return reference();
 }
 
 void Memory::clear() {
 	std::fill(m_bus.begin(), m_bus.end(), 0);
+	std::fill(m_locked.begin(), m_locked.end(), false);
 }
 
 void Memory::loadRom(const std::string& path, uint16_t offset) {

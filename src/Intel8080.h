@@ -29,12 +29,20 @@ public:
 
 	const std::array<Instruction, 0x100>& getInstructions() const { return instructions;  }
 
-	uint8_t getA() const { return a; }
-	StatusFlags getF() const { return f; }
+	uint8_t A() { return a; }
+	StatusFlags F() { return f; }
 
-	const register16_t& getBC() const { return bc; }
-	const register16_t& getDE() const { return de; }
-	const register16_t& getHL() const { return hl; }
+	register16_t& BC() { return bc; }
+	uint8_t& B() { return bc.high; }
+	uint8_t& C() { return bc.low; }
+
+	register16_t& DE() { return de; }
+	uint8_t& D() { return de.high; }
+	uint8_t& E() { return de.low; }
+
+	register16_t& HL() { return hl; }
+	uint8_t& H() { return hl.high; }
+	uint8_t& L() { return hl.low; }
 
 	bool isInterruptable() const {
 		return m_interrupt;
@@ -80,7 +88,7 @@ private:
 
 	void adjustParity(uint8_t value) {
 		static const uint8_t lookup[0x10] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
-		auto set = (lookup[value >> 4] + lookup[value & 0xF]);
+		auto set = (lookup[highNibble(value)] + lookup[lowNibble(value)]);
 		f.P = (set % 2) == 0;
 	}
 
@@ -177,16 +185,16 @@ private:
 		adjustSZP(a ^= value);
 	}
 
-	void add(uint8_t value) {
-		uint16_t sum = a + value;
+	void add(uint8_t value, int carry = 0) {
+		uint16_t sum = a + value + carry;
+		adjustAuxiliaryCarryAdd(value, sum);
 		a = Memory::lowByte(sum);
 		f.C = sum > 0xff;
 		adjustSZP(a);
-		adjustAuxiliaryCarryAdd(value, sum);
 	}
 
 	void adc(uint8_t value) {
-		add(value + f.C);
+		add(value, f.C);
 	}
 
 	void dad(uint16_t value) {
@@ -195,16 +203,16 @@ private:
 		hl.word = (uint16_t)sum;
 	}
 
-	void sub(uint8_t value) {
-		uint16_t difference = a - value;
+	void sub(uint8_t value, int carry = 0) {
+		uint16_t difference = a - value - carry;
+		adjustAuxiliaryCarrySub(value, difference);
 		a = Memory::lowByte(difference);
 		f.C = difference > 0xff;
 		adjustSZP(a);
-		adjustAuxiliaryCarrySub(value, difference);
 	}
 
 	void sbb(uint8_t value) {
-		sub(value + f.C);
+		sub(value, f.C);
 	}
 
 	void mov_m_r(uint8_t value) {
@@ -668,10 +676,10 @@ private:
 	void daa() {
 		auto carry = f.C;
 		uint8_t addition = 0;
-		if (f.AC || (a & 0xf) > 9) {
+		if (f.AC || lowNibble(a) > 9) {
 			addition = 0x6;
 		}
-		if (f.C || (a >> 4) > 9 || ((a >> 4) >= 9 && (a & 0xf) > 9)) {
+		if (f.C || highNibble(a) > 9 || (highNibble(a) >= 9 && lowNibble(a) > 9)) {
 			addition |= 0x60;
 			carry = true;
 		}
