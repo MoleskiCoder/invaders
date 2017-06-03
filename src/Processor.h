@@ -96,7 +96,7 @@ protected:
 	Memory& m_memory;
 	InputOutput& m_ports;
 
-	uint64_t cycles;
+	int cycles;
 
 	uint16_t pc;
 	uint16_t sp;

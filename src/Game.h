@@ -31,7 +31,7 @@ public:
 
 	void runLoop();
 	void initialise();
-	
+
 private:
 	enum {
 		DisplayScale = 2,
@@ -62,7 +62,7 @@ private:
 	std::map<int, std::shared_ptr<GameController>> m_gameControllers;
 	std::map<SDL_JoystickID, int> m_mappedControllers;
 
-	void drawFrame();
+	int drawFrame(int prior);
 
 	void configureBackground() const;
 	void createBitmapTexture();

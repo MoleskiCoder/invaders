@@ -20,7 +20,7 @@ public:
 		instruction_t vector = nullptr;
 		AddressingMode mode = Unknown;
 		std::string disassembly;
-		uint64_t count = 0;
+		int count = 0;
 	};
 
 	Intel8080(Memory& memory, InputOutput& ports);
@@ -51,15 +51,16 @@ public:
 	void disableInterrupts() { m_interrupt = false; }
 	void enableInterrupts() { m_interrupt = true; }
 
-	void interrupt(uint8_t value) {
+	int interrupt(uint8_t value) {
 		if (isInterruptable()) {
 			disableInterrupts();
-			execute(value);
+			return execute(value);
 		}
+		return 0;
 	}
 
 	virtual void initialise();
-	void step();
+	int step();
 
 private:
 	std::array<Instruction, 0x100> instructions;
@@ -76,11 +77,12 @@ private:
 
 	bool m_interrupt;
 
-	void execute(uint8_t opcode);
+	int execute(uint8_t opcode);
 
-	void execute(const Instruction& instruction) {
+	int execute(const Instruction& instruction) {
+		cycles = 0;
 		instruction.vector();
-		cycles += instruction.count;
+		return cycles + instruction.count;
 	}
 
 	void adjustSign(uint8_t value) { f.S = ((value & 0x80) != 0); }
@@ -122,7 +124,7 @@ private:
 		f.AC = (value & 0x0f) != 0xf;
 	}
 
-	static Instruction INS(instruction_t method, AddressingMode mode, std::string disassembly, uint64_t cycles);
+	static Instruction INS(instruction_t method, AddressingMode mode, std::string disassembly, int cycles);
 	Instruction UNKNOWN();
 
 	void installInstructions();

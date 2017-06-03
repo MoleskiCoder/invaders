@@ -29,12 +29,12 @@ public:
 
 	void initialise();
 
-	void triggerInterruptScanLine224() {
-		m_cpu.interrupt(0xcf);	// RST 1
+	int triggerInterruptScanLine224() {
+		return m_cpu.interrupt(0xd7);	// RST 2
 	}
 
-	void triggerInterruptScanLine96() {
-		m_cpu.interrupt(0xd7);	// RST 2
+	int triggerInterruptScanLine96() {
+		return m_cpu.interrupt(0xcf);	// RST 1
 	}
 
 	bool getCocktailModeControl() const {
@@ -45,27 +45,29 @@ public:
 		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
 	}
 
-	void runFrame() {
-		runRasterScan();
-		runVerticalBlank();
+	int runFrame(int prior) {
+		prior = runRasterScan(prior);
+		return runVerticalBlank(prior);
 	}
 
-	void runScanLine() {
-		runToLimit(getCyclesPerScanLine());
+	int runScanLine(int prior) {
+		return runToLimit(prior, getCyclesPerScanLine());
 	}
 
-	void runRasterScan() {
-		runToLimit(m_configuration.getCyclesPerRasterScan());
+	int runRasterScan(int prior) {
+		return runToLimit(prior, m_configuration.getCyclesPerRasterScan());
 	}
 
-	void runVerticalBlank() {
-		runToLimit(m_configuration.getCyclesPerVerticalBlank());
+	int runVerticalBlank(int prior) {
+		return runToLimit(prior, m_configuration.getCyclesPerVerticalBlank());
 	}
 
-	void runToLimit(int limit) {
-		for (int cycles = 0; !finishedCycling(limit, cycles); ++cycles) {
-			m_cpu.step();
+	int runToLimit(int prior, int limit) {
+		int cycles = prior;
+		while (!finishedCycling(limit, cycles)) {
+			cycles += m_cpu.step();
 		}
+		return cycles - limit;
 	}
 
 	bool finishedCycling(int limit, int cycles) const {
@@ -194,8 +196,8 @@ private:
 	void Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent);
 	void Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent);
 
-	void Cpu_ExecutingInstruction_Debug(const Intel8080& cpu);
-	void Cpu_ExecutingInstruction_Profile(const Intel8080& cpu);
+	void Cpu_ExecutingInstruction_Debug(const Intel8080& cpuEvent);
+	void Cpu_ExecutingInstruction_Profile(const Intel8080& cpuEvent);
 
 	void bdos();
 };

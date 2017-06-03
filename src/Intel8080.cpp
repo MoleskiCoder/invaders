@@ -13,7 +13,7 @@ Intel8080::Intel8080(Memory& memory, InputOutput& ports)
 	installInstructions();
 }
 
-Intel8080::Instruction Intel8080::INS(instruction_t method, AddressingMode mode, std::string disassembly, uint64_t cycles) {
+Intel8080::Instruction Intel8080::INS(instruction_t method, AddressingMode mode, std::string disassembly, int cycles) {
 	Intel8080::Instruction returnValue;
 	returnValue.vector = method;
 	returnValue.mode = mode;
@@ -64,14 +64,14 @@ void Intel8080::initialise() {
 	a = f = 0;
 }
 
-void Intel8080::step() {
+int Intel8080::step() {
 	ExecutingInstruction.fire(*this);
-	execute(fetchByte());
+	return execute(fetchByte());
 }
 
-void Intel8080::execute(uint8_t opcode) {
+int Intel8080::execute(uint8_t opcode) {
 	const auto& instruction = instructions[opcode];
-	execute(instruction);
+	return execute(instruction);
 }
 
 //
