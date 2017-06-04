@@ -139,20 +139,22 @@ private:
 	}
 
 	void callAddress(uint16_t address) {
-		pushWord(pc + 2);
-		pc = address;
+		register16_t saved = pc;
+		saved.word += 2;
+		pushWord(saved);
+		pc.word = address;
 	}
 
 	void restart(uint8_t position) {
 		uint16_t address = position << 3;
 		pushWord(pc);
-		pc = address;
+		pc.word = address;
 	}
 
 	void jmpConditional(int conditional) {
 		auto destination = fetchWord();
 		if (conditional)
-			pc = destination;
+			pc.word = destination;
 	}
 
 	void callConditional(int condition) {
@@ -160,7 +162,7 @@ private:
 			call();
 			cycles += 6;
 		} else {
-			pc += 2;
+			pc.word += 2;
 		}
 	}
 
@@ -188,10 +190,11 @@ private:
 	}
 
 	void add(uint8_t value, int carry = 0) {
-		uint16_t sum = A() + value + carry;
-		adjustAuxiliaryCarryAdd(value, sum);
-		A() = Memory::lowByte(sum);
-		F().C = sum > 0xff;
+		register16_t sum;
+		sum.word = A() + value + carry;
+		adjustAuxiliaryCarryAdd(value, sum.word);
+		A() = sum.low;
+		F().C = sum.word > 0xff;
 		adjustSZP(A());
 	}
 
@@ -206,10 +209,11 @@ private:
 	}
 
 	void sub(uint8_t value, int carry = 0) {
-		uint16_t difference = A() - value - carry;
-		adjustAuxiliaryCarrySub(value, difference);
-		A() = Memory::lowByte(difference);
-		F().C = difference > 0xff;
+		register16_t difference;
+		difference.word = A() - value - carry;
+		adjustAuxiliaryCarrySub(value, difference.word);
+		A() = difference.low;
+		F().C = difference.word > 0xff;
 		adjustSZP(A());
 	}
 
@@ -338,12 +342,11 @@ private:
 
 	void shld() {
 		auto destination = fetchWord();
-		setWord(destination, HL().word);
+		setWord(destination, HL());
 	}
 
 	void lhld() {
-		auto source = fetchWord();
-		HL().word = getWord(source);
+		HL() = getWord(fetchWord());
 	}
 
 	void xchg() {
@@ -352,41 +355,43 @@ private:
 
 	// stack ops
 
-	void push_b() { pushWord(BC().word); }
-	void push_d() { pushWord(DE().word); }
-	void push_h() { pushWord(HL().word); }
+	void push_b() { pushWord(BC()); }
+	void push_d() { pushWord(DE()); }
+	void push_h() { pushWord(HL()); }
 
 	void push_psw() {
-		auto pair = makeWord(F(), A());
+		register16_t pair;
+		pair.low = F();
+		pair.high = A();
 		pushWord(pair);
 	}
 
-	void pop_b() { BC().word = popWord(); }
-	void pop_d() { DE().word = popWord(); }
-	void pop_h() { HL().word = popWord(); }
+	void pop_b() { BC() = popWord(); }
+	void pop_d() { DE() = popWord(); }
+	void pop_h() { HL() = popWord(); }
 
 	void pop_psw() {
 		auto af = popWord();
-		A() = Memory::highByte(af);
-		F() = Memory::lowByte(af);
+		A() = af.high;
+		F() = af.low;
 	}
 
 	void xhtl() {
-		auto tos = getWord(sp);
-		setWord(sp, HL().word);
-		HL().word = tos;
+		auto tos = getWord(sp.word);
+		setWord(sp.word, HL());
+		HL() = tos;
 	}
 
 	void sphl() {
-		sp = HL().word;
+		sp = HL();
 	}
 
 	void lxi_sp() {
-		sp = fetchWord();
+		sp.word = fetchWord();
 	}
 
-	void inx_sp() { ++sp; }
-	void dcx_sp() { --sp; }
+	void inx_sp() { ++sp.word; }
+	void dcx_sp() { --sp.word; }
 
 	// jump
 
@@ -405,14 +410,14 @@ private:
 	void jp() { jmpConditional(!F().S); }
 	
 	void pchl() {
-		pc = HL().word;
+		pc = HL();
 	}
 
 	// call
 
 	void call() {
-		auto destination = getWord(pc);
-		callAddress(destination);
+		auto destination = getWord(pc.word);
+		callAddress(destination.word);
 	}
 
 	void cc() { callConditional(F().C); }
@@ -529,7 +534,7 @@ private:
 	void dad_b() { dad(BC().word); }
 	void dad_d() { dad(DE().word); }
 	void dad_h() { dad(HL().word); }
-	void dad_sp() { dad(sp); }
+	void dad_sp() { dad(sp.word); }
 
 	// subtract
 

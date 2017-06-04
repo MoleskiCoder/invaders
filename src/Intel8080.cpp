@@ -77,7 +77,7 @@ int Intel8080::execute(uint8_t opcode) {
 //
 
 void Intel8080::___() {
-	auto opcode = m_memory.get(pc - 1);
+	auto opcode = m_memory.get(pc.word - 1);
 	auto message = Disassembler::invalid(opcode);
 	throw std::domain_error(message);
 }

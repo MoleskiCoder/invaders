@@ -32,9 +32,9 @@ std::string Disassembler::state(Intel8080& cpu) {
 	std::ostringstream output;
 
 	output
-		<< "PC=" << hex(pc)
+		<< "PC=" << hex(pc.word)
 		<< " "
-		<< "SP=" << hex(sp)
+		<< "SP=" << hex(sp.word)
 		<< " " << "A=" << hex(a) << " " << "F=" << (std::string)f
 		<< " " << "B=" << hex(b) << " " << "C=" << hex(c)
 		<< " " << "D=" << hex(d) << " " << "E=" << hex(e)
@@ -47,7 +47,7 @@ std::string Disassembler::disassemble(Intel8080& cpu) {
 
 	const auto& memory = cpu.getMemory();
 	auto pc = cpu.getProgramCounter();
-	auto opcode = memory.peek(pc);
+	auto opcode = memory.peek(pc.word);
 	const auto& instruction = cpu.getInstructions()[opcode];
 
 	std::ostringstream output;
@@ -58,11 +58,11 @@ std::string Disassembler::disassemble(Intel8080& cpu) {
 	// hex raw operand
 	switch (instruction.mode) {
 	case Intel8080::Immediate:
-		output << hex(memory.peek(pc + 1));
+		output << hex(memory.peek(pc.word + 1));
 		break;
 	case Intel8080::Absolute:
-		output << hex(memory.peek(pc + 1));
-		output << hex(memory.peek(pc + 2));
+		output << hex(memory.peek(pc.word + 1));
+		output << hex(memory.peek(pc.word + 2));
 		break;
 	default:
 		break;
@@ -75,10 +75,10 @@ std::string Disassembler::disassemble(Intel8080& cpu) {
 	// disassembly operand
 	switch (instruction.mode) {
 	case Intel8080::Immediate:
-		output << hex(memory.peek(pc + 1));
+		output << hex(memory.peek(pc.word + 1));
 		break;
 	case Intel8080::Absolute:
-		output << hex(cpu.getWord(pc + 1));
+		output << hex(cpu.getWord(pc.word + 1).word);
 		break;
 	default:
 		break;

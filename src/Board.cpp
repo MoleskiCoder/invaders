@@ -73,7 +73,7 @@ void Board::initialise() {
 
 void Board::Cpu_ExecutingInstruction_Cpm(const Intel8080&) {
 	auto pc = m_cpu.getProgramCounter();
-	switch (pc) {
+	switch (pc.word) {
 	case 0x0:	// CP/M warm start
 		m_cpu.halt();
 		m_profiler.dump();
@@ -224,8 +224,8 @@ void Board::Cpu_ExecutingInstruction_Profile(const Intel8080& cpu) {
 
 	const auto pc = cpu.getProgramCounter();
 
-	m_profiler.addAddress(pc);
-	m_profiler.addInstruction(m_memory.peek(pc));
+	m_profiler.addAddress(pc.word);
+	m_profiler.addInstruction(m_memory.peek(pc.word));
 }
 
 void Board::Cpu_ExecutingInstruction_Debug(const Intel8080&) {

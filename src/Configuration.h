@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "Memory.h"
+
 class Configuration {
 public:
 	enum MachineMode {
@@ -112,8 +114,10 @@ public:
 		m_machineMode = value;
 	}
 
-	uint16_t getStartAddress() const {
-		return getMachineMode() == CPM ? 0x100 : 0;
+	register16_t getStartAddress() const {
+		register16_t returned;
+		returned.word = getMachineMode() == CPM ? 0x100 : 0;
+		return returned;
 	}
 
 private:

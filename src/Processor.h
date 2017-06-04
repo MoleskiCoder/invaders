@@ -51,32 +51,18 @@ public:
 		return (high << 8) | low;
 	}
 
-	typedef union {
-		struct {
-#ifdef HOST_LITTLE_ENDIAN
-			uint8_t low;
-			uint8_t high;
-#endif
-#ifdef HOST_BIG_ENDIAN
-			uint8_t high;
-			uint8_t low;
-#endif
-		};
-		uint16_t word;
-	} register16_t;
-
 	Processor(Memory& memory, InputOutput& ports);
 
 	const Memory& getMemory() const { return m_memory; }
 
-	uint16_t getProgramCounter() const { return pc; }
-	void setProgramCounter(uint16_t value) { pc = value; }
+	register16_t getProgramCounter() const { return pc; }
+	void setProgramCounter(register16_t value) { pc = value; }
 
-	uint16_t getStackPointer() const { return sp; }
-	void setStackPointer(uint16_t value) { sp = value; }
+	register16_t getStackPointer() const { return sp; }
+	void setStackPointer(register16_t value) { sp = value; }
 
 	bool isHalted() const { return m_halted; }
-	void halt() { --pc;  m_halted = true; }
+	void halt() { --pc.word;  m_halted = true; }
 
 	uint64_t getCycles() const { return cycles; }
 
@@ -84,11 +70,11 @@ public:
 
 	void reset();
 
-	virtual uint16_t getWord(uint16_t address) const {
+	virtual register16_t getWord(uint16_t address) const {
 		return m_memory.getWord(address);
 	}
 
-	virtual void setWord(uint16_t address, uint16_t value) {
+	virtual void setWord(uint16_t address, register16_t value) {
 		m_memory.setWord(address, value);
 	}
 
@@ -98,21 +84,21 @@ protected:
 
 	int cycles;
 
-	uint16_t pc;
-	uint16_t sp;
+	register16_t pc;
+	register16_t sp;
 
 	bool m_halted;
 
-	void pushWord(uint16_t value);
-	uint16_t popWord();
+	void pushWord(register16_t value);
+	register16_t popWord();
 
 	uint8_t fetchByte() {
-		return m_memory.get(pc++);
+		return m_memory.get(pc.word++);
 	}
 
 	uint16_t fetchWord() {
-		auto value = getWord(pc);
-		pc += 2;
-		return value;
+		auto value = getWord(pc.word);
+		pc.word += 2;
+		return value.word;
 	}
 };
