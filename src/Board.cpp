@@ -2,6 +2,8 @@
 #include "Board.h"
 #include "Disassembler.h"
 
+#include <iostream>
+
 Board::Board(const Configuration& configuration)
 : m_configuration(configuration),
   m_memory(0x3fff),
