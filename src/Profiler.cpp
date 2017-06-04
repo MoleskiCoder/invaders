@@ -3,6 +3,8 @@
 #include "Disassembler.h"
 
 Profiler::Profiler() {
+	m_instructions.fill(0);
+	m_addresses.fill(0);
 }
 
 Profiler::~Profiler() {

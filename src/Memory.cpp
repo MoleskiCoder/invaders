@@ -64,8 +64,8 @@ uint8_t& Memory::reference(uint16_t address) {
 }
 
 void Memory::clear() {
-	std::fill(m_bus.begin(), m_bus.end(), 0);
-	std::fill(m_locked.begin(), m_locked.end(), false);
+	m_bus.fill(0);
+	m_locked.fill(false);
 }
 
 void Memory::loadRom(const std::string& path, uint16_t offset) {
