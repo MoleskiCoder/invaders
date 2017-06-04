@@ -23,9 +23,9 @@ public:
 
 	Board(const Configuration& configuration);
 
-	Memory& getMemory() { return m_memory; }
-	const Intel8080& getCPU() const { return m_cpu; }
-	Intel8080& getCPUMutable() { return m_cpu; }
+	EightBit::Memory& getMemory() { return m_memory; }
+	const EightBit::Intel8080& getCPU() const { return m_cpu; }
+	EightBit::Intel8080& getCPUMutable() { return m_cpu; }
 
 	void initialise();
 
@@ -98,20 +98,20 @@ public:
 	void releaseLeft2P() { m_twoPlayerLeft = false; }
 	void releaseRight2P() { m_twoPlayerRight = false; }
 
-	Signal<EventArgs> UfoSound;
-	Signal<EventArgs> ShotSound;
-	Signal<EventArgs> PlayerDieSound;
-	Signal<EventArgs> InvaderDieSound;
-	Signal<EventArgs> ExtendSound;
+	EightBit::Signal<EightBit::EventArgs> UfoSound;
+	EightBit::Signal<EightBit::EventArgs> ShotSound;
+	EightBit::Signal<EightBit::EventArgs> PlayerDieSound;
+	EightBit::Signal<EightBit::EventArgs> InvaderDieSound;
+	EightBit::Signal<EightBit::EventArgs> ExtendSound;
 
-	Signal<EventArgs> Walk1Sound;
-	Signal<EventArgs> Walk2Sound;
-	Signal<EventArgs> Walk3Sound;
-	Signal<EventArgs> Walk4Sound;
-	Signal<EventArgs> UfoDieSound;
+	EightBit::Signal<EightBit::EventArgs> Walk1Sound;
+	EightBit::Signal<EightBit::EventArgs> Walk2Sound;
+	EightBit::Signal<EightBit::EventArgs> Walk3Sound;
+	EightBit::Signal<EightBit::EventArgs> Walk4Sound;
+	EightBit::Signal<EightBit::EventArgs> UfoDieSound;
 
-	Signal<EventArgs> EnableAmplifier;
-	Signal<EventArgs> DisableAmplifier;
+	EightBit::Signal<EightBit::EventArgs> EnableAmplifier;
+	EightBit::Signal<EightBit::EventArgs> DisableAmplifier;
 
 private:
 	enum InputPorts {
@@ -158,10 +158,10 @@ private:
 	} };
 
 	const Configuration& m_configuration;
-	Memory m_memory;
-	InputOutput m_ports;
-	Intel8080 m_cpu;
-	Profiler m_profiler;
+	EightBit::Memory m_memory;
+	EightBit::InputOutput m_ports;
+	EightBit::Intel8080 m_cpu;
+	EightBit::Profiler m_profiler;
 
 	ShipSwitch m_ships;
 	ExtraShipSwitch m_extraLife;
@@ -190,14 +190,14 @@ private:
 
 	bool m_cocktailModeControl;
 
-	void Cpu_ExecutingInstruction_Cpm(const Intel8080& cpu);
+	void Cpu_ExecutingInstruction_Cpm(const EightBit::Intel8080& cpu);
 
-	void Board_PortWriting_SpaceInvaders(const PortEventArgs& portEvent);
-	void Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent);
-	void Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent);
+	void Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
+	void Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
+	void Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
 
-	void Cpu_ExecutingInstruction_Debug(const Intel8080& cpuEvent);
-	void Cpu_ExecutingInstruction_Profile(const Intel8080& cpuEvent);
+	void Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080& cpuEvent);
+	void Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpuEvent);
 
 	void bdos();
 };

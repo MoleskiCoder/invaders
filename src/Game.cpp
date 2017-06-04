@@ -428,53 +428,53 @@ void Game::dumpRendererInformation(::SDL_RendererInfo info) {
 	::SDL_Log("%s: software=%d, accelerated=%d, vsync=%d, target texture=%d", name, software, accelerated, vsync, targetTexture);
 }
 
-void Game::Board_UfoSound(const EventArgs&) {
+void Game::Board_UfoSound(const EightBit::EventArgs&) {
 	m_effects.playUfo();
 }
 
-void Game::Board_ShotSound(const EventArgs&) {
+void Game::Board_ShotSound(const EightBit::EventArgs&) {
 	m_effects.playShot();
 }
 
-void Game::Board_PlayerDieSound(const EventArgs&) {
+void Game::Board_PlayerDieSound(const EightBit::EventArgs&) {
 	m_effects.playPlayerDie();
 	auto controller = chooseController(whichPlayer());
 	if (controller != nullptr)
 		controller->startRumble();
 }
 
-void Game::Board_InvaderDieSound(const EventArgs&) {
+void Game::Board_InvaderDieSound(const EightBit::EventArgs&) {
 	m_effects.playInvaderDie();
 }
 
-void Game::Board_ExtendSound(const EventArgs&) {
+void Game::Board_ExtendSound(const EightBit::EventArgs&) {
 	m_effects.playExtend();
 }
 
-void Game::Board_Walk1Sound(const EventArgs&) {
+void Game::Board_Walk1Sound(const EightBit::EventArgs&) {
 	m_effects.playWalk1();
 }
 
-void Game::Board_Walk2Sound(const EventArgs&) {
+void Game::Board_Walk2Sound(const EightBit::EventArgs&) {
 	m_effects.playWalk2();
 }
 
-void Game::Board_Walk3Sound(const EventArgs&) {
+void Game::Board_Walk3Sound(const EightBit::EventArgs&) {
 	m_effects.playWalk3();
 }
 
-void Game::Board_Walk4Sound(const EventArgs&) {
+void Game::Board_Walk4Sound(const EightBit::EventArgs&) {
 	m_effects.playWalk4();
 }
 
-void Game::Board_UfoDieSound(const EventArgs&) {
+void Game::Board_UfoDieSound(const EightBit::EventArgs&) {
 	m_effects.playUfoDie();
 }
 
-void Game::Board_EnableAmplifier(const EventArgs&) {
+void Game::Board_EnableAmplifier(const EightBit::EventArgs&) {
 	m_effects.enable();
 }
 
-void Game::Board_DisableAmplifier(const EventArgs&) {
+void Game::Board_DisableAmplifier(const EightBit::EventArgs&) {
 	m_effects.disable();
 }

@@ -114,8 +114,8 @@ public:
 		m_machineMode = value;
 	}
 
-	register16_t getStartAddress() const {
-		register16_t returned;
+	EightBit::register16_t getStartAddress() const {
+		EightBit::register16_t returned;
 		returned.word = getMachineMode() == CPM ? 0x100 : 0;
 		return returned;
 	}

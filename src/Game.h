@@ -77,20 +77,20 @@ private:
 
 	int whichPlayer() const;
 
-	void Board_UfoSound(const EventArgs& event);
-	void Board_ShotSound(const EventArgs& event);
-	void Board_PlayerDieSound(const EventArgs& event);
-	void Board_InvaderDieSound(const EventArgs& event);
-	void Board_ExtendSound(const EventArgs& event);
+	void Board_UfoSound(const EightBit::EventArgs& event);
+	void Board_ShotSound(const EightBit::EventArgs& event);
+	void Board_PlayerDieSound(const EightBit::EventArgs& event);
+	void Board_InvaderDieSound(const EightBit::EventArgs& event);
+	void Board_ExtendSound(const EightBit::EventArgs& event);
 
-	void Board_Walk1Sound(const EventArgs& event);
-	void Board_Walk2Sound(const EventArgs& event);
-	void Board_Walk3Sound(const EventArgs& event);
-	void Board_Walk4Sound(const EventArgs& event);
-	void Board_UfoDieSound(const EventArgs& event);
+	void Board_Walk1Sound(const EightBit::EventArgs& event);
+	void Board_Walk2Sound(const EightBit::EventArgs& event);
+	void Board_Walk3Sound(const EightBit::EventArgs& event);
+	void Board_Walk4Sound(const EightBit::EventArgs& event);
+	void Board_UfoDieSound(const EightBit::EventArgs& event);
 
-	void Board_EnableAmplifier(const EventArgs& event);
-	void Board_DisableAmplifier(const EventArgs& event);
+	void Board_EnableAmplifier(const EightBit::EventArgs& event);
+	void Board_DisableAmplifier(const EightBit::EventArgs& event);
 
 	void handleKeyDown(SDL_Keycode key);
 	void handleKeyUp(SDL_Keycode key);
