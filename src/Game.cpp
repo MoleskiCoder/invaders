@@ -350,7 +350,7 @@ int Game::whichPlayer() const {
 
 int Game::drawFrame(int prior) {
 
-	auto memory = m_board.getMemory();
+	const auto& memory = m_board.getMemory();
 
 	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
 	auto invaders = m_configuration.getMachineMode() == Configuration::SpaceInvaders;
