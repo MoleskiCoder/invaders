@@ -14,9 +14,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Intel8080", "libraries\EightBit\Intel8080\src\Intel8080.vcxproj", "{93BDC8D8-9F0D-44ED-94FB-1BE6AC4B6BD6}"
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
