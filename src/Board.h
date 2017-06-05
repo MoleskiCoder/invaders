@@ -190,14 +190,10 @@ private:
 
 	bool m_cocktailModeControl;
 
-	void Cpu_ExecutingInstruction_Cpm(const EightBit::Intel8080& cpu);
-
 	void Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
 	void Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
 	void Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
 
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080& cpuEvent);
 	void Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpuEvent);
-
-	void bdos();
 };

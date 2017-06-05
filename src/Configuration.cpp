@@ -12,6 +12,5 @@ Configuration::Configuration()
 	m_cyclesPerSecond(2000000),
 	m_cocktailTable(false),
 	m_romDirectory("roms"),
-	m_soundDirectory("sounds"),
-	m_machineMode(SpaceInvaders) {
+	m_soundDirectory("sounds") {
 }

@@ -353,7 +353,6 @@ int Game::drawFrame(int prior) {
 	const auto& memory = m_board.getMemory();
 
 	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
-	auto invaders = m_configuration.getMachineMode() == Configuration::SpaceInvaders;
 	auto interlaced = m_configuration.isInterlaced();
 
 	auto renderOdd = interlaced ? m_frames % 2 == 1 : true;
@@ -366,7 +365,7 @@ int Game::drawFrame(int prior) {
 	// This code handles the display rotation
 	auto bytesPerScanLine = Board::RasterWidth / 8;
 	for (int inputY = 0; inputY < Board::RasterHeight; ++inputY) {
-		if (invaders && (inputY == 96))
+		if (inputY == 96)
 			prior += m_board.triggerInterruptScanLine96();
 		prior = m_board.runScanLine(prior);
 		auto evenScanLine = (inputY % 2 == 0);
@@ -397,8 +396,7 @@ int Game::drawFrame(int prior) {
 		}
 	}
 
-	if (invaders)
-		prior += m_board.triggerInterruptScanLine224();
+	prior += m_board.triggerInterruptScanLine224();
 
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 

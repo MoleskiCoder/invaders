@@ -34,32 +34,14 @@ void Board::initialise() {
 	m_memory.clear();
 	auto romDirectory = m_configuration.getRomDirectory();
 
-	switch (m_configuration.getMachineMode()) {
-	case Configuration::SpaceInvaders:
+	m_memory.loadRom(romDirectory + "/invaders.e", 0x1800);
+	m_memory.loadRom(romDirectory + "/invaders.f", 0x1000);
+	m_memory.loadRom(romDirectory + "/invaders.g", 0x0800);
+	m_memory.loadRom(romDirectory + "/invaders.h", 0x0000);
 
-		m_memory.loadRom(romDirectory + "/invaders.e", 0x1800);
-		m_memory.loadRom(romDirectory + "/invaders.f", 0x1000);
-		m_memory.loadRom(romDirectory + "/invaders.g", 0x0800);
-		m_memory.loadRom(romDirectory + "/invaders.h", 0x0000);
-
-		m_ports.WritingPort.connect(std::bind(&Board::Board_PortWriting_SpaceInvaders, this, std::placeholders::_1));
-		m_ports.WrittenPort.connect(std::bind(&Board::Board_PortWritten_SpaceInvaders, this, std::placeholders::_1));
-		m_ports.ReadingPort.connect(std::bind(&Board::Board_PortReading_SpaceInvaders, this, std::placeholders::_1));
-		break;
-
-	case Configuration::CPM:
-		//m_memory.loadRam(romDirectory + "/TEST.COM", 0x100);		// Microcosm
-		//m_memory.loadRam(romDirectory + "/8080PRE.COM", 0x100);	// Bartholomew preliminary
-		m_memory.loadRam(romDirectory + "/8080EX1.COM", 0x100);	// Cringle/Bartholomew
-		//m_memory.loadRam(romDirectory + "/CPUTEST.COM", 0x100);	// SuperSoft diagnostics
-
-		m_memory.set(5, 0xc9);	// ret
-		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Cpm, this, std::placeholders::_1));
-		break;
-
-	default:
-		throw std::logic_error("Unhandled machine type");
-	}
+	m_ports.WritingPort.connect(std::bind(&Board::Board_PortWriting_SpaceInvaders, this, std::placeholders::_1));
+	m_ports.WrittenPort.connect(std::bind(&Board::Board_PortWritten_SpaceInvaders, this, std::placeholders::_1));
+	m_ports.ReadingPort.connect(std::bind(&Board::Board_PortReading_SpaceInvaders, this, std::placeholders::_1));
 
 	if (m_configuration.isProfileMode()) {
 		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
@@ -71,37 +53,6 @@ void Board::initialise() {
 
 	m_cpu.initialise();
 	m_cpu.setProgramCounter(m_configuration.getStartAddress());
-}
-
-void Board::Cpu_ExecutingInstruction_Cpm(const EightBit::Intel8080&) {
-	auto pc = m_cpu.getProgramCounter();
-	switch (pc.word) {
-	case 0x0:	// CP/M warm start
-		m_cpu.halt();
-		m_profiler.dump();
-		break;
-	case 0x5:	// BDOS
-		bdos();
-		break;
-	default:
-		break;
-	}
-}
-
-void Board::bdos() {
-	auto c = m_cpu.C();
-	switch (c) {
-	case 0x2: {
-		auto character = m_cpu.E();
-		std::cout << character;
-		break;
-	}
-	case 0x9:
-		for (uint16_t i = m_cpu.DE().word; m_memory.get(i) != '$'; ++i) {
-			std::cout << m_memory.get(i);
-		}
-		break;
-	}
 }
 
 void Board::Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent) {
