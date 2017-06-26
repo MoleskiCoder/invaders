@@ -12,8 +12,6 @@ Board::Board(const Configuration& configuration)
   m_extraLife(OneThousandFiveHundred),
   m_demoCoinInfo(On),
   m_shiftAmount(0),
-  m_shiftDataLow(0),
-  m_shiftDataHigh(0),
   m_credit(false),
   m_onePlayerStart(false),
   m_onePlayerShot(false),
@@ -27,6 +25,7 @@ Board::Board(const Configuration& configuration)
   m_preSound1(0),
   m_preSound2(0),
   m_cocktailModeControl(false) {
+	m_shiftData.word = 0;
 }
 
 void Board::initialise() {
@@ -52,7 +51,7 @@ void Board::initialise() {
 	}
 
 	m_cpu.initialise();
-	m_cpu.setProgramCounter(m_configuration.getStartAddress());
+	m_cpu.PC() = m_configuration.getStartAddress();
 }
 
 void Board::Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent) {
@@ -73,11 +72,11 @@ void Board::Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portE
 	auto value = m_ports.readOutputPort(port);
 	switch (port) {
 	case SHFTAMNT:
-		m_shiftAmount = value & 0x7;
+		m_shiftAmount = value & EightBit::Processor::Mask3;
 		break;
 	case SHFT_DATA:
-		m_shiftDataLow = m_shiftDataHigh;
-		m_shiftDataHigh = value;
+		m_shiftData.low = m_shiftData.high;
+		m_shiftData.high = value;
 		break;
 	case WATCHDOG:
 		if (m_configuration.isShowWatchdogOutput())
@@ -168,14 +167,14 @@ void Board::Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portE
 		break;
 	case SHFT_IN:
 		m_ports.writeInputPort(port,
-			((((m_shiftDataHigh << 8) | m_shiftDataLow) << m_shiftAmount) >> 8));
+			((((m_shiftData.high << 8) | m_shiftData.low) << m_shiftAmount) >> 8));
 		break;
 	}
 }
 
 void Board::Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpu) {
 
-	const auto pc = cpu.getProgramCounter();
+	const auto pc = m_cpu.PC();
 
 	m_profiler.addAddress(pc.word);
 	m_profiler.addInstruction(m_memory.peek(pc.word));

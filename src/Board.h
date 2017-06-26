@@ -23,9 +23,9 @@ public:
 
 	Board(const Configuration& configuration);
 
-	EightBit::Memory& getMemory() { return m_memory; }
-	const EightBit::Intel8080& getCPU() const { return m_cpu; }
-	EightBit::Intel8080& getCPUMutable() { return m_cpu; }
+	EightBit::Profiler& Profiler() { return m_profiler; }
+	EightBit::Memory& Bus() { return m_memory; }
+	EightBit::Intel8080& CPU() { return m_cpu; }
 
 	void initialise();
 
@@ -168,8 +168,7 @@ private:
 	DemoCoinInfoSwitch m_demoCoinInfo;
 
 	uint8_t m_shiftAmount;
-	uint8_t m_shiftDataLow;
-	uint8_t m_shiftDataHigh;
+	EightBit::register16_t m_shiftData;
 
 	bool m_credit;
 

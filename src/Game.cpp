@@ -116,7 +116,7 @@ void Game::runLoop() {
 	m_frames = 0UL;
 	m_startTicks = ::SDL_GetTicks();
 
-	auto& cpu = m_board.getCPUMutable();
+	auto& cpu = m_board.CPU();
 
 	auto graphics = m_configuration.isDrawGraphics();
 
@@ -183,6 +183,9 @@ void Game::runLoop() {
 			}
 		}
 	}
+
+	if (m_configuration.isProfileMode())
+		m_board.Profiler().dump();
 }
 
 // -1 if no controllers, otherwise index
@@ -337,7 +340,7 @@ void Game::handleKeyUp(SDL_Keycode key) {
 }
 
 int Game::whichPlayer() const {
-	auto playerId = m_board.getMemory().peek(0x2067);	// player MSB
+	auto playerId = m_board.Bus().peek(0x2067);	// player MSB
 	switch (playerId) {
 	case 0x21:
 		return 1;
@@ -350,7 +353,7 @@ int Game::whichPlayer() const {
 
 int Game::drawFrame(int prior) {
 
-	const auto& memory = m_board.getMemory();
+	const auto& memory = m_board.Bus();
 
 	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
 	auto interlaced = m_configuration.isInterlaced();
