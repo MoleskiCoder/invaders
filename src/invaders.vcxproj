@@ -71,20 +71,20 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;C:\local\boost_1_64_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;C:\local\boost_1_64_0;$(IncludePath)</IncludePath>
     <LibraryPath>C:\local\SDL2-2.0.5\lib\$(Platform);C:\local\SDL2_mixer-2.0.1\lib\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;C:\local\boost_1_64_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;C:\local\boost_1_64_0;$(IncludePath)</IncludePath>
     <LibraryPath>C:\local\SDL2-2.0.5\lib\$(Platform);C:\local\SDL2_mixer-2.0.1\lib\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

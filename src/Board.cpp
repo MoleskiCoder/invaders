@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Board.h"
-#include "Disassembler.h"
 
 #include <iostream>
 
@@ -185,6 +184,6 @@ void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080&) {
 	std::cerr
 		<< EightBit::Disassembler::state(m_cpu)
 		<< "\t"
-		<< EightBit::Disassembler::disassemble(m_cpu)
+		<< m_disassembler.disassemble(m_cpu)
 		<< '\n';
 }

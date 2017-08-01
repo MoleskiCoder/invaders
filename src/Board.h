@@ -8,6 +8,7 @@
 #include "Intel8080.h"
 #include "Profiler.h"
 #include "EventArgs.h"
+#include "Disassembler.h"
 
 class Board {
 public:
@@ -162,6 +163,7 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Intel8080 m_cpu;
 	EightBit::Profiler m_profiler;
+	EightBit::Disassembler m_disassembler;
 
 	ShipSwitch m_ships;
 	ExtraShipSwitch m_extraLife;
