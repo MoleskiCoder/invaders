@@ -353,7 +353,7 @@ int Game::whichPlayer() const {
 
 int Game::drawFrame(int prior) {
 
-	const auto& memory = m_board.Bus();
+	auto& memory = m_board.Bus();
 
 	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
 	auto interlaced = m_configuration.isInterlaced();
