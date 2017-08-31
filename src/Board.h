@@ -52,28 +52,15 @@ public:
 	}
 
 	int runScanLine(int prior) {
-		return runToLimit(prior, getCyclesPerScanLine());
+		return m_cpu.run(getCyclesPerScanLine() - prior);
 	}
 
 	int runRasterScan(int prior) {
-		return runToLimit(prior, m_configuration.getCyclesPerRasterScan());
+		return m_cpu.run(m_configuration.getCyclesPerRasterScan() - prior);
 	}
 
 	int runVerticalBlank(int prior) {
-		return runToLimit(prior, m_configuration.getCyclesPerVerticalBlank());
-	}
-
-	int runToLimit(int prior, int limit) {
-		int cycles = prior;
-		while (!finishedCycling(limit, cycles)) {
-			cycles += m_cpu.step();
-		}
-		return cycles - limit;
-	}
-
-	bool finishedCycling(int limit, int cycles) const {
-		auto exhausted = cycles > limit;
-		return exhausted || m_cpu.isHalted();
+		return m_cpu.run(m_configuration.getCyclesPerVerticalBlank() - prior);
 	}
 
 	void pressCredit() { m_credit = true; }
