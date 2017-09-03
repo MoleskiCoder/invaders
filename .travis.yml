@@ -20,6 +20,7 @@ addons:
     packages:
       - libsdl2-dev
       - libsdl2-mixer-dev
+      - libboost-dev
   coverity_scan:
     project:
       name: "MoleskiCoder/invaders"
