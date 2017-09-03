@@ -18,11 +18,6 @@ Uses SDL2 to provide graphics and SDL_mixer for sound effects.
 * Intel 8080 profiler
 * Intel 8080 disassembler
 
-### To be done
-
-* AppVeyor integration
-* 8080 test cases. Maybe...
-
 ## Compiling
 
 ### Windows
@@ -31,6 +26,8 @@ Compile with Visual Studio 2015 (via the solution)
 
 #### Prerequisites
 
+* Boost headers (for Format)
+* SDL
 * SDL_Mixer
 * Visual Studio 2015
 
@@ -42,7 +39,7 @@ Compile with Visual Studio 2015 (via the solution)
 
 #### Prerequisites
 
-apt-get install build-essential libsdl2-dev libsdl2-mixer-dev
+apt-get install build-essential libsdl2-dev libsdl2-mixer-dev libboost-dev
 
 ## Running
 
