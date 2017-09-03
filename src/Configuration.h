@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Memory.h"
+#include <Memory.h>
 
 class Configuration {
 public:

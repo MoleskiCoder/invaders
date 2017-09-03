@@ -2,17 +2,24 @@
 #pragma once
 #endif
 
-#include <string>
-#include <cstdint>
-#include <stdexcept>
-#include <algorithm>
 #include <memory>
+#include <stdexcept>
+#include <cstdint>
+#include <algorithm>
+
+#include <string>
+#include <vector>
+#include <array>
+#include <map>
 
 #include <iostream>
 
-#include <array>
-#include <vector>
-#include <map>
+#include <Memory.h>
+#include <InputOutput.h>
+#include <Intel8080.h>
+#include <Profiler.h>
+#include <EventArgs.h>
+#include <Disassembler.h>
 
 #include <SDL.h>
 #include <SDL_mixer.h>

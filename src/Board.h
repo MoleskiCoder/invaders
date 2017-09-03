@@ -2,13 +2,14 @@
 
 #include <string>
 
-#include "Memory.h"
-#include "InputOutput.h"
+#include <Memory.h>
+#include <InputOutput.h>
+#include <Intel8080.h>
+#include <Profiler.h>
+#include <EventArgs.h>
+#include <Disassembler.h>
+
 #include "Configuration.h"
-#include "Intel8080.h"
-#include "Profiler.h"
-#include "EventArgs.h"
-#include "Disassembler.h"
 
 class Board {
 public:
