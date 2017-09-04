@@ -2,12 +2,14 @@
 
 #include <string>
 
-#include "Memory.h"
-#include "InputOutput.h"
+#include <Memory.h>
+#include <InputOutput.h>
+#include <Intel8080.h>
+#include <Profiler.h>
+#include <EventArgs.h>
+#include <Disassembler.h>
+
 #include "Configuration.h"
-#include "Intel8080.h"
-#include "Profiler.h"
-#include "EventArgs.h"
 
 class Board {
 public:
@@ -23,18 +25,18 @@ public:
 
 	Board(const Configuration& configuration);
 
-	Memory& getMemory() { return m_memory; }
-	const Intel8080& getCPU() const { return m_cpu; }
-	Intel8080& getCPUMutable() { return m_cpu; }
+	EightBit::Profiler& Profiler() { return m_profiler; }
+	EightBit::Memory& Bus() { return m_memory; }
+	EightBit::Intel8080& CPU() { return m_cpu; }
 
 	void initialise();
 
-	void triggerInterruptScanLine224() {
-		m_cpu.interrupt(0xcf);	// RST 1
+	int triggerInterruptScanLine224() {
+		return m_cpu.interrupt(0xd7);	// RST 2
 	}
 
-	void triggerInterruptScanLine96() {
-		m_cpu.interrupt(0xd7);	// RST 2
+	int triggerInterruptScanLine96() {
+		return m_cpu.interrupt(0xcf);	// RST 1
 	}
 
 	bool getCocktailModeControl() const {
@@ -45,32 +47,21 @@ public:
 		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
 	}
 
-	void runFrame() {
-		runRasterScan();
-		runVerticalBlank();
+	int runFrame(int prior) {
+		prior = runRasterScan(prior);
+		return runVerticalBlank(prior);
 	}
 
-	void runScanLine() {
-		runToLimit(getCyclesPerScanLine());
+	int runScanLine(int prior) {
+		return m_cpu.run(getCyclesPerScanLine() - prior);
 	}
 
-	void runRasterScan() {
-		runToLimit(m_configuration.getCyclesPerRasterScan());
+	int runRasterScan(int prior) {
+		return m_cpu.run(m_configuration.getCyclesPerRasterScan() - prior);
 	}
 
-	void runVerticalBlank() {
-		runToLimit(m_configuration.getCyclesPerVerticalBlank());
-	}
-
-	void runToLimit(int limit) {
-		for (int cycles = 0; !finishedCycling(limit, cycles); ++cycles) {
-			m_cpu.step();
-		}
-	}
-
-	bool finishedCycling(int limit, int cycles) const {
-		auto exhausted = cycles > limit;
-		return exhausted || m_cpu.isHalted();
+	int runVerticalBlank(int prior) {
+		return m_cpu.run(m_configuration.getCyclesPerVerticalBlank() - prior);
 	}
 
 	void pressCredit() { m_credit = true; }
@@ -96,20 +87,20 @@ public:
 	void releaseLeft2P() { m_twoPlayerLeft = false; }
 	void releaseRight2P() { m_twoPlayerRight = false; }
 
-	Signal<EventArgs> UfoSound;
-	Signal<EventArgs> ShotSound;
-	Signal<EventArgs> PlayerDieSound;
-	Signal<EventArgs> InvaderDieSound;
-	Signal<EventArgs> ExtendSound;
+	EightBit::Signal<EightBit::EventArgs> UfoSound;
+	EightBit::Signal<EightBit::EventArgs> ShotSound;
+	EightBit::Signal<EightBit::EventArgs> PlayerDieSound;
+	EightBit::Signal<EightBit::EventArgs> InvaderDieSound;
+	EightBit::Signal<EightBit::EventArgs> ExtendSound;
 
-	Signal<EventArgs> Walk1Sound;
-	Signal<EventArgs> Walk2Sound;
-	Signal<EventArgs> Walk3Sound;
-	Signal<EventArgs> Walk4Sound;
-	Signal<EventArgs> UfoDieSound;
+	EightBit::Signal<EightBit::EventArgs> Walk1Sound;
+	EightBit::Signal<EightBit::EventArgs> Walk2Sound;
+	EightBit::Signal<EightBit::EventArgs> Walk3Sound;
+	EightBit::Signal<EightBit::EventArgs> Walk4Sound;
+	EightBit::Signal<EightBit::EventArgs> UfoDieSound;
 
-	Signal<EventArgs> EnableAmplifier;
-	Signal<EventArgs> DisableAmplifier;
+	EightBit::Signal<EightBit::EventArgs> EnableAmplifier;
+	EightBit::Signal<EightBit::EventArgs> DisableAmplifier;
 
 private:
 	enum InputPorts {
@@ -156,18 +147,18 @@ private:
 	} };
 
 	const Configuration& m_configuration;
-	Memory m_memory;
-	InputOutput m_ports;
-	Intel8080 m_cpu;
-	Profiler m_profiler;
+	EightBit::Memory m_memory;
+	EightBit::InputOutput m_ports;
+	EightBit::Intel8080 m_cpu;
+	EightBit::Profiler m_profiler;
+	EightBit::Disassembler m_disassembler;
 
 	ShipSwitch m_ships;
 	ExtraShipSwitch m_extraLife;
 	DemoCoinInfoSwitch m_demoCoinInfo;
 
 	uint8_t m_shiftAmount;
-	uint8_t m_shiftDataLow;
-	uint8_t m_shiftDataHigh;
+	EightBit::register16_t m_shiftData;
 
 	bool m_credit;
 
@@ -188,14 +179,10 @@ private:
 
 	bool m_cocktailModeControl;
 
-	void Cpu_ExecutingInstruction_Cpm(const Intel8080& cpu);
+	void Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
+	void Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
+	void Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
 
-	void Board_PortWriting_SpaceInvaders(const PortEventArgs& portEvent);
-	void Board_PortWritten_SpaceInvaders(const PortEventArgs& portEvent);
-	void Board_PortReading_SpaceInvaders(const PortEventArgs& portEvent);
-
-	void Cpu_ExecutingInstruction_Debug(const Intel8080& cpuEvent);
-	void Cpu_ExecutingInstruction_Profile(const Intel8080& cpuEvent);
-
-	void bdos();
+	void Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080& cpuEvent);
+	void Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpuEvent);
 };

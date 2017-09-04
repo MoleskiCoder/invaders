@@ -2,14 +2,10 @@
 
 #include <string>
 
+#include <Memory.h>
+
 class Configuration {
 public:
-	enum MachineMode {
-		Unknown,
-		SpaceInvaders,
-		CPM
-	};
-
 	Configuration();
 
 	bool isDebugMode() const {
@@ -104,16 +100,10 @@ public:
 		return m_soundDirectory;
 	}
 
-	MachineMode getMachineMode() const {
-		return m_machineMode;
-	}
-
-	void setMachineMode(MachineMode value) {
-		m_machineMode = value;
-	}
-
-	uint16_t getStartAddress() const {
-		return getMachineMode() == CPM ? 0x100 : 0;
+	EightBit::register16_t getStartAddress() const {
+		EightBit::register16_t returned;
+		returned.word = 0;
+		return returned;
 	}
 
 private:
@@ -130,6 +120,4 @@ private:
 
 	std::string m_romDirectory;
 	std::string m_soundDirectory;
-
-	MachineMode m_machineMode;
 };

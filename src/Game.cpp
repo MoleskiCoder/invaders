@@ -4,7 +4,7 @@
 #include <algorithm>
 
 Game::Game(const Configuration& configuration)
-:	m_configuration(configuration),
+	: m_configuration(configuration),
 	m_board(configuration),
 	m_window(nullptr),
 	m_renderer(nullptr),
@@ -116,16 +116,18 @@ void Game::runLoop() {
 	m_frames = 0UL;
 	m_startTicks = ::SDL_GetTicks();
 
-	auto& cpu = m_board.getCPUMutable();
+	auto& cpu = m_board.CPU();
+	cpu.powerOn();
 
 	auto graphics = m_configuration.isDrawGraphics();
 
-	while (!cpu.isHalted()) {
+	auto cycles = 0;
+	while (cpu.powered()) {
 		::SDL_Event e;
 		while (::SDL_PollEvent(&e)) {
 			switch (e.type) {
 			case SDL_QUIT:
-				cpu.halt();
+				cpu.powerOff();
 				break;
 			case SDL_KEYDOWN:
 				handleKeyDown(e.key.keysym.sym);
@@ -165,11 +167,13 @@ void Game::runLoop() {
 		}
 
 		if (graphics) {
-			drawFrame();
+			cycles = drawFrame(cycles);
 			::SDL_RenderPresent(m_renderer);
 		} else {
-			m_board.runFrame();
+			cycles = m_board.runFrame(cycles);
 		}
+
+		++m_frames;
 
 		if (!m_vsync || !graphics) {
 			const auto elapsedTicks = ::SDL_GetTicks() - m_startTicks;
@@ -180,6 +184,9 @@ void Game::runLoop() {
 			}
 		}
 	}
+
+	if (m_configuration.isProfileMode())
+		m_board.Profiler().dump();
 }
 
 // -1 if no controllers, otherwise index
@@ -334,7 +341,7 @@ void Game::handleKeyUp(SDL_Keycode key) {
 }
 
 int Game::whichPlayer() const {
-	auto playerId = m_board.getMemory().get(0x2067);	// player MSB
+	auto playerId = m_board.Bus().peek(0x2067);	// player MSB
 	switch (playerId) {
 	case 0x21:
 		return 1;
@@ -345,26 +352,26 @@ int Game::whichPlayer() const {
 	}
 }
 
-void Game::drawFrame() {
+int Game::drawFrame(int prior) {
 
-	auto memory = m_board.getMemory();
+	auto& memory = m_board.Bus();
 
 	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
-	auto invaders = m_configuration.getMachineMode() == Configuration::SpaceInvaders;
 	auto interlaced = m_configuration.isInterlaced();
 
 	auto renderOdd = interlaced ? m_frames % 2 == 1 : true;
 	auto renderEven = interlaced ? m_frames % 2 == 0 : true;
 
 	auto black = m_colours.getColour(ColourPalette::Black);
-	std::fill(m_pixels.begin(), m_pixels.end(), black);
+	if (interlaced)
+		std::fill(m_pixels.begin(), m_pixels.end(), black);
 
 	// This code handles the display rotation
 	auto bytesPerScanLine = Board::RasterWidth / 8;
 	for (int inputY = 0; inputY < Board::RasterHeight; ++inputY) {
-		if (invaders && (inputY == 96))
-			m_board.triggerInterruptScanLine96();
-		m_board.runScanLine();
+		if (inputY == 96)
+			prior += m_board.triggerInterruptScanLine96();
+		prior = m_board.runScanLine(prior);
 		auto evenScanLine = (inputY % 2 == 0);
 		auto oddScanLine = !evenScanLine;
 		if (oddScanLine && !renderOdd)
@@ -372,25 +379,28 @@ void Game::drawFrame() {
 		if (evenScanLine && !renderEven)
 			continue;
 		auto address = Board::VideoRam + bytesPerScanLine * inputY;
+		auto outputX = flip ? Board::RasterHeight - inputY - 1 : inputY;
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
-			auto video = memory.get(++address);
+			auto video = memory.peek(++address);
 			for (int bit = 0; bit < 8; ++bit) {
 				auto inputX = byte * 8 + bit;
-				auto outputX = flip ? Board::RasterHeight - inputY - 1 : inputY;
 				auto outputY = flip ? inputX : Board::RasterWidth - inputX - 1;
 				auto outputPixel = outputX + outputY * DisplayWidth;
 				auto mask = 1 << bit;
 				auto inputPixel = video & mask;
-				auto colour = inputPixel ? m_colours.getColour(ColourPalette::calculateColour(outputX, outputY)) : black;
-				m_pixels[outputPixel] = colour;
+				if (interlaced) {
+					if (inputPixel) {
+						m_pixels[outputPixel] = m_colours.getColour(ColourPalette::calculateColour(outputX, outputY));
+					}
+				} else {
+					auto colour = inputPixel ? m_colours.getColour(ColourPalette::calculateColour(outputX, outputY)) : black;
+					m_pixels[outputPixel] = colour;
+				}
 			}
 		}
 	}
 
-	if (invaders)
-		m_board.triggerInterruptScanLine224();
-
-	m_board.runVerticalBlank();
+	prior += m_board.triggerInterruptScanLine224();
 
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 
@@ -398,7 +408,7 @@ void Game::drawFrame() {
 		::SDL_RenderCopy(m_renderer, m_bitmapTexture, nullptr, nullptr), 
 		"Unable to copy texture to renderer");
 
-	++m_frames;
+	return m_board.runVerticalBlank(prior);
 }
 
 void Game::dumpRendererInformation() {
@@ -420,53 +430,53 @@ void Game::dumpRendererInformation(::SDL_RendererInfo info) {
 	::SDL_Log("%s: software=%d, accelerated=%d, vsync=%d, target texture=%d", name, software, accelerated, vsync, targetTexture);
 }
 
-void Game::Board_UfoSound(const EventArgs&) {
+void Game::Board_UfoSound(const EightBit::EventArgs&) {
 	m_effects.playUfo();
 }
 
-void Game::Board_ShotSound(const EventArgs&) {
+void Game::Board_ShotSound(const EightBit::EventArgs&) {
 	m_effects.playShot();
 }
 
-void Game::Board_PlayerDieSound(const EventArgs&) {
+void Game::Board_PlayerDieSound(const EightBit::EventArgs&) {
 	m_effects.playPlayerDie();
 	auto controller = chooseController(whichPlayer());
 	if (controller != nullptr)
 		controller->startRumble();
 }
 
-void Game::Board_InvaderDieSound(const EventArgs&) {
+void Game::Board_InvaderDieSound(const EightBit::EventArgs&) {
 	m_effects.playInvaderDie();
 }
 
-void Game::Board_ExtendSound(const EventArgs& event) {
+void Game::Board_ExtendSound(const EightBit::EventArgs&) {
 	m_effects.playExtend();
 }
 
-void Game::Board_Walk1Sound(const EventArgs&) {
+void Game::Board_Walk1Sound(const EightBit::EventArgs&) {
 	m_effects.playWalk1();
 }
 
-void Game::Board_Walk2Sound(const EventArgs&) {
+void Game::Board_Walk2Sound(const EightBit::EventArgs&) {
 	m_effects.playWalk2();
 }
 
-void Game::Board_Walk3Sound(const EventArgs&) {
+void Game::Board_Walk3Sound(const EightBit::EventArgs&) {
 	m_effects.playWalk3();
 }
 
-void Game::Board_Walk4Sound(const EventArgs&) {
+void Game::Board_Walk4Sound(const EightBit::EventArgs&) {
 	m_effects.playWalk4();
 }
 
-void Game::Board_UfoDieSound(const EventArgs&) {
+void Game::Board_UfoDieSound(const EightBit::EventArgs&) {
 	m_effects.playUfoDie();
 }
 
-void Game::Board_EnableAmplifier(const EventArgs& event) {
+void Game::Board_EnableAmplifier(const EightBit::EventArgs&) {
 	m_effects.enable();
 }
 
-void Game::Board_DisableAmplifier(const EventArgs& event) {
+void Game::Board_DisableAmplifier(const EightBit::EventArgs&) {
 	m_effects.disable();
 }

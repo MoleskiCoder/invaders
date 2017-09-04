@@ -71,15 +71,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;C:\local\boost_1_64_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\local\SDL2-2.0.5\lib\$(PlatformShortName);C:\local\SDL2_mixer-2.0.1\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;C:\local\boost_1_64_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\local\SDL2-2.0.5\lib\$(Platform);C:\local\SDL2_mixer-2.0.1\lib\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;C:\local\boost_1_64_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\local\SDL2-2.0.5\lib\$(PlatformShortName);C:\local\SDL2_mixer-2.0.1\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\local\SDL2-2.0.5\include;C:\local\SDL2_mixer-2.0.1\include;C:\local\boost_1_64_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\local\SDL2-2.0.5\lib\$(Platform);C:\local\SDL2_mixer-2.0.1\lib\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,11 +124,13 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\libraries\SDL2_mixer-2.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,11 +146,13 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\libraries\SDL2_mixer-2.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,34 +167,18 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="ColourPalette.h" />
     <ClInclude Include="Configuration.h" />
-    <ClInclude Include="Disassembler.h" />
-    <ClInclude Include="EventArgs.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameController.h" />
-    <ClInclude Include="InputOutput.h" />
-    <ClInclude Include="Intel8080.h" />
-    <ClInclude Include="Memory.h" />
-    <ClInclude Include="PortEventArgs.h" />
-    <ClInclude Include="Processor.h" />
-    <ClInclude Include="Profiler.h" />
-    <ClInclude Include="Signal.h" />
     <ClInclude Include="SoundEffects.h" />
-    <ClInclude Include="StatusFlags.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="ColourPalette.cpp" />
     <ClCompile Include="Configuration.cpp" />
-    <ClCompile Include="Disassembler.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameController.cpp" />
-    <ClCompile Include="InputOutput.cpp" />
-    <ClCompile Include="Intel8080.cpp" />
     <ClCompile Include="invaders.cpp" />
-    <ClCompile Include="Memory.cpp" />
-    <ClCompile Include="Processor.cpp" />
-    <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="SoundEffects.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -192,18 +188,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\libraries\EightBit\Intel8080\src\Intel8080.vcxproj">
+      <Project>{93bdc8d8-9f0d-44ed-94fb-1be6ac4b6bd6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libraries\EightBit\src\EightBit.vcxproj">
+      <Project>{a9c24bd9-0cb4-4c84-b09b-46b815f9da47}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets" Condition="Exists('..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" />
-    <Import Project="..\packages\sdl2.2.0.5\build\native\sdl2.targets" Condition="Exists('..\packages\sdl2.2.0.5\build\native\sdl2.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
