@@ -13,10 +13,9 @@ int main(int, char*[]) {
 	configuration.setShowWatchdogOutput(true);
 #endif
 
-	Game game(configuration);
-	game.initialise();
-
 	try {
+		Game game(configuration);
+		game.initialise();
 		game.runLoop();
 	} catch (const std::exception& error) {
 		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "%s", error.what());
