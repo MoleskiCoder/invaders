@@ -2,7 +2,8 @@
 
 #include <string>
 
-#include <Memory.h>
+#include <Rom.h>
+#include <Ram.h>
 #include <InputOutput.h>
 #include <Intel8080.h>
 #include <Profiler.h>
@@ -11,7 +12,7 @@
 
 #include "Configuration.h"
 
-class Board {
+class Board : public EightBit::Bus {
 public:
 	enum {
 		RasterWidth = 256,
@@ -26,7 +27,6 @@ public:
 	Board(const Configuration& configuration);
 
 	EightBit::Profiler& Profiler() { return m_profiler; }
-	EightBit::Memory& Bus() { return m_memory; }
 	EightBit::Intel8080& CPU() { return m_cpu; }
 
 	void initialise();
@@ -102,6 +102,28 @@ public:
 	EightBit::Signal<EightBit::EventArgs> EnableAmplifier;
 	EightBit::Signal<EightBit::EventArgs> DisableAmplifier;
 
+protected:
+	virtual uint8_t& reference(uint16_t address, bool& rom) {
+		address &= ~0xc000;
+		if (address < 0x2000) {
+			rom = true;
+			if (address < 0x800)
+				return m_romH.reference(address);
+			if (address < 0x1000)
+				return m_romG.reference(address - 0x800);
+			if (address < 0x1800)
+				return m_romF.reference(address - (0x800 * 2));
+			return m_romE.reference(address - (0x800 * 3));
+		}
+		if (address < 0x4000) {
+			rom = false;
+			if (address < 0x2400)
+				return m_workRAM.reference(address - 0x2000);
+			return m_videoRAM.reference(address - 0x2400);
+		}
+		UNREACHABLE;
+	}
+
 private:
 	enum InputPorts {
 		INP0 = 0,
@@ -147,7 +169,14 @@ private:
 	} };
 
 	const Configuration& m_configuration;
-	EightBit::Memory m_memory;
+
+	EightBit::Rom m_romE;
+	EightBit::Rom m_romF;
+	EightBit::Rom m_romG;
+	EightBit::Rom m_romH;
+	EightBit::Ram m_workRAM;
+	EightBit::Ram m_videoRAM;
+
 	EightBit::InputOutput m_ports;
 	EightBit::Intel8080 m_cpu;
 	EightBit::Profiler m_profiler;

@@ -5,8 +5,13 @@
 
 Board::Board(const Configuration& configuration)
 : m_configuration(configuration),
-  m_memory(0x3fff),
-  m_cpu(EightBit::Intel8080(m_memory, m_ports)),
+  m_romE(0x800),
+  m_romF(0x800),
+  m_romG(0x800),
+  m_romH(0x800),
+  m_videoRAM(0x1c00),
+  m_workRAM(0x400),
+  m_cpu(EightBit::Intel8080(*this, m_ports)),
   m_ships(Three),
   m_extraLife(OneThousandFiveHundred),
   m_demoCoinInfo(On),
@@ -29,13 +34,12 @@ Board::Board(const Configuration& configuration)
 
 void Board::initialise() {
 
-	m_memory.clear();
 	auto romDirectory = m_configuration.getRomDirectory();
 
-	m_memory.loadRom(romDirectory + "/invaders.e", 0x1800);
-	m_memory.loadRom(romDirectory + "/invaders.f", 0x1000);
-	m_memory.loadRom(romDirectory + "/invaders.g", 0x0800);
-	m_memory.loadRom(romDirectory + "/invaders.h", 0x0000);
+	m_romE.load(romDirectory + "/invaders.e");
+	m_romF.load(romDirectory + "/invaders.f");
+	m_romG.load(romDirectory + "/invaders.g");
+	m_romH.load(romDirectory + "/invaders.h");
 
 	m_ports.WritingPort.connect(std::bind(&Board::Board_PortWriting_SpaceInvaders, this, std::placeholders::_1));
 	m_ports.WrittenPort.connect(std::bind(&Board::Board_PortWritten_SpaceInvaders, this, std::placeholders::_1));
@@ -176,7 +180,7 @@ void Board::Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpu) {
 	const auto pc = m_cpu.PC();
 
 	m_profiler.addAddress(pc.word);
-	m_profiler.addInstruction(m_memory.peek(pc.word));
+	m_profiler.addInstruction(peek(pc.word));
 }
 
 void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080&) {

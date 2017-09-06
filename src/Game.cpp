@@ -341,7 +341,7 @@ void Game::handleKeyUp(SDL_Keycode key) {
 }
 
 int Game::whichPlayer() const {
-	auto playerId = m_board.Bus().peek(0x2067);	// player MSB
+	auto playerId = m_board.peek(0x2067);	// player MSB
 	switch (playerId) {
 	case 0x21:
 		return 1;
@@ -353,8 +353,6 @@ int Game::whichPlayer() const {
 }
 
 int Game::drawFrame(int prior) {
-
-	auto& memory = m_board.Bus();
 
 	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
 	auto interlaced = m_configuration.isInterlaced();
@@ -381,7 +379,7 @@ int Game::drawFrame(int prior) {
 		auto address = Board::VideoRam + bytesPerScanLine * inputY;
 		auto outputX = flip ? Board::RasterHeight - inputY - 1 : inputY;
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
-			auto video = memory.peek(++address);
+			auto video = m_board.peek(++address);
 			for (int bit = 0; bit < 8; ++bit) {
 				auto inputX = byte * 8 + bit;
 				auto outputY = flip ? inputX : Board::RasterWidth - inputX - 1;
