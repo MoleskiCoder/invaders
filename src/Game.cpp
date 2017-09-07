@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "Game.h"
 
-#include <algorithm>
-
 Game::Game(const Configuration& configuration)
 	: m_configuration(configuration),
 	m_board(configuration),

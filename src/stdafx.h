@@ -5,7 +5,6 @@
 #include <memory>
 #include <stdexcept>
 #include <cstdint>
-#include <algorithm>
 
 #include <string>
 #include <vector>
@@ -14,7 +13,10 @@
 
 #include <iostream>
 
-#include <Memory.h>
+#include <Rom.h>
+#include <Ram.h>
+#include <Bus.h>
+#include <Register.h>
 #include <InputOutput.h>
 #include <Intel8080.h>
 #include <Profiler.h>
