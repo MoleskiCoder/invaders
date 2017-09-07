@@ -4,7 +4,7 @@ CXXFLAGS = -Wall `sdl2-config --cflags` -std=c++11 -pipe -I ../libraries/EightBi
 
 LDFLAGS  = `sdl2-config --libs` -lSDL2_mixer -L ../libraries/EightBit/Intel8080/src -L ../libraries/EightBit/src -lintel8080 -leightbit
 
-CXXFILES = Board.cpp ColourPalette.cpp Configuration.cpp GameController.cpp Game.cpp invaders.cpp SoundEffects.cpp stdafx.cpp
+CXXFILES = Board.cpp ColourPalette.cpp Configuration.cpp GameController.cpp Game.cpp invaders.cpp SoundEffects.cpp
 
 CXXOBJECTS = $(CXXFILES:.cpp=.o)
 

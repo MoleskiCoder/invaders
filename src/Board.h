@@ -4,6 +4,7 @@
 
 #include <Rom.h>
 #include <Ram.h>
+#include <Bus.h>
 #include <InputOutput.h>
 #include <Intel8080.h>
 #include <Profiler.h>
