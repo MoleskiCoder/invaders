@@ -1,11 +1,12 @@
 version: 1.0.{build}
 before_build:
     - git submodule update --init --recursive
-    - appveyor DownloadFile http://libsdl.org/release/SDL2-2.0.5.zip -FileName c:\Libraries\SDL2-2.0.5.zip
-    - 7z x c:\Libraries\SDL2-2.0.5.zip
-    - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-VC.zip -FileName c:\Libraries\SDL2_mixer-devel-2.0.1-VC.zip
-    - 7z x c:\Libraries\SDL2_mixer-devel-2.0.1-VC.zip
-    - dir c:\Libraries
+    - cd c:\Libraries
+    - appveyor DownloadFile http://libsdl.org/release/SDL2-2.0.5.zip
+    - 7z x SDL2-2.0.5.zip
+    - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-VC.zip
+    - 7z x SDL2_mixer-devel-2.0.1-VC.zip
+    - dir
     - cd
 
 build:
