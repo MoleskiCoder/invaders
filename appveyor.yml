@@ -10,3 +10,11 @@ before_build:
 build:
   project: invaders.sln
   verbosity: minimal
+
+platform:
+    - x86
+    - x64
+
+configuration:
+    - Debug
+    - Release
