@@ -209,9 +209,9 @@ private:
 
 	bool m_cocktailModeControl;
 
-	void Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
-	void Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
-	void Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
+	void Board_PortWriting_SpaceInvaders(const uint8_t& port);
+	void Board_PortWritten_SpaceInvaders(const uint8_t& port);
+	void Board_PortReading_SpaceInvaders(const uint8_t& port);
 
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080& cpuEvent);
 	void Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpuEvent);

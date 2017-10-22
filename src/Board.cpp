@@ -57,8 +57,7 @@ void Board::initialise() {
 	m_cpu.PC() = m_configuration.getStartAddress();
 }
 
-void Board::Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent) {
-	auto port = portEvent.getPort();
+void Board::Board_PortWriting_SpaceInvaders(const uint8_t& port) {
 	auto value = m_ports.readOutputPort(port);
 	switch (port) {
 	case SOUND1:
@@ -70,8 +69,7 @@ void Board::Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portE
 	}
 }
 
-void Board::Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portEvent) {
-	auto port = portEvent.getPort();
+void Board::Board_PortWritten_SpaceInvaders(const uint8_t& port) {
 	auto value = m_ports.readOutputPort(port);
 	switch (port) {
 	case SHFTAMNT:
@@ -143,8 +141,7 @@ void Board::Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portE
 	}
 }
 
-void Board::Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portEvent) {
-	auto port = portEvent.getPort();
+void Board::Board_PortReading_SpaceInvaders(const uint8_t& port) {
 	switch (port) {
 	case INP1:
 		m_ports.writeInputPort(port,
