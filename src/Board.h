@@ -27,8 +27,8 @@ public:
 
 	Board(const Configuration& configuration);
 
-	EightBit::Profiler& Profiler() { return m_profiler; }
-	EightBit::Intel8080& CPU() { return m_cpu; }
+	auto& Profiler() { return m_profiler; }
+	auto& CPU() { return m_cpu; }
 
 	void initialise();
 
