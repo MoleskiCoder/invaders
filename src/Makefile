@@ -15,8 +15,8 @@ PCH = stdafx.h.gch
 
 all: opt
 
-opt: CXXFLAGS += -DNDEBUG -march=native -O3
-opt: LDFLAGS += -s
+opt: CXXFLAGS += -DNDEBUG -march=native -O3 -flto
+opt: LDFLAGS += -s -flto
 opt: $(EXE)
 
 debug: CXXFLAGS += -g -D_DEBUG
