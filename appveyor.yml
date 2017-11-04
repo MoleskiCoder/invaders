@@ -1,11 +1,13 @@
+image: Visual Studio 2017
+
 version: 1.0.{build}
 before_build:
     - git submodule update --init --recursive
     - cd c:\Libraries
-    - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.5-VC.zip
-    - 7z x SDL2-devel-2.0.5-VC.zip
-    - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-VC.zip
-    - 7z x SDL2_mixer-devel-2.0.1-VC.zip
+    - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.7-VC.zip
+    - 7z x SDL2-devel-2.0.7-VC.zip
+    - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.2-VC.zip
+    - 7z x SDL2_mixer-devel-2.0.2-VC.zip
 
 build:
   project: invaders.sln
