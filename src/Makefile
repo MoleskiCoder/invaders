@@ -1,6 +1,6 @@
 EXE = invaders
 
-CXXFLAGS = -Wall `sdl2-config --cflags` -std=c++11 -pipe -I ../libraries/EightBit/Intel8080/inc -I ../libraries/EightBit/inc
+CXXFLAGS = -Wall `sdl2-config --cflags` -std=c++14 -pipe -I ../libraries/EightBit/Intel8080/inc -I ../libraries/EightBit/inc
 
 LDFLAGS  = `sdl2-config --libs` -lSDL2_mixer -L ../libraries/EightBit/Intel8080/src -L ../libraries/EightBit/src -lintel8080 -leightbit
 
@@ -15,7 +15,7 @@ PCH = stdafx.h.gch
 
 all: opt
 
-opt: CXXFLAGS += -DNDEBUG -march=native -O2
+opt: CXXFLAGS += -DNDEBUG -march=native -O3
 opt: LDFLAGS += -s
 opt: $(EXE)
 
