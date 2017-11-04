@@ -12,16 +12,21 @@ env:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "YvaGTKzDSt2V68POXG/lEo4fvk8xmxQmAHZLOwx4k8f07e33f1oqek5I9BwDl9pVDEXKe1CkvzAlV59DfIT5dSHhb3m8nn/H7Y40+KTso2v6Iy6VL7SPqFekyvWCEg5eK2AGDFJlq//ts1gG90q10HNKmrDiKx87uthmMFnQ2P/eKcoBLMlYpSNzsjvoXbiHCRPECbZFTdvZrPZXB8R9iisK/EFKJoMmL7W7DAq16nSAkIGBJmrhPu6PkAWwm88tVw8upzxXy3GChKuEUi5SuosONWohCItmqBolPJ3ErcSWmrHL1DBlOsgNXY61dMxU1zavJElo2PVLxVuFB2Eeq+QgdIA9998V8yAahB48IkdB9gz71DnBsMJ9s+hm8yGficcXvSZdos6D49oC/QLxh8VtcC6Pi+v4l6kvSn/adfqfbzG55KA3mXf7HHI5pZHJj7r2KdvTcagSOkNNyBvrSCS3cNLRfakyyRUVznTPrfHwM21gvV0N1of8jYOK1GRmzY51+TaZOY9ZN6Lk6XPjnNHxI8HYQMu8zYlM+REgbrN8892D2XTQBzB1+kEDwrXsLgT8qB+nu9cNIJTfOi/buDQXZQztjs9AbNAh5QGhtG3aW9DRRy22zjZ5qHIa70bhXbrXDCtd2qYOiULltalDn6YL+xheI1keNiLgjbrkQQY="
+   - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
 before_install:
   - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+  - eval "${MATRIX_EVAL}"
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
       - libsdl2-dev
       - libsdl2-mixer-dev
       - libboost-dev
+      - g++-7
   coverity_scan:
     project:
       name: "MoleskiCoder/invaders"
