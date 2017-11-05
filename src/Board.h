@@ -104,26 +104,7 @@ public:
 	EightBit::Signal<EightBit::EventArgs> DisableAmplifier;
 
 protected:
-	virtual uint8_t& reference(uint16_t address, bool& rom) {
-		address &= ~0xc000;
-		if (address < 0x2000) {
-			rom = true;
-			if (address < 0x800)
-				return m_romH.reference(address);
-			if (address < 0x1000)
-				return m_romG.reference(address - 0x800);
-			if (address < 0x1800)
-				return m_romF.reference(address - (0x800 * 2));
-			return m_romE.reference(address - (0x800 * 3));
-		}
-		if (address < 0x4000) {
-			rom = false;
-			if (address < 0x2400)
-				return m_workRAM.reference(address - 0x2000);
-			return m_videoRAM.reference(address - 0x2400);
-		}
-		UNREACHABLE;
-	}
+	virtual uint8_t& reference(uint16_t address, bool& rom) override;
 
 private:
 	enum InputPorts {
