@@ -366,7 +366,7 @@ int Game::drawFrame(int prior) {
 	auto bytesPerScanLine = Board::RasterWidth / 8;
 	for (int inputY = 0; inputY < Board::RasterHeight; ++inputY) {
 		if (inputY == 96)
-			prior += m_board.triggerInterruptScanLine96();
+			m_board.triggerInterruptScanLine96();
 		prior = m_board.runScanLine(prior);
 		auto evenScanLine = (inputY % 2 == 0);
 		auto oddScanLine = !evenScanLine;
@@ -396,7 +396,7 @@ int Game::drawFrame(int prior) {
 		}
 	}
 
-	prior += m_board.triggerInterruptScanLine224();
+	m_board.triggerInterruptScanLine224();
 
 	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 

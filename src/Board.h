@@ -32,12 +32,14 @@ public:
 
 	void initialise();
 
-	int triggerInterruptScanLine224() {
-		return m_cpu.interrupt(0xd7);	// RST 2
+	void triggerInterruptScanLine224() {
+		placeDATA(0xd7);	// RST 2
+		CPU().INT() = true;
 	}
 
-	int triggerInterruptScanLine96() {
-		return m_cpu.interrupt(0xcf);	// RST 1
+	void triggerInterruptScanLine96() {
+		placeDATA(0xcf);	// RST 2
+		CPU().INT() = true;
 	}
 
 	bool getCocktailModeControl() const {
