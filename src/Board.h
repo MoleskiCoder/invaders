@@ -34,12 +34,12 @@ public:
 
 	void triggerInterruptScanLine224() {
 		placeDATA(0xd7);	// RST 2
-		CPU().INT() = true;
+		EightBit::Processor::lower(CPU().INT());
 	}
 
 	void triggerInterruptScanLine96() {
-		placeDATA(0xcf);	// RST 2
-		CPU().INT() = true;
+		placeDATA(0xcf);	// RST 1
+		EightBit::Processor::lower(CPU().INT());
 	}
 
 	bool getCocktailModeControl() const {

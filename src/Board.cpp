@@ -46,15 +46,15 @@ void Board::initialise() {
 	m_ports.ReadingPort.connect(std::bind(&Board::Board_PortReading_SpaceInvaders, this, std::placeholders::_1));
 
 	if (m_configuration.isProfileMode()) {
-		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
+		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
 	}
 
 	if (m_configuration.isDebugMode()) {
-		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
+		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
 	}
 
-	m_cpu.initialise();
-	m_cpu.PC() = m_configuration.getStartAddress();
+	CPU().powerOn();
+	CPU().PC() = m_configuration.getStartAddress();
 }
 
 void Board::Board_PortWriting_SpaceInvaders(const uint8_t& port) {
@@ -174,7 +174,7 @@ void Board::Board_PortReading_SpaceInvaders(const uint8_t& port) {
 
 void Board::Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpu) {
 
-	const auto pc = m_cpu.PC();
+	const auto pc = CPU().PC();
 
 	m_profiler.addAddress(pc.word);
 	m_profiler.addInstruction(peek(pc.word));
@@ -183,9 +183,9 @@ void Board::Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpu) {
 void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080&) {
 
 	std::cerr
-		<< EightBit::Disassembler::state(m_cpu)
+		<< EightBit::Disassembler::state(CPU())
 		<< "\t"
-		<< m_disassembler.disassemble(m_cpu)
+		<< m_disassembler.disassemble(CPU())
 		<< '\n';
 }
 
