@@ -3,8 +3,7 @@
 #include "Configuration.h"
 
 SoundEffects::SoundEffects(const Configuration& configuration)
-:	m_configuration(configuration),
-	m_enabled(false) {
+:	m_configuration(configuration) {
 
 	::Mix_Init(0);
 

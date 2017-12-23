@@ -6,7 +6,7 @@
 class Configuration;
 struct Mix_Chunk;
 
-class SoundEffects {
+class SoundEffects final {
 public:
 	SoundEffects(const Configuration& configuration);
 	~SoundEffects();
@@ -30,7 +30,7 @@ public:
 private:
 	const Configuration& m_configuration;
 
-	bool m_enabled;
+	bool m_enabled = false;
 
 	std::shared_ptr<Mix_Chunk> m_ufoChunk;
 	std::shared_ptr<Mix_Chunk> m_shotChunk;

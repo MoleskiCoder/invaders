@@ -4,120 +4,61 @@
 
 #include <Register.h>
 
-class Configuration {
+class Configuration final {
 public:
-	Configuration();
+	Configuration() = default;
 
-	bool isDebugMode() const {
-		return m_debugMode;
-	}
+	bool isDebugMode() const { return m_debugMode; }
+	void setDebugMode(bool value) { m_debugMode = value; }
 
-	void setDebugMode(bool value) {
-		m_debugMode = value;
-	}
+	bool isProfileMode() const { return m_profileMode; }
+	void setProfileMode(bool value) { m_profileMode = value; }
 
-	bool isProfileMode() const {
-		return m_profileMode;
-	}
+	bool isDrawGraphics() const { return m_drawGraphics; }
+	void setDrawGraphics(bool value) { m_drawGraphics = value; }
 
-	void setProfileMode(bool value) {
-		m_profileMode = value;
-	}
+	bool isShowWatchdogOutput() const { return m_showWatchdogOutput; }
+	void setShowWatchdogOutput(bool value) { m_showWatchdogOutput = value; }
 
-	bool isDrawGraphics() const {
-		return m_drawGraphics;
-	}
+	bool isInterlaced() const { return m_interlaced; }
+	void setInterlaced(bool value) { m_interlaced = value; }
 
-	void setDrawGraphics(bool value) {
-		m_drawGraphics = value;
-	}
+	bool getVsyncLocked() const { return m_vsyncLocked;	}
+	void setVsyncLocked(bool value) { m_vsyncLocked = value; }
 
-	bool isShowWatchdogOutput() const {
-		return m_showWatchdogOutput;
-	}
+	int getFramesPerSecond() const { return m_framesPerSecond; }
+	void setFramesPerSecond(int value) { m_framesPerSecond = value; }
 
-	void setShowWatchdogOutput(bool value) {
-		m_showWatchdogOutput = value;
-	}
+	int getCyclesPerFrame() const { return m_cyclesPerSecond / getFramesPerSecond(); }
+	int getCyclesPerRasterScan() const { return getCyclesPerFrame() - getCyclesPerVerticalBlank(); }
+	int getCyclesPerVerticalBlank() const { return getCyclesPerFrame() / 6; }
 
-	bool isInterlaced() const {
-		return m_interlaced;
-	}
+	int getCyclesPerSecond() const { return m_cyclesPerSecond; }
+	void setCyclesPerSecond(int value) { m_cyclesPerSecond = value; }
 
-	void setInterlaced(bool value) {
-		m_interlaced = value;
-	}
+	bool getCocktailTable() const { return m_cocktailTable; }
+	void setCocktailTable(bool value) { m_cocktailTable = value; }
 
-	bool getVsyncLocked() const {
-		return m_vsyncLocked;
-	}
+	std::string getRomDirectory() const { return m_romDirectory; }
+	std::string getSoundDirectory() const { return m_soundDirectory; }
 
-	void setVsyncLocked(bool value) {
-		m_vsyncLocked = value;
-	}
-
-	int getFramesPerSecond() const {
-		return m_framesPerSecond;
-	}
-
-	void setFramesPerSecond(int value) {
-		m_framesPerSecond = value;
-	}
-
-	int getCyclesPerFrame() const {
-		return m_cyclesPerSecond / getFramesPerSecond();
-	}
-
-	int getCyclesPerRasterScan() const {
-		return getCyclesPerFrame() - getCyclesPerVerticalBlank();
-	}
-
-	int getCyclesPerVerticalBlank() const {
-		return getCyclesPerFrame() / 6;
-	}
-
-	int getCyclesPerSecond() const {
-		return m_cyclesPerSecond;
-	}
-
-	void setCyclesPerSecond(int value) {
-		m_cyclesPerSecond = value;
-	}
-
-	bool getCocktailTable() const {
-		return m_cocktailTable;
-	}
-
-	void getCocktailTable(bool value) {
-		m_cocktailTable = value;
-	}
-
-	std::string getRomDirectory() const {
-		return m_romDirectory;
-	}
-
-	std::string getSoundDirectory() const {
-		return m_soundDirectory;
-	}
-
-	EightBit::register16_t getStartAddress() const {
-		EightBit::register16_t returned;
-		returned.word = 0;
+	static EightBit::register16_t getStartAddress() {
+		const EightBit::register16_t returned = { { 0, 0 } };
 		return returned;
 	}
 
 private:
-	bool m_debugMode;
-	bool m_profileMode;
-	bool m_drawGraphics;
-	bool m_showWatchdogOutput;
+	bool m_debugMode = false;
+	bool m_profileMode = false;
+	bool m_drawGraphics = true;
+	bool m_showWatchdogOutput = false;
 
-	bool m_interlaced;
-	bool m_vsyncLocked;
-	int m_framesPerSecond;
-	int m_cyclesPerSecond;
-	bool m_cocktailTable;
+	bool m_interlaced = false;
+	bool m_vsyncLocked = true;
+	int m_framesPerSecond = 60;
+	int m_cyclesPerSecond = 2000000;
+	bool m_cocktailTable = false;
 
-	std::string m_romDirectory;
-	std::string m_soundDirectory;
+	std::string m_romDirectory = "roms";
+	std::string m_soundDirectory = "sounds";
 };

@@ -2,17 +2,9 @@
 #include "Game.h"
 
 Game::Game(const Configuration& configuration)
-	: m_configuration(configuration),
+:	m_configuration(configuration),
 	m_board(configuration),
-	m_window(nullptr),
-	m_renderer(nullptr),
-	m_bitmapTexture(nullptr),
-	m_pixelType(SDL_PIXELFORMAT_ARGB8888),
-	m_pixelFormat(nullptr),
 	m_fps(configuration.getFramesPerSecond()),
-	m_startTicks(0),
-	m_frames(0),
-	m_vsync(false),
 	m_effects(configuration) {
 }
 
@@ -352,18 +344,18 @@ int Game::whichPlayer() const {
 
 int Game::drawFrame(int prior) {
 
-	auto flip = m_configuration.getCocktailTable() ? m_board.getCocktailModeControl() : false;
-	auto interlaced = m_configuration.isInterlaced();
+	const auto flip = m_configuration.getCocktailTable() && m_board.getCocktailModeControl();
+	const auto interlaced = m_configuration.isInterlaced();
 
-	auto renderOdd = interlaced ? m_frames % 2 == 1 : true;
-	auto renderEven = interlaced ? m_frames % 2 == 0 : true;
+	const auto renderOdd = !interlaced || (interlaced && (m_frames % 2 == 1));
+	const auto renderEven = !interlaced || (interlaced && (m_frames % 2 == 0));
 
-	auto black = m_colours.getColour(ColourPalette::Black);
+	const auto black = m_colours.getColour(ColourPalette::Black);
 	if (interlaced)
 		std::fill(m_pixels.begin(), m_pixels.end(), black);
 
 	// This code handles the display rotation
-	auto bytesPerScanLine = Board::RasterWidth / 8;
+	const auto bytesPerScanLine = Board::RasterWidth >> 3;
 	for (int inputY = 0; inputY < Board::RasterHeight; ++inputY) {
 		if (inputY == 96)
 			m_board.triggerInterruptScanLine96();
@@ -374,22 +366,22 @@ int Game::drawFrame(int prior) {
 			continue;
 		if (evenScanLine && !renderEven)
 			continue;
-		auto address = Board::VideoRam + bytesPerScanLine * inputY;
-		auto outputX = flip ? Board::RasterHeight - inputY - 1 : inputY;
+		auto address = bytesPerScanLine * inputY;
+		const auto outputX = flip ? Board::RasterHeight - inputY - 1 : inputY;
 		for (int byte = 0; byte < bytesPerScanLine; ++byte) {
-			auto video = m_board.peek(++address);
+			auto video = m_board.VRAM().peek(address++);
 			for (int bit = 0; bit < 8; ++bit) {
-				auto inputX = byte * 8 + bit;
-				auto outputY = flip ? inputX : Board::RasterWidth - inputX - 1;
-				auto outputPixel = outputX + outputY * DisplayWidth;
-				auto mask = 1 << bit;
-				auto inputPixel = video & mask;
+				const auto inputX = (byte << 3) + bit;
+				const auto outputY = flip ? inputX : Board::RasterWidth - inputX - 1;
+				const auto outputPixel = outputX + outputY * DisplayWidth;
+				const auto mask = 1 << bit;
+				const auto inputPixel = video & mask;
 				if (interlaced) {
 					if (inputPixel) {
 						m_pixels[outputPixel] = m_colours.getColour(ColourPalette::calculateColour(outputX, outputY));
 					}
 				} else {
-					auto colour = inputPixel ? m_colours.getColour(ColourPalette::calculateColour(outputX, outputY)) : black;
+					const auto colour = inputPixel ? m_colours.getColour(ColourPalette::calculateColour(outputX, outputY)) : black;
 					m_pixels[outputPixel] = colour;
 				}
 			}

@@ -3,10 +3,7 @@
 #include "Game.h"
 
 GameController::GameController(int index)
-: m_index(index),
-  m_gameController(nullptr),
-  m_hapticController(nullptr),
-  m_hapticRumbleSupported(false) {
+: m_index(index) {
 	open();
 }
 

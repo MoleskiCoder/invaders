@@ -13,22 +13,19 @@
 
 #include "Configuration.h"
 
-class Board : public EightBit::Bus {
+class Board final : public EightBit::Bus {
 public:
 	enum {
 		RasterWidth = 256,
 		RasterHeight = 224
 	};
 
-	enum {
-		WorkRam = 0x2000,
-		VideoRam = 0x2400
-	};
-
 	Board(const Configuration& configuration);
 
 	auto& Profiler() { return m_profiler; }
 	auto& CPU() { return m_cpu; }
+
+	auto& VRAM() { return m_videoRAM; }
 
 	void initialise();
 
@@ -154,43 +151,43 @@ private:
 
 	const Configuration& m_configuration;
 
-	EightBit::Rom m_romE;
-	EightBit::Rom m_romF;
-	EightBit::Rom m_romG;
-	EightBit::Rom m_romH;
-	EightBit::Ram m_workRAM;
-	EightBit::Ram m_videoRAM;
+	EightBit::Rom m_romE = 0x800;
+	EightBit::Rom m_romF = 0x800;
+	EightBit::Rom m_romG = 0x800;
+	EightBit::Rom m_romH = 0x800;
+	EightBit::Ram m_workRAM = 0x400;
+	EightBit::Ram m_videoRAM = 0x1c00;
 
 	EightBit::InputOutput m_ports;
 	EightBit::Intel8080 m_cpu;
 	EightBit::Profiler m_profiler;
 	EightBit::Disassembler m_disassembler;
 
-	ShipSwitch m_ships;
-	ExtraShipSwitch m_extraLife;
-	DemoCoinInfoSwitch m_demoCoinInfo;
+	ShipSwitch m_ships = Three;
+	ExtraShipSwitch m_extraLife = OneThousandFiveHundred;
+	DemoCoinInfoSwitch m_demoCoinInfo = On;
 
-	uint8_t m_shiftAmount;
-	EightBit::register16_t m_shiftData;
+	uint8_t m_shiftAmount = 0;
+	EightBit::register16_t m_shiftData = { { 0, 0 } };
 
-	bool m_credit;
+	bool m_credit = false;
 
-	bool m_onePlayerStart;
-	bool m_onePlayerShot;
-	bool m_onePlayerLeft;
-	bool m_onePlayerRight;
+	bool m_onePlayerStart = false;
+	bool m_onePlayerShot = false;
+	bool m_onePlayerLeft = false;
+	bool m_onePlayerRight = false;
 
-	bool m_twoPlayerStart;
-	bool m_twoPlayerShot;
-	bool m_twoPlayerLeft;
-	bool m_twoPlayerRight;
+	bool m_twoPlayerStart = false;
+	bool m_twoPlayerShot = false;
+	bool m_twoPlayerLeft = false;
+	bool m_twoPlayerRight = false;
 
-	bool m_tilt;
+	bool m_tilt = false;
 
-	uint8_t m_preSound1;
-	uint8_t m_preSound2;
+	uint8_t m_preSound1 = 0;
+	uint8_t m_preSound2 = 0;
 
-	bool m_cocktailModeControl;
+	bool m_cocktailModeControl = false;
 
 	void Board_PortWriting_SpaceInvaders(const uint8_t& port);
 	void Board_PortWritten_SpaceInvaders(const uint8_t& port);

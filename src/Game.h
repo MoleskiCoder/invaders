@@ -14,7 +14,7 @@
 
 class Configuration;
 
-class Game {
+class Game final {
 public:
 
 	static void throwSDLException(std::string failure) {
@@ -43,19 +43,19 @@ private:
 	mutable Board m_board;
 	ColourPalette m_colours;
 
-	SDL_Window* m_window;
-	SDL_Renderer* m_renderer;
+	SDL_Window* m_window = nullptr;
+	SDL_Renderer* m_renderer = nullptr;
 
-	SDL_Texture* m_bitmapTexture;
-	Uint32 m_pixelType;
-	SDL_PixelFormat* m_pixelFormat;
+	SDL_Texture* m_bitmapTexture = nullptr;
+	Uint32 m_pixelType = SDL_PIXELFORMAT_ARGB8888;
+	SDL_PixelFormat* m_pixelFormat = nullptr;
 
 	std::vector<uint32_t> m_pixels;
 
 	int m_fps;
-	Uint32 m_startTicks;
-	Uint32 m_frames;
-	bool m_vsync;
+	Uint32 m_startTicks = 0;
+	Uint32 m_frames = 0;
+	bool m_vsync = false;
 
 	SoundEffects m_effects;
 

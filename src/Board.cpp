@@ -5,32 +5,7 @@
 
 Board::Board(const Configuration& configuration)
 : m_configuration(configuration),
-  m_romE(0x800),
-  m_romF(0x800),
-  m_romG(0x800),
-  m_romH(0x800),
-  m_workRAM(0x400),
-  m_videoRAM(0x1c00),
-  m_cpu(EightBit::Intel8080(*this, m_ports)),
-  m_ships(Three),
-  m_extraLife(OneThousandFiveHundred),
-  m_demoCoinInfo(On),
-  m_shiftAmount(0),
-  m_credit(false),
-  m_onePlayerStart(false),
-  m_onePlayerShot(false),
-  m_onePlayerLeft(false),
-  m_onePlayerRight(false),
-  m_twoPlayerStart(false),
-  m_twoPlayerShot(false),
-  m_twoPlayerLeft(false),
-  m_twoPlayerRight(false),
-  m_tilt(false),
-  m_preSound1(0),
-  m_preSound2(0),
-  m_cocktailModeControl(false) {
-	m_shiftData.word = 0;
-}
+  m_cpu(EightBit::Intel8080(*this, m_ports)) {}
 
 void Board::initialise() {
 

@@ -4,7 +4,7 @@
 #include <map>
 #include <SDL.h>
 
-class GameController {
+class GameController final {
 public:
 	GameController(int index);
 	virtual ~GameController();
@@ -23,13 +23,13 @@ public:
 
 private:
 	int m_index;
-	SDL_GameController* m_gameController;
+	SDL_GameController* m_gameController = nullptr;
 
 	void open();
 	void close();
 
-	SDL_Haptic* m_hapticController;
-	bool m_hapticRumbleSupported;
+	SDL_Haptic* m_hapticController = nullptr;
+	bool m_hapticRumbleSupported = false;
 
 	void openHapticController();
 	void closeHapticController();
