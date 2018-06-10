@@ -30,12 +30,12 @@ public:
 	void initialise();
 
 	void triggerInterruptScanLine224() {
-		placeDATA(0xd7);	// RST 2
+		DATA() = 0xd7;	// RST 2
 		EightBit::Processor::lower(CPU().INT());
 	}
 
 	void triggerInterruptScanLine96() {
-		placeDATA(0xcf);	// RST 1
+		DATA() = 0xcf;	// RST 1
 		EightBit::Processor::lower(CPU().INT());
 	}
 
@@ -103,7 +103,8 @@ public:
 	EightBit::Signal<EightBit::EventArgs> DisableAmplifier;
 
 protected:
-	virtual uint8_t& reference(uint16_t address, bool& rom) override;
+	virtual uint8_t& reference(uint16_t address, bool& rom) final;
+	virtual uint8_t reference(uint16_t address, bool& rom) const;
 
 private:
 	enum InputPorts {
