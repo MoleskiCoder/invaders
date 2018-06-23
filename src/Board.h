@@ -103,8 +103,8 @@ public:
 	EightBit::Signal<EightBit::EventArgs> DisableAmplifier;
 
 protected:
-	virtual uint8_t& reference(uint16_t address, bool& rom) final;
-	virtual uint8_t reference(uint16_t address, bool& rom) const;
+	virtual uint8_t& reference(uint16_t address) final;
+	virtual uint8_t reference(uint16_t address) const final;
 
 private:
 	enum InputPorts {
@@ -169,7 +169,7 @@ private:
 	DemoCoinInfoSwitch m_demoCoinInfo = On;
 
 	uint8_t m_shiftAmount = 0;
-	EightBit::register16_t m_shiftData = { { 0, 0 } };
+	EightBit::register16_t m_shiftData = 0U;
 
 	bool m_credit = false;
 

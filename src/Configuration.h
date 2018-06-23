@@ -43,8 +43,7 @@ public:
 	std::string getSoundDirectory() const { return m_soundDirectory; }
 
 	static EightBit::register16_t getStartAddress() {
-		const EightBit::register16_t returned = { { 0, 0 } };
-		return returned;
+		return 0U;
 	}
 
 private:
