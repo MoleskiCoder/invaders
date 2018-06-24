@@ -104,7 +104,6 @@ public:
 
 protected:
 	virtual uint8_t& reference(uint16_t address) final;
-	virtual uint8_t reference(uint16_t address) const final;
 
 private:
 	enum InputPorts {

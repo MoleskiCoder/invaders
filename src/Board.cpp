@@ -168,31 +168,12 @@ uint8_t& Board::reference(uint16_t address) {
 	address &= ~0xc000;
 	if (address < 0x2000) {
 		if (address < 0x800)
-			return DATA() = m_romH.reference(address);
+			return DATA() = m_romH.peek(address);
 		if (address < 0x1000)
-			return DATA() = m_romG.reference(address - 0x800);
+			return DATA() = m_romG.peek(address - 0x800);
 		if (address < 0x1800)
-			return DATA() = m_romF.reference(address - (0x800 * 2));
-		return DATA() = m_romE.reference(address - (0x800 * 3));
-	}
-	if (address < 0x4000) {
-		if (address < 0x2400)
-			return m_workRAM.reference(address - 0x2000);
-		return m_videoRAM.reference(address - 0x2400);
-	}
-	UNREACHABLE;
-}
-
-uint8_t Board::reference(uint16_t address) const {
-	address &= ~0xc000;
-	if (address < 0x2000) {
-		if (address < 0x800)
-			return m_romH.reference(address);
-		if (address < 0x1000)
-			return m_romG.reference(address - 0x800);
-		if (address < 0x1800)
-			return m_romF.reference(address - (0x800 * 2));
-		return m_romE.reference(address - (0x800 * 3));
+			return DATA() = m_romF.peek(address - (0x800 * 2));
+		return DATA() = m_romE.peek(address - (0x800 * 3));
 	}
 	if (address < 0x4000) {
 		if (address < 0x2400)
