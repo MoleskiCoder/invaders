@@ -29,7 +29,6 @@ void Board::initialise() {
 	}
 
 	CPU().powerOn();
-	CPU().PC() = m_configuration.getStartAddress();
 }
 
 void Board::Board_PortWriting_SpaceInvaders(const uint8_t& port) {

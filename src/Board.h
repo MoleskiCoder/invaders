@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include <Rom.h>
 #include <Ram.h>
 #include <Bus.h>
 #include <InputOutput.h>

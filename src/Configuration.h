@@ -42,10 +42,6 @@ public:
 	std::string getRomDirectory() const { return m_romDirectory; }
 	std::string getSoundDirectory() const { return m_soundDirectory; }
 
-	static EightBit::register16_t getStartAddress() {
-		return 0U;
-	}
-
 private:
 	bool m_debugMode = false;
 	bool m_profileMode = false;
