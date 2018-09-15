@@ -102,7 +102,7 @@ public:
 	EightBit::Signal<EightBit::EventArgs> DisableAmplifier;
 
 protected:
-	virtual uint8_t& reference(uint16_t address) final;
+	virtual EightBit::MemoryMapping mapping(uint16_t address) final;
 
 private:
 	enum InputPorts {

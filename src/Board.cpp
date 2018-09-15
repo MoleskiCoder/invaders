@@ -163,21 +163,21 @@ void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080&) {
 		<< '\n';
 }
 
-uint8_t& Board::reference(uint16_t address) {
+EightBit::MemoryMapping Board::mapping(uint16_t address) {
 	address &= ~0xc000;
 	if (address < 0x2000) {
 		if (address < 0x800)
-			return DATA() = m_romH.peek(address);
+			return { m_romH, 0x0000, EightBit::MemoryMapping::ReadOnly };
 		if (address < 0x1000)
-			return DATA() = m_romG.peek(address - 0x800);
+			return { m_romG, 0x0800, EightBit::MemoryMapping::ReadOnly };
 		if (address < 0x1800)
-			return DATA() = m_romF.peek(address - (0x800 * 2));
-		return DATA() = m_romE.peek(address - (0x800 * 3));
+			return { m_romF, 0x0800 * 2, EightBit::MemoryMapping::ReadOnly };
+		return { m_romE, 0x0800 * 3, EightBit::MemoryMapping::ReadOnly };
 	}
 	if (address < 0x4000) {
 		if (address < 0x2400)
-			return m_workRAM.reference(address - 0x2000);
-		return m_videoRAM.reference(address - 0x2400);
+			return { m_workRAM, 0x2000, EightBit::MemoryMapping::ReadWrite };
+		return { m_videoRAM, 0x2400, EightBit::MemoryMapping::ReadWrite };
 	}
 	UNREACHABLE;
 }
