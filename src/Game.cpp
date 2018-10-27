@@ -180,8 +180,8 @@ void Game::runLoop() {
 }
 
 // -1 if no controllers, otherwise index
-int Game::chooseControllerIndex(int who) const {
-	auto count = m_gameControllers.size();
+int Game::chooseControllerIndex(const int who) const {
+	const auto count = m_gameControllers.size();
 	if (count == 0)
 		return -1;
 	auto firstController = m_gameControllers.cbegin();
@@ -191,16 +191,16 @@ int Game::chooseControllerIndex(int who) const {
 	return secondController;
 }
 
-std::shared_ptr<GameController> Game::chooseController(int who) const {
-	auto which = chooseControllerIndex(who);
+std::shared_ptr<GameController> Game::chooseController(const int who) const {
+	const auto which = chooseControllerIndex(who);
 	if (which == -1)
 		return nullptr;
-	auto found = m_gameControllers.find(which);
+	const auto found = m_gameControllers.find(which);
 	SDL_assert(found != m_gameControllers.cend());
 	return found->second;
 }
 
-void Game::handleJoyButtonDown(SDL_JoyButtonEvent event) {
+void Game::handleJoyButtonDown(const SDL_JoyButtonEvent event) {
 	auto joystickId = event.which;
 	auto controllerIndex = m_mappedControllers[joystickId];
 	auto value = event.button;
@@ -218,7 +218,7 @@ void Game::handleJoyButtonDown(SDL_JoyButtonEvent event) {
 	}
 }
 
-void Game::handleJoyButtonUp(SDL_JoyButtonEvent event) {
+void Game::handleJoyButtonUp(const SDL_JoyButtonEvent event) {
 	auto joystickId = event.which;
 	auto controllerIndex = m_mappedControllers[joystickId];
 	auto value = event.button;
@@ -236,37 +236,37 @@ void Game::handleJoyButtonUp(SDL_JoyButtonEvent event) {
 	}
 }
 
-void Game::handleJoyLeftPress(int who, int joystick) {
+void Game::handleJoyLeftPress(const int who, const int joystick) {
 	if (chooseControllerIndex(who) == joystick)
 		m_board.pressLeft1P();
 }
 
-void Game::handleJoyRightPress(int who, int joystick) {
+void Game::handleJoyRightPress(const int who, const int joystick) {
 	if (chooseControllerIndex(who) == joystick)
 		m_board.pressRight1P();
 }
 
-void Game::handleJoyFirePress(int who, int joystick) {
+void Game::handleJoyFirePress(const int who, const int joystick) {
 	if (chooseControllerIndex(who) == joystick)
 		m_board.pressShoot1P();
 }
 
-void Game::handleJoyLeftRelease(int who, int joystick) {
+void Game::handleJoyLeftRelease(const int who, const int joystick) {
 	if (chooseControllerIndex(who) == joystick)
 		m_board.releaseLeft1P();
 }
 
-void Game::handleJoyRightRelease(int who, int joystick) {
+void Game::handleJoyRightRelease(const int who, const int joystick) {
 	if (chooseControllerIndex(who) == joystick)
 		m_board.releaseRight1P();
 }
 
-void Game::handleJoyFireRelease(int who, int joystick) {
+void Game::handleJoyFireRelease(const int who, const int joystick) {
 	if (chooseControllerIndex(who) == joystick)
 		m_board.releaseShoot1P();
 }
 
-void Game::handleKeyDown(SDL_Keycode key) {
+void Game::handleKeyDown(const SDL_Keycode key) {
 	switch (key) {
 	case SDLK_1:
 		m_board.press1P();
@@ -298,7 +298,7 @@ void Game::handleKeyDown(SDL_Keycode key) {
 	}
 }
 
-void Game::handleKeyUp(SDL_Keycode key) {
+void Game::handleKeyUp(const SDL_Keycode key) {
 	switch (key) {
 	case SDLK_1:
 		m_board.release1P();
@@ -331,7 +331,7 @@ void Game::handleKeyUp(SDL_Keycode key) {
 }
 
 int Game::whichPlayer() const {
-	auto playerId = m_board.peek(0x2067);	// player MSB
+	const auto playerId = m_board.peek(0x2067);	// player MSB
 	switch (playerId) {
 	case 0x21:
 		return 1;
@@ -400,7 +400,7 @@ int Game::drawFrame(int prior) {
 }
 
 void Game::dumpRendererInformation() {
-	auto count = ::SDL_GetNumRenderDrivers();
+	const auto count = ::SDL_GetNumRenderDrivers();
 	for (int i = 0; i < count; ++i) {
 		::SDL_RendererInfo info;
 		verifySDLCall(::SDL_GetRenderDriverInfo(i, &info), "Unable to obtain renderer information");
@@ -408,7 +408,7 @@ void Game::dumpRendererInformation() {
 	}
 }
 
-void Game::dumpRendererInformation(::SDL_RendererInfo info) {
+void Game::dumpRendererInformation(const::SDL_RendererInfo info) {
 	auto name = info.name;
 	auto flags = info.flags;
 	int software = (flags & SDL_RENDERER_SOFTWARE) != 0;

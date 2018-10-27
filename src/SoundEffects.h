@@ -11,7 +11,7 @@ public:
 	SoundEffects(const Configuration& configuration);
 	~SoundEffects();
 
-	bool isEnabled() { return m_enabled; }
+	auto isEnabled() { return m_enabled; }
 
 	void enable();
 	void disable();

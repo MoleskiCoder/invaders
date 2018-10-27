@@ -14,7 +14,7 @@ public:
 		Green
 	};
 
-	static int calculateColour(int x, int y) {
+	static auto calculateColour(const int x, const int y) {
 		if (y < 32)
 			return White;
 		if (y < (32 + 32))
@@ -32,7 +32,7 @@ public:
 
 	ColourPalette();
 
-	uint32_t getColour(size_t index) const {
+	auto getColour(const size_t index) const {
 		return m_colours[index];
 	}
 

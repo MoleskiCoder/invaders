@@ -58,7 +58,7 @@ std::shared_ptr<Mix_Chunk> SoundEffects::loadEffect(const std::string& name) con
 		auto message = "Unable to load mix chunk (" + name + "): ";
 		throwMixException(message);
 	}
-	return std::shared_ptr<Mix_Chunk>(chunk, ::Mix_FreeChunk);
+	return { chunk, ::Mix_FreeChunk };
 }
 
 void SoundEffects::playEffect(int channel, Mix_Chunk* effect) {

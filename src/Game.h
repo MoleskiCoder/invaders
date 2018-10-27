@@ -67,11 +67,11 @@ private:
 	void configureBackground() const;
 	void createBitmapTexture();
 
-	int getScreenWidth() const {
+	static constexpr auto getScreenWidth() {
 		return DisplayWidth * DisplayScale;
 	}
 
-	int getScreenHeight() const {
+	static constexpr auto getScreenHeight() {
 		return DisplayHeight * DisplayScale;
 	}
 

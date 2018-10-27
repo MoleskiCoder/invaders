@@ -30,37 +30,37 @@ public:
 
 	void triggerInterruptScanLine224() {
 		DATA() = 0xd7;	// RST 2
-		EightBit::Processor::lower(CPU().INT());
+		EightBit::Chip::lower(CPU().INT());
 	}
 
 	void triggerInterruptScanLine96() {
 		DATA() = 0xcf;	// RST 1
-		EightBit::Processor::lower(CPU().INT());
+		EightBit::Chip::lower(CPU().INT());
 	}
 
-	bool getCocktailModeControl() const {
+	auto getCocktailModeControl() const {
 		return m_cocktailModeControl;
 	}
 
-	int getCyclesPerScanLine() const {
+	auto getCyclesPerScanLine() const {
 		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
 	}
 
-	int runFrame(int prior) {
-		prior = runRasterScan(prior);
-		return runVerticalBlank(prior);
-	}
-
-	int runScanLine(int prior) {
+	auto runScanLine(const int prior) {
 		return m_cpu.run(getCyclesPerScanLine() - prior);
 	}
 
-	int runRasterScan(int prior) {
+	auto runRasterScan(const int prior) {
 		return m_cpu.run(m_configuration.getCyclesPerRasterScan() - prior);
 	}
 
-	int runVerticalBlank(int prior) {
+	auto runVerticalBlank(const int prior) {
 		return m_cpu.run(m_configuration.getCyclesPerVerticalBlank() - prior);
+	}
+
+	auto runFrame(const int prior) {
+		const auto remaining = runRasterScan(prior);
+		return runVerticalBlank(remaining);
 	}
 
 	void pressCredit() { m_credit = true; }
@@ -162,9 +162,9 @@ private:
 	EightBit::Profiler m_profiler;
 	EightBit::Disassembler m_disassembler;
 
-	ShipSwitch m_ships = Three;
-	ExtraShipSwitch m_extraLife = OneThousandFiveHundred;
-	DemoCoinInfoSwitch m_demoCoinInfo = On;
+	const ShipSwitch m_ships = Three;
+	const ExtraShipSwitch m_extraLife = OneThousandFiveHundred;
+	const DemoCoinInfoSwitch m_demoCoinInfo = On;
 
 	uint8_t m_shiftAmount = 0;
 	EightBit::register16_t m_shiftData = 0U;
