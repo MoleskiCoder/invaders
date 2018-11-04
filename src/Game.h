@@ -28,6 +28,7 @@ public:
 	}
 
 	Game(const Configuration& configuration);
+	~Game();
 
 	void runLoop();
 	void initialise();
@@ -61,6 +62,8 @@ private:
 
 	std::map<int, std::shared_ptr<GameController>> m_gameControllers;
 	std::map<SDL_JoystickID, int> m_mappedControllers;
+
+	void terminate();
 
 	int drawFrame(int prior);
 

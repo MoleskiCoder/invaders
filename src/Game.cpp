@@ -8,6 +8,10 @@ Game::Game(const Configuration& configuration)
 	m_effects(configuration) {
 }
 
+Game::~Game() {
+	terminate();
+}
+
 void Game::initialise() {
 
 	verifySDLCall(::SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC), "Failed to initialise SDL: ");
@@ -85,6 +89,19 @@ void Game::initialise() {
 
 	configureBackground();
 	createBitmapTexture();
+}
+
+void Game::terminate() {
+	m_pixels.clear();
+	if (m_pixelFormat != nullptr)
+		::SDL_FreeFormat(m_pixelFormat);
+	if (m_bitmapTexture != nullptr)
+		::SDL_DestroyTexture(m_bitmapTexture);
+	if (m_renderer != nullptr)
+		::SDL_DestroyRenderer(m_renderer);
+	if (m_window != nullptr)
+		::SDL_DestroyWindow(m_window);
+    ::SDL_Quit();
 }
 
 void Game::configureBackground() const {
