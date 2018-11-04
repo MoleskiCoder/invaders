@@ -29,8 +29,8 @@ void Game::initialise() {
 	m_board.EnableAmplifier.connect(std::bind(&Game::Board_EnableAmplifier, this, std::placeholders::_1));
 	m_board.DisableAmplifier.connect(std::bind(&Game::Board_DisableAmplifier, this, std::placeholders::_1));
 
-	auto windowWidth = getScreenWidth();
-	auto windowHeight = getScreenHeight();
+	constexpr auto windowWidth = getScreenWidth();
+	constexpr auto windowHeight = getScreenHeight();
 
 	m_window = ::SDL_CreateWindow(
 		"Space Invaders",
