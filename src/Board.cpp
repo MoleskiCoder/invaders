@@ -169,18 +169,18 @@ EightBit::MemoryMapping Board::mapping(uint16_t address) {
 	address &= ~0xc000;
 
 	if (address < 0x800)
-		return { m_romH, 0x0000, EightBit::MemoryMapping::ReadOnly };
+		return { m_romH, 0x0000, 0xffff, EightBit::MemoryMapping::ReadOnly };
 	if (address < 0x1000)
-		return { m_romG, 0x0800, EightBit::MemoryMapping::ReadOnly };
+		return { m_romG, 0x0800, 0xffff, EightBit::MemoryMapping::ReadOnly };
 	if (address < 0x1800)
-		return { m_romF, 0x0800 * 2, EightBit::MemoryMapping::ReadOnly };
+		return { m_romF, 0x0800 * 2, 0xffff, EightBit::MemoryMapping::ReadOnly };
 	if (address < 0x2000)
-		return { m_romE, 0x0800 * 3, EightBit::MemoryMapping::ReadOnly };
+		return { m_romE, 0x0800 * 3, 0xffff, EightBit::MemoryMapping::ReadOnly };
 
 	if (address < 0x2400)
-		return { m_workRAM, 0x2000, EightBit::MemoryMapping::ReadWrite };
+		return { m_workRAM, 0x2000, 0xffff, EightBit::MemoryMapping::ReadWrite };
 	if (address < 0x4000)
-		return { m_videoRAM, 0x2400, EightBit::MemoryMapping::ReadWrite };
+		return { m_videoRAM, 0x2400, 0xffff, EightBit::MemoryMapping::ReadWrite };
 
 	UNREACHABLE;
 }
