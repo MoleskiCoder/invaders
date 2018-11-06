@@ -6,15 +6,14 @@ Game::Game(const Configuration& configuration)
 	m_board(configuration),
 	m_fps(configuration.getFramesPerSecond()),
 	m_effects(configuration) {
+	verifySDLCall(::SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC), "Failed to initialise SDL: ");
 }
 
 Game::~Game() {
-	terminate();
+    ::SDL_Quit();
 }
 
 void Game::initialise() {
-
-	verifySDLCall(::SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC), "Failed to initialise SDL: ");
 
 	m_board.initialise();
 
@@ -36,18 +35,18 @@ void Game::initialise() {
 	constexpr auto windowWidth = getScreenWidth();
 	constexpr auto windowHeight = getScreenHeight();
 
-	m_window = ::SDL_CreateWindow(
+	m_window.reset(::SDL_CreateWindow(
 		"Space Invaders",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		windowWidth, windowHeight,
-		SDL_WINDOW_SHOWN);
+		SDL_WINDOW_SHOWN), ::SDL_DestroyWindow);
 
 	if (m_window == nullptr) {
 		throwSDLException("Unable to create window: ");
 	}
 
 	::SDL_DisplayMode mode;
-	verifySDLCall(::SDL_GetWindowDisplayMode(m_window, &mode), "Unable to obtain window information");
+	verifySDLCall(::SDL_GetWindowDisplayMode(m_window.get(), &mode), "Unable to obtain window information");
 
 	m_vsync = m_configuration.getVsyncLocked();
 	Uint32 rendererFlags = 0;
@@ -61,7 +60,7 @@ void Game::initialise() {
 			::SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Display refresh rate is incompatible with required rate (%d)", required);
 		}
 	}
-	m_renderer = ::SDL_CreateRenderer(m_window, -1, rendererFlags);
+	m_renderer.reset(::SDL_CreateRenderer(m_window.get(), -1, rendererFlags), ::SDL_DestroyRenderer);
 	if (m_renderer == nullptr) {
 		throwSDLException("Unable to create renderer: ");
 	}
@@ -70,7 +69,7 @@ void Game::initialise() {
 	dumpRendererInformation();
 
 	::SDL_RendererInfo info;
-	verifySDLCall(::SDL_GetRendererInfo(m_renderer, &info), "Unable to obtain renderer information");
+	verifySDLCall(::SDL_GetRendererInfo(m_renderer.get(), &info), "Unable to obtain renderer information");
 	::SDL_Log("Using renderer:");
 	dumpRendererInformation(info);
 
@@ -81,37 +80,24 @@ void Game::initialise() {
 		}
 	}
 
-	m_pixelFormat = ::SDL_AllocFormat(m_pixelType);
+	m_pixelFormat.reset(::SDL_AllocFormat(m_pixelType), ::SDL_FreeFormat);
 	if (m_pixelFormat == nullptr) {
 		throwSDLException("Unable to allocate pixel format: ");
 	}
-	m_colours.load(m_pixelFormat);
+	m_colours.load(m_pixelFormat.get());
 
 	configureBackground();
 	createBitmapTexture();
 }
 
-void Game::terminate() {
-	m_pixels.clear();
-	if (m_pixelFormat != nullptr)
-		::SDL_FreeFormat(m_pixelFormat);
-	if (m_bitmapTexture != nullptr)
-		::SDL_DestroyTexture(m_bitmapTexture);
-	if (m_renderer != nullptr)
-		::SDL_DestroyRenderer(m_renderer);
-	if (m_window != nullptr)
-		::SDL_DestroyWindow(m_window);
-    ::SDL_Quit();
-}
-
 void Game::configureBackground() const {
 	Uint8 r, g, b;
-	::SDL_GetRGB(m_colours.getColour(0), m_pixelFormat, &r, &g, &b);
-	verifySDLCall(::SDL_SetRenderDrawColor(m_renderer, r, g, b, SDL_ALPHA_OPAQUE), "Unable to set render draw colour");
+	::SDL_GetRGB(m_colours.getColour(0), m_pixelFormat.get(), &r, &g, &b);
+	verifySDLCall(::SDL_SetRenderDrawColor(m_renderer.get(), r, g, b, SDL_ALPHA_OPAQUE), "Unable to set render draw colour");
 }
 
 void Game::createBitmapTexture() {
-	m_bitmapTexture = ::SDL_CreateTexture(m_renderer, m_pixelType, SDL_TEXTUREACCESS_STREAMING, DisplayWidth, DisplayHeight);
+	m_bitmapTexture.reset(::SDL_CreateTexture(m_renderer.get(), m_pixelType, SDL_TEXTUREACCESS_STREAMING, DisplayWidth, DisplayHeight), ::SDL_DestroyTexture);
 	if (m_bitmapTexture == nullptr) {
 		throwSDLException("Unable to create bitmap texture");
 	}
@@ -175,7 +161,7 @@ void Game::runLoop() {
 
 		if (graphics) {
 			cycles = drawFrame(cycles);
-			::SDL_RenderPresent(m_renderer);
+			::SDL_RenderPresent(m_renderer.get());
 		} else {
 			cycles = m_board.runFrame(cycles);
 		}
@@ -407,10 +393,10 @@ int Game::drawFrame(int prior) {
 
 	m_board.triggerInterruptScanLine224();
 
-	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture, NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
+	verifySDLCall(::SDL_UpdateTexture(m_bitmapTexture.get(), NULL, &m_pixels[0], DisplayWidth * sizeof(Uint32)), "Unable to update texture: ");
 
 	verifySDLCall(
-		::SDL_RenderCopy(m_renderer, m_bitmapTexture, nullptr, nullptr), 
+		::SDL_RenderCopy(m_renderer.get(), m_bitmapTexture.get(), nullptr, nullptr), 
 		"Unable to copy texture to renderer");
 
 	return m_board.runVerticalBlank(prior);

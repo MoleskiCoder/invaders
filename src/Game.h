@@ -44,12 +44,11 @@ private:
 	mutable Board m_board;
 	ColourPalette m_colours;
 
-	SDL_Window* m_window = nullptr;
-	SDL_Renderer* m_renderer = nullptr;
-
-	SDL_Texture* m_bitmapTexture = nullptr;
+	std::shared_ptr<SDL_Window> m_window;
+	std::shared_ptr<SDL_Renderer> m_renderer;
+	std::shared_ptr<SDL_PixelFormat> m_pixelFormat;
+	std::shared_ptr<SDL_Texture> m_bitmapTexture;
 	Uint32 m_pixelType = SDL_PIXELFORMAT_ARGB8888;
-	SDL_PixelFormat* m_pixelFormat = nullptr;
 
 	std::vector<uint32_t> m_pixels;
 
@@ -62,8 +61,6 @@ private:
 
 	std::map<int, std::shared_ptr<GameController>> m_gameControllers;
 	std::map<SDL_JoystickID, int> m_mappedControllers;
-
-	void terminate();
 
 	int drawFrame(int prior);
 
