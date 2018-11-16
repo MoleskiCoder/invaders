@@ -1,14 +1,18 @@
 #pragma once
 
-#include <string>
+#include <array>
+#include <cstdint>
 
-#include <Ram.h>
 #include <Bus.h>
+#include <Disassembler.h>
+#include <EventArgs.h>
 #include <InputOutput.h>
 #include <Intel8080.h>
 #include <Profiler.h>
-#include <EventArgs.h>
-#include <Disassembler.h>
+#include <Register.h>
+#include <Ram.h>
+#include <Rom.h>
+#include <Signal.h>
 
 #include "Configuration.h"
 
@@ -27,6 +31,8 @@ public:
 	auto& VRAM() { return m_videoRAM; }
 
 	void initialise();
+	void powerOn();
+	void powerOff();
 
 	void triggerInterruptScanLine224() {
 		DATA() = 0xd7;	// RST 2

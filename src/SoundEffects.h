@@ -2,6 +2,9 @@
 
 #include <memory>
 #include <stdexcept>
+#include <string>
+
+#include <SDL_mixer.h>
 
 class Configuration;
 struct Mix_Chunk;

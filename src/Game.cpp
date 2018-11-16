@@ -109,18 +109,18 @@ void Game::runLoop() {
 	m_frames = 0UL;
 	m_startTicks = ::SDL_GetTicks();
 
-	auto& cpu = m_board.CPU();
-	cpu.powerOn();
+	m_board.powerOn();
 
 	auto graphics = m_configuration.isDrawGraphics();
 
 	auto cycles = 0;
+	auto& cpu = m_board.CPU();
 	while (cpu.powered()) {
 		::SDL_Event e;
 		while (::SDL_PollEvent(&e)) {
 			switch (e.type) {
 			case SDL_QUIT:
-				cpu.powerOff();
+				m_board.powerOff();
 				break;
 			case SDL_KEYDOWN:
 				handleKeyDown(e.key.keysym.sym);
@@ -208,16 +208,18 @@ void Game::handleJoyButtonDown(const SDL_JoyButtonEvent event) {
 	auto controllerIndex = m_mappedControllers[joystickId];
 	auto value = event.button;
 	auto who = whichPlayer();
-	switch (value) {
-	case SDL_CONTROLLER_BUTTON_A:
-		handleJoyFirePress(who, controllerIndex);
-		break;
-	case SDL_CONTROLLER_BUTTON_BACK:
-		handleJoyLeftPress(who, controllerIndex);
-		break;
-	case SDL_CONTROLLER_BUTTON_GUIDE:
-		handleJoyRightPress(who, controllerIndex);
-		break;
+	if (chooseControllerIndex(who) == controllerIndex) {
+		switch (value) {
+		case SDL_CONTROLLER_BUTTON_A:
+			who == 1 ? m_board.pressShoot1P() : m_board.pressShoot2P();
+			break;
+		case SDL_CONTROLLER_BUTTON_BACK:
+			who == 1 ? m_board.pressLeft1P() : m_board.pressLeft2P();
+			break;
+		case SDL_CONTROLLER_BUTTON_GUIDE:
+			who == 1 ? m_board.pressRight1P() : m_board.pressRight2P();
+			break;
+		}
 	}
 }
 
@@ -226,47 +228,19 @@ void Game::handleJoyButtonUp(const SDL_JoyButtonEvent event) {
 	auto controllerIndex = m_mappedControllers[joystickId];
 	auto value = event.button;
 	auto who = whichPlayer();
-	switch (value) {
-	case SDL_CONTROLLER_BUTTON_A:
-		handleJoyFireRelease(who, controllerIndex);
-		break;
-	case SDL_CONTROLLER_BUTTON_BACK:
-		handleJoyLeftRelease(who, controllerIndex);
-		break;
-	case SDL_CONTROLLER_BUTTON_GUIDE:
-		handleJoyRightRelease(who, controllerIndex);
-		break;
+	if (chooseControllerIndex(who) == controllerIndex) {
+		switch (value) {
+		case SDL_CONTROLLER_BUTTON_A:
+			who == 1 ? m_board.releaseShoot1P() : m_board.releaseShoot2P();
+			break;
+		case SDL_CONTROLLER_BUTTON_BACK:
+			who == 1 ? m_board.releaseLeft1P() : m_board.releaseLeft2P();
+			break;
+		case SDL_CONTROLLER_BUTTON_GUIDE:
+			who == 1 ? m_board.releaseRight1P() : m_board.releaseRight2P();
+			break;
+		}
 	}
-}
-
-void Game::handleJoyLeftPress(const int who, const int joystick) {
-	if (chooseControllerIndex(who) == joystick)
-		m_board.pressLeft1P();
-}
-
-void Game::handleJoyRightPress(const int who, const int joystick) {
-	if (chooseControllerIndex(who) == joystick)
-		m_board.pressRight1P();
-}
-
-void Game::handleJoyFirePress(const int who, const int joystick) {
-	if (chooseControllerIndex(who) == joystick)
-		m_board.pressShoot1P();
-}
-
-void Game::handleJoyLeftRelease(const int who, const int joystick) {
-	if (chooseControllerIndex(who) == joystick)
-		m_board.releaseLeft1P();
-}
-
-void Game::handleJoyRightRelease(const int who, const int joystick) {
-	if (chooseControllerIndex(who) == joystick)
-		m_board.releaseRight1P();
-}
-
-void Game::handleJoyFireRelease(const int who, const int joystick) {
-	if (chooseControllerIndex(who) == joystick)
-		m_board.releaseShoot1P();
 }
 
 void Game::handleKeyDown(const SDL_Keycode key) {
@@ -333,7 +307,7 @@ void Game::handleKeyUp(const SDL_Keycode key) {
 	}
 }
 
-int Game::whichPlayer() const {
+int Game::whichPlayer() {
 	const auto playerId = m_board.peek(0x2067);	// player MSB
 	switch (playerId) {
 	case 0x21:

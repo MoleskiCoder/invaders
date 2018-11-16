@@ -1,11 +1,15 @@
 #pragma once
 
+#include <cstdint>
+#include <map>
+#include <memory>
 #include <stdexcept>
 #include <string>
-#include <memory>
-#include <map>
+#include <vector>
 
 #include <SDL.h>
+
+#include <EventArgs.h>
 
 #include "Board.h"
 #include "ColourPalette.h"
@@ -41,7 +45,7 @@ private:
 	};
 
 	const Configuration& m_configuration;
-	mutable Board m_board;
+	Board m_board;
 	ColourPalette m_colours;
 
 	std::shared_ptr<SDL_Window> m_window;
@@ -75,7 +79,7 @@ private:
 		return DisplayHeight * DisplayScale;
 	}
 
-	int whichPlayer() const;
+	int whichPlayer();
 
 	void Board_UfoSound(const EightBit::EventArgs& event);
 	void Board_ShotSound(const EightBit::EventArgs& event);
@@ -100,14 +104,6 @@ private:
 
 	int chooseControllerIndex(int who) const;
 	std::shared_ptr<GameController> chooseController(int who) const;
-
-	void handleJoyLeftPress(int who, int joystick);
-	void handleJoyRightPress(int who, int joystick);
-	void handleJoyFirePress(int who, int joystick);
-
-	void handleJoyLeftRelease(int who, int joystick);
-	void handleJoyRightRelease(int who, int joystick);
-	void handleJoyFireRelease(int who, int joystick);
 
 	static void dumpRendererInformation();
 	static void dumpRendererInformation(::SDL_RendererInfo info);

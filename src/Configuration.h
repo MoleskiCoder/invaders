@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include <Register.h>
-
 class Configuration final {
 public:
 	Configuration() = default;
