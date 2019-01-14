@@ -22,12 +22,14 @@ void Board::initialise() {
 	m_ports.ReadingPort.connect(std::bind(&Board::Board_PortReading_SpaceInvaders, this, std::placeholders::_1));
 }
 
-void Board::powerOn() {
-	CPU().powerOn();
+void Board::raisePOWER() {
+	CPU().raisePOWER();
+	CPU().raiseRESET();
+	CPU().raiseINT();
 }
 
-void Board::powerOff() {
-	CPU().powerOff();
+void Board::lowerPOWER() {
+	CPU().lowerPOWER();
 }
 
 void Board::Board_PortWriting_SpaceInvaders(const uint8_t& port) {
@@ -167,18 +169,18 @@ EightBit::MemoryMapping Board::mapping(uint16_t address) {
 	address &= ~0xc000;
 
 	if (address < 0x800)
-		return { m_romH, 0x0000, EightBit::Chip::Mask16, EightBit::MemoryMapping::ReadOnly };
+		return { m_romH, 0x0000, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 	if (address < 0x1000)
-		return { m_romG, 0x0800, EightBit::Chip::Mask16, EightBit::MemoryMapping::ReadOnly };
+		return { m_romG, 0x0800, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 	if (address < 0x1800)
-		return { m_romF, 0x0800 * 2, EightBit::Chip::Mask16, EightBit::MemoryMapping::ReadOnly };
+		return { m_romF, 0x0800 * 2, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 	if (address < 0x2000)
-		return { m_romE, 0x0800 * 3, EightBit::Chip::Mask16, EightBit::MemoryMapping::ReadOnly };
+		return { m_romE, 0x0800 * 3, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 
 	if (address < 0x2400)
-		return { m_workRAM, 0x2000, EightBit::Chip::Mask16, EightBit::MemoryMapping::ReadWrite };
+		return { m_workRAM, 0x2000, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadWrite };
 	if (address < 0x4000)
-		return { m_videoRAM, 0x2400, EightBit::Chip::Mask16, EightBit::MemoryMapping::ReadWrite };
+		return { m_videoRAM, 0x2400, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadWrite };
 
 	UNREACHABLE;
 }

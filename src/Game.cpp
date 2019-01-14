@@ -109,7 +109,7 @@ void Game::runLoop() {
 	m_frames = 0UL;
 	m_startTicks = ::SDL_GetTicks();
 
-	m_board.powerOn();
+	m_board.raisePOWER();
 
 	auto graphics = m_configuration.isDrawGraphics();
 
@@ -120,7 +120,7 @@ void Game::runLoop() {
 		while (::SDL_PollEvent(&e)) {
 			switch (e.type) {
 			case SDL_QUIT:
-				m_board.powerOff();
+				m_board.lowerPOWER();
 				break;
 			case SDL_KEYDOWN:
 				handleKeyDown(e.key.keysym.sym);

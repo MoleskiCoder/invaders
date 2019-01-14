@@ -31,8 +31,8 @@ public:
 	auto& VRAM() { return m_videoRAM; }
 
 	void initialise();
-	void powerOn();
-	void powerOff();
+	void raisePOWER();
+	void lowerPOWER();
 
 	void triggerInterruptScanLine224() {
 		DATA() = 0xd7;	// RST 2
