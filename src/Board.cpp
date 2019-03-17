@@ -166,21 +166,26 @@ void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080&) {
 
 EightBit::MemoryMapping Board::mapping(uint16_t address) {
 
-	address &= ~0xc000;
+	const uint16_t mask = 0b0011111111111111;
+	address &= mask;
 
 	if (address < 0x800)
-		return { m_romH, 0x0000, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		return { m_romH, 0x0000, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+
 	if (address < 0x1000)
-		return { m_romG, 0x0800, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		return { m_romG, 0x0800, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+
 	if (address < 0x1800)
-		return { m_romF, 0x0800 * 2, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		return { m_romF, 0x0800 * 2, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+
 	if (address < 0x2000)
-		return { m_romE, 0x0800 * 3, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		return { m_romE, 0x0800 * 3, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 
 	if (address < 0x2400)
-		return { m_workRAM, 0x2000, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+		return { m_workRAM, 0x2000, mask, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+
 	if (address < 0x4000)
-		return { m_videoRAM, 0x2400, EightBit::Chip::Mask16, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+		return { m_videoRAM, 0x2400, mask, EightBit::MemoryMapping::AccessLevel::ReadWrite };
 
 	UNREACHABLE;
 }
