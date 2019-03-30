@@ -14,9 +14,9 @@ public:
 	SoundEffects(const Configuration& configuration);
 	~SoundEffects();
 
-	auto isEnabled() { return m_enabled; }
+	auto isEnabled() const noexcept { return m_enabled; }
 
-	void enable();
+	void enable() noexcept;
 	void disable();
 
 	void playUfo();
@@ -58,8 +58,9 @@ private:
 	}
 
 	void open();
-	void close();
+	void close() noexcept;
 
+	void maybePlayEffect(int channel, Mix_Chunk* effect);
 	static void playEffect(int channel, Mix_Chunk* effect);
 
 	std::shared_ptr<Mix_Chunk> loadEffect(const std::string& name) const;

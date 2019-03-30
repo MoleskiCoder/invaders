@@ -59,54 +59,54 @@ void Board::Board_PortWritten_SpaceInvaders(const uint8_t& port) {
 			std::cout << (value < 64 ? m_characterSet[value] : '_');
 		break;
 	case SOUND1: {
-			auto soundUfo = ((value & 1) != 0);
+			const auto soundUfo = ((value & 1) != 0);
 			if (soundUfo)
 				UfoSound.fire(EightBit::EventArgs::empty());
 
-			auto soundShot = ((value & 2) != 0) && ((m_preSound1 & 2) == 0);
+			const auto soundShot = ((value & 2) != 0) && ((m_preSound1 & 2) == 0);
 			if (soundShot)
 				ShotSound.fire(EightBit::EventArgs::empty());
 
-			auto soundPlayerDie = ((value & 4) != 0) && ((m_preSound1 & 4) == 0);
+			const auto soundPlayerDie = ((value & 4) != 0) && ((m_preSound1 & 4) == 0);
 			if (soundPlayerDie)
 				PlayerDieSound.fire(EightBit::EventArgs::empty());
 	
-			auto soundInvaderDie = ((value & 8) != 0) && ((m_preSound1 & 8) == 0);
+			const auto soundInvaderDie = ((value & 8) != 0) && ((m_preSound1 & 8) == 0);
 			if (soundInvaderDie)
 				InvaderDieSound.fire(EightBit::EventArgs::empty());
 
-			auto extend = ((value & 0x10) != 0) && ((m_preSound1 & 0x10) == 0);
+			const auto extend = ((value & 0x10) != 0) && ((m_preSound1 & 0x10) == 0);
 			if (extend)
 				ExtendSound.fire(EightBit::EventArgs::empty());
 
-			auto ampenable = ((value & 0x20) != 0) && ((m_preSound1 & 0x20) == 0);
+			const auto ampenable = ((value & 0x20) != 0) && ((m_preSound1 & 0x20) == 0);
 			if (ampenable)
 				EnableAmplifier.fire(EightBit::EventArgs::empty());
 
-			auto ampdisable = ((value & 0x20) == 0) && ((m_preSound1 & 0x20) != 0);
+			const auto ampdisable = ((value & 0x20) == 0) && ((m_preSound1 & 0x20) != 0);
 			if (ampdisable)
 				DisableAmplifier.fire(EightBit::EventArgs::empty());
 		}
 		break;
 
 	case SOUND2: {
-			auto soundWalk1 = ((value & 1) != 0) && ((m_preSound2 & 1) == 0);
+			const auto soundWalk1 = ((value & 1) != 0) && ((m_preSound2 & 1) == 0);
 			if (soundWalk1)
 				Walk1Sound.fire(EightBit::EventArgs::empty());
 
-			auto soundWalk2 = ((value & 2) != 0) && ((m_preSound2 & 2) == 0);
+			const auto soundWalk2 = ((value & 2) != 0) && ((m_preSound2 & 2) == 0);
 			if (soundWalk2)
 				Walk2Sound.fire(EightBit::EventArgs::empty());
 
-			auto soundWalk3 = ((value & 4) != 0) && ((m_preSound2 & 4) == 0);
+			const auto soundWalk3 = ((value & 4) != 0) && ((m_preSound2 & 4) == 0);
 			if (soundWalk3)
 				Walk3Sound.fire(EightBit::EventArgs::empty());
 
-			auto soundWalk4 = ((value & 8) != 0) && ((m_preSound2 & 8) == 0);
+			const auto soundWalk4 = ((value & 8) != 0) && ((m_preSound2 & 8) == 0);
 			if (soundWalk4)
 				Walk4Sound.fire(EightBit::EventArgs::empty());
 
-			auto soundUfoDie = ((value & 0x10) != 0) && ((m_preSound2 & 0x10) == 0);
+			const auto soundUfoDie = ((value & 0x10) != 0) && ((m_preSound2 & 0x10) == 0);
 			if (soundUfoDie)
 				UfoDieSound.fire(EightBit::EventArgs::empty());
 
@@ -145,14 +145,6 @@ void Board::Board_PortReading_SpaceInvaders(const uint8_t& port) {
 			((((m_shiftData.high << 8) | m_shiftData.low) << m_shiftAmount) >> 8));
 		break;
 	}
-}
-
-void Board::Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpu) {
-
-	const auto pc = CPU().PC();
-
-	m_profiler.addAddress(pc.word);
-	m_profiler.addInstruction(peek(pc.word));
 }
 
 void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080&) {

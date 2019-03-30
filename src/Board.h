@@ -25,14 +25,13 @@ public:
 
 	Board(const Configuration& configuration);
 
-	auto& Profiler() { return m_profiler; }
-	auto& CPU() { return m_cpu; }
+	auto& CPU() noexcept { return m_cpu; }
 
-	auto& VRAM() { return m_videoRAM; }
+	auto& VRAM() noexcept { return m_videoRAM; }
 
-	void initialise();
-	void raisePOWER();
-	void lowerPOWER();
+	void initialise() final;
+	void raisePOWER() final;
+	void lowerPOWER() final;
 
 	void triggerInterruptScanLine224() {
 		DATA() = 0xd7;	// RST 2
@@ -44,11 +43,11 @@ public:
 		EightBit::Chip::lower(CPU().INT());
 	}
 
-	auto getCocktailModeControl() const {
+	auto getCocktailModeControl() const noexcept {
 		return m_cocktailModeControl;
 	}
 
-	auto getCyclesPerScanLine() const {
+	auto getCyclesPerScanLine() const noexcept {
 		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
 	}
 
@@ -69,28 +68,28 @@ public:
 		return runVerticalBlank(remaining);
 	}
 
-	void pressCredit() { m_credit = true; }
-	void releaseCredit() { m_credit = false; }
+	void pressCredit() noexcept { m_credit = true; }
+	void releaseCredit() noexcept { m_credit = false; }
 
-	void press1P() { m_onePlayerStart = true; }
-	void pressShoot1P() { m_onePlayerShot = true; }
-	void pressLeft1P() { m_onePlayerLeft = true; }
-	void pressRight1P() { m_onePlayerRight = true; }
+	void press1P() noexcept { m_onePlayerStart = true; }
+	void pressShoot1P() noexcept { m_onePlayerShot = true; }
+	void pressLeft1P() noexcept { m_onePlayerLeft = true; }
+	void pressRight1P() noexcept { m_onePlayerRight = true; }
 
-	void release1P() { m_onePlayerStart = false; }
-	void releaseShoot1P() { m_onePlayerShot = false; }
-	void releaseLeft1P() { m_onePlayerLeft = false; }
-	void releaseRight1P() { m_onePlayerRight = false; }
+	void release1P() noexcept { m_onePlayerStart = false; }
+	void releaseShoot1P() noexcept { m_onePlayerShot = false; }
+	void releaseLeft1P() noexcept { m_onePlayerLeft = false; }
+	void releaseRight1P() noexcept { m_onePlayerRight = false; }
 
-	void press2P() { m_twoPlayerStart = true; }
-	void pressShoot2P() { m_twoPlayerShot = true; }
-	void pressLeft2P() { m_twoPlayerLeft = true; }
-	void pressRight2P() { m_twoPlayerRight = true; }
+	void press2P() noexcept { m_twoPlayerStart = true; }
+	void pressShoot2P() noexcept { m_twoPlayerShot = true; }
+	void pressLeft2P() noexcept { m_twoPlayerLeft = true; }
+	void pressRight2P() noexcept { m_twoPlayerRight = true; }
 
-	void release2P() { m_twoPlayerStart = false; }
-	void releaseShoot2P() { m_twoPlayerShot = false; }
-	void releaseLeft2P() { m_twoPlayerLeft = false; }
-	void releaseRight2P() { m_twoPlayerRight = false; }
+	void release2P() noexcept { m_twoPlayerStart = false; }
+	void releaseShoot2P() noexcept { m_twoPlayerShot = false; }
+	void releaseLeft2P() noexcept { m_twoPlayerLeft = false; }
+	void releaseRight2P() noexcept { m_twoPlayerRight = false; }
 
 	EightBit::Signal<EightBit::EventArgs> UfoSound;
 	EightBit::Signal<EightBit::EventArgs> ShotSound;
@@ -165,7 +164,6 @@ private:
 
 	EightBit::InputOutput m_ports;
 	EightBit::Intel8080 m_cpu;
-	EightBit::Profiler m_profiler;
 	EightBit::Disassembler m_disassembler;
 
 	const ShipSwitch m_ships = Three;
@@ -199,5 +197,4 @@ private:
 	void Board_PortReading_SpaceInvaders(const uint8_t& port);
 
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080& cpuEvent);
-	void Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpuEvent);
 };

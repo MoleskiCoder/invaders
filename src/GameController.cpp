@@ -35,7 +35,7 @@ void GameController::openHapticController() {
 	m_hapticRumbleSupported = ::SDL_HapticRumbleSupported(m_hapticController) != SDL_FALSE;
 }
 
-void GameController::closeHapticController() {
+void GameController::closeHapticController() noexcept {
 	if (m_hapticController != nullptr) {
 		::SDL_HapticClose(m_hapticController);
 		m_hapticController = nullptr;
@@ -43,7 +43,7 @@ void GameController::closeHapticController() {
 	m_hapticRumbleSupported = false;
 }
 
-void GameController::close() {
+void GameController::close() noexcept {
 	if (m_gameController != nullptr) {
 		::SDL_GameControllerClose(m_gameController);
 		m_gameController = nullptr;
@@ -51,7 +51,7 @@ void GameController::close() {
 	closeHapticController();
 }
 
-void GameController::startRumble() {
+void GameController::startRumble() noexcept {
 	if (m_hapticRumbleSupported) {
 		if (::SDL_HapticRumblePlay(m_hapticController, 1.0, 1000) < 0) {
 			::SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unable to start haptic rumble: %s", ::SDL_GetError());
@@ -59,7 +59,7 @@ void GameController::startRumble() {
 	}
 }
 
-void GameController::stopRumble() {
+void GameController::stopRumble() noexcept {
 	if (m_hapticRumbleSupported) {
 		if (::SDL_HapticRumbleStop(m_hapticController) < 0) {
 			::SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unable to stop haptic rumble: %s", ::SDL_GetError());

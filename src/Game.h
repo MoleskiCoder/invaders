@@ -40,8 +40,8 @@ public:
 private:
 	enum {
 		DisplayScale = 2,
-		DisplayWidth = Board::RasterHeight,
-		DisplayHeight = Board::RasterWidth
+		DisplayWidth = Board::RasterWidth,
+		DisplayHeight = Board::RasterHeight
 	};
 
 	const Configuration& m_configuration;
@@ -67,17 +67,11 @@ private:
 	std::map<SDL_JoystickID, int> m_mappedControllers;
 
 	int drawFrame(int prior);
+	void drawScanLine(int y);
+	void displayTexture();
 
 	void configureBackground() const;
 	void createBitmapTexture();
-
-	static constexpr auto getScreenWidth() {
-		return DisplayWidth * DisplayScale;
-	}
-
-	static constexpr auto getScreenHeight() {
-		return DisplayHeight * DisplayScale;
-	}
 
 	int whichPlayer();
 
@@ -96,15 +90,12 @@ private:
 	void Board_EnableAmplifier(const EightBit::EventArgs& event);
 	void Board_DisableAmplifier(const EightBit::EventArgs& event);
 
-	void handleKeyDown(SDL_Keycode key);
-	void handleKeyUp(SDL_Keycode key);
+	void handleKeyDown(SDL_Keycode key) noexcept;
+	void handleKeyUp(SDL_Keycode key) noexcept;
 
 	void handleJoyButtonDown(SDL_JoyButtonEvent event);
 	void handleJoyButtonUp(SDL_JoyButtonEvent event);
 
 	int chooseControllerIndex(int who) const;
 	std::shared_ptr<GameController> chooseController(int who) const;
-
-	static void dumpRendererInformation();
-	static void dumpRendererInformation(::SDL_RendererInfo info);
 };

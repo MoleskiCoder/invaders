@@ -3,11 +3,11 @@
 
 #include <SDL.h>
 
-ColourPalette::ColourPalette()
+ColourPalette::ColourPalette() noexcept
 : m_colours(4) {
 }
 
-void ColourPalette::load(SDL_PixelFormat* hardware) {
+void ColourPalette::load(const SDL_PixelFormat* hardware) {
 
 	auto black = ::SDL_MapRGBA(hardware, 0x00, 0x00, 0x00, SDL_ALPHA_OPAQUE);
 	auto white = ::SDL_MapRGBA(hardware, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
