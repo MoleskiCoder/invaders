@@ -12,7 +12,7 @@ void ColourPalette::load(const SDL_PixelFormat* hardware) {
 	auto black = ::SDL_MapRGBA(hardware, 0x00, 0x00, 0x00, SDL_ALPHA_OPAQUE);
 	auto white = ::SDL_MapRGBA(hardware, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
 	auto red = ::SDL_MapRGBA(hardware, 0xff, 0x00, 0x00, SDL_ALPHA_OPAQUE);
-	auto green = ::SDL_MapRGBA(hardware, 0x00, 0xff, 0x00, SDL_ALPHA_OPAQUE);
+	auto green = ::SDL_MapRGBA(hardware, 0x00, 0x7f, 0x00, SDL_ALPHA_OPAQUE);
 
 	m_colours[Black] = black;
 	m_colours[White] = white;
