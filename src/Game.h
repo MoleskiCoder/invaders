@@ -5,7 +5,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <vector>
+#include <array>
 
 #include <SDL.h>
 
@@ -54,7 +54,8 @@ private:
 	std::shared_ptr<SDL_Texture> m_bitmapTexture;
 	Uint32 m_pixelType = SDL_PIXELFORMAT_ARGB8888;
 
-	std::vector<uint32_t> m_pixels;
+	std::array<uint32_t, DisplayWidth * DisplayHeight> m_pixels;
+	std::array<uint32_t, DisplayWidth * DisplayHeight> m_gel;
 
 	int m_fps;
 	Uint32 m_startTicks = 0;
@@ -72,6 +73,7 @@ private:
 
 	void configureBackground() const;
 	void createBitmapTexture();
+	void createGelPixels();
 
 	int whichPlayer();
 

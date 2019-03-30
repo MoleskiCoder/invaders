@@ -78,8 +78,18 @@ void Game::initialise() {
 	}
 	m_colours.load(m_pixelFormat.get());
 
+	createGelPixels();
 	configureBackground();
 	createBitmapTexture();
+}
+
+void Game::createGelPixels() {
+	for (int y = 0; y < DisplayHeight; ++y) {
+		for (int x = 0; x < DisplayWidth; ++x) {
+			const auto colourIndex = ColourPalette::calculateColour(y, Board::RasterWidth - x - 1);
+			m_gel[x + (y * DisplayWidth)] = m_colours.getColour(colourIndex);
+		}
+	}
 }
 
 void Game::configureBackground() const {
@@ -93,7 +103,6 @@ void Game::createBitmapTexture() {
 	if (m_bitmapTexture == nullptr) {
 		throwSDLException("Unable to create bitmap texture");
 	}
-	m_pixels.resize(DisplayWidth * DisplayHeight);
 }
 
 void Game::runLoop() {
@@ -353,7 +362,7 @@ void Game::drawScanLine(int y) {
 			const auto mask = 1 << bit;
 			const auto pixel = video & mask;
 			const auto index = x + y * DisplayWidth;
-			m_pixels[index] = pixel ? m_colours.getColour(ColourPalette::calculateColour(y, Board::RasterWidth - x - 1)) : black;
+			m_pixels[index] = pixel ? m_gel[index] : black;
 		}
 	}
 }
