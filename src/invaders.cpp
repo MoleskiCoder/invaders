@@ -16,7 +16,7 @@ int main(int, char*[]) {
 
 	try {
 		auto game = std::make_unique<Game>(configuration);
-		game->initialise();
+		game->raisePOWER();
 		game->runLoop();
 	} catch (const std::exception& error) {
 		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "%s", error.what());

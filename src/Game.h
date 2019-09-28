@@ -1,81 +1,70 @@
 #pragma once
 
 #include <cstdint>
-#include <map>
 #include <memory>
-#include <stdexcept>
 #include <string>
-#include <array>
 
-#include <SDL.h>
-
-#include <EventArgs.h>
+#include <Game.h>
+#include <GameController.h>
 
 #include "Board.h"
 #include "ColourPalette.h"
 #include "SoundEffects.h"
-#include "GameController.h"
 
 class Configuration;
+class Expansion;
 
-class Game final {
+class Game final : public Gaming::Game {
 public:
-
-	static void throwSDLException(std::string failure) {
-		throw std::runtime_error(failure + ::SDL_GetError());
-	}
-
-	static void verifySDLCall(int returned, std::string failure) {
-		if (returned < 0) {
-			throwSDLException(failure);
-		}
-	}
-
 	Game(const Configuration& configuration);
-	~Game();
+	~Game() { }
 
-	void runLoop();
-	void initialise();
+	virtual void raisePOWER() override;
+
+	Board& BUS() noexcept { return m_board; }
+	const Board& BUS() const noexcept { return m_board; }
+
+protected:
+	int fps() const noexcept final { return m_configuration.getFramesPerSecond(); }
+	bool useVsync() const noexcept final { return m_configuration.getVsyncLocked(); }
+
+	int windowWidth() const noexcept final { return displayHeight() * displayScale(); }
+	int windowHeight() const noexcept final { return displayWidth() * displayScale(); }
+	int displayWidth() const noexcept final { return rasterWidth(); }
+	int displayHeight() const noexcept final { return rasterHeight(); }
+	int displayScale() const noexcept final { return 2; }
+	int rasterWidth() const noexcept final { return Board::RasterWidth; }
+	int rasterHeight() const noexcept final { return Board::RasterHeight; }
+
+	std::string title() const final { return "Space Invaders"; }
+
+	const uint32_t* pixels() const noexcept final;
+
+	void runFrame() final;
+
+	void handleKeyDown(SDL_Keycode key) final;
+	void handleKeyUp(SDL_Keycode key) final;
+
+	void handleJoyButtonDown(SDL_JoyButtonEvent event) final;
+	void handleJoyButtonUp(SDL_JoyButtonEvent event) final;
+
+	void copyTexture() final;
 
 private:
-	enum {
-		DisplayScale = 2,
-		DisplayWidth = Board::RasterWidth,
-		DisplayHeight = Board::RasterHeight
-	};
+	std::array<uint32_t, Board::RasterWidth * Board::RasterHeight> m_pixels;
+	std::array<uint32_t, Board::RasterWidth * Board::RasterHeight> m_gel;
 
 	const Configuration& m_configuration;
-	Board m_board;
 	ColourPalette m_colours;
-
-	std::shared_ptr<SDL_Window> m_window;
-	std::shared_ptr<SDL_Renderer> m_renderer;
-	std::shared_ptr<SDL_PixelFormat> m_pixelFormat;
-	std::shared_ptr<SDL_Texture> m_bitmapTexture;
-	Uint32 m_pixelType = SDL_PIXELFORMAT_ARGB8888;
-
-	std::array<uint32_t, DisplayWidth * DisplayHeight> m_pixels;
-	std::array<uint32_t, DisplayWidth * DisplayHeight> m_gel;
-
-	int m_fps;
-	Uint32 m_startTicks = 0;
-	Uint32 m_frames = 0;
-	bool m_vsync = false;
-
+	Board m_board;
 	SoundEffects m_effects;
 
-	std::map<int, std::shared_ptr<GameController>> m_gameControllers;
-	std::map<SDL_JoystickID, int> m_mappedControllers;
 
-	int drawFrame(int prior);
-	void drawScanLine(int y);
-	void displayTexture();
-
-	void configureBackground() const;
-	void createBitmapTexture();
 	void createGelPixels();
 
 	int whichPlayer();
+
+	void drawScanLine(int y);
 
 	void Board_UfoSound(const EightBit::EventArgs& event);
 	void Board_ShotSound(const EightBit::EventArgs& event);
@@ -91,13 +80,4 @@ private:
 
 	void Board_EnableAmplifier(const EightBit::EventArgs& event);
 	void Board_DisableAmplifier(const EightBit::EventArgs& event);
-
-	void handleKeyDown(SDL_Keycode key) noexcept;
-	void handleKeyUp(SDL_Keycode key) noexcept;
-
-	void handleJoyButtonDown(SDL_JoyButtonEvent event);
-	void handleJoyButtonUp(SDL_JoyButtonEvent event);
-
-	int chooseControllerIndex(int who) const;
-	std::shared_ptr<GameController> chooseController(int who) const;
 };

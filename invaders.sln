@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "invaders", "src\invaders.vcxproj", "{0A9DB95C-87CB-427F-A815-CEC0D5AD5B25}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -12,6 +12,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EightBit", "libraries\EightBit\src\EightBit.vcxproj", "{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Intel8080", "libraries\EightBit\Intel8080\src\Intel8080.vcxproj", "{93BDC8D8-9F0D-44ED-94FB-1BE6AC4B6BD6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gaming", "libraries\EightBit\Gaming\src\Gaming.vcxproj", "{BC526300-E3D0-44B1-B57B-312BAA6566AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,8 +47,19 @@ Global
 		{93BDC8D8-9F0D-44ED-94FB-1BE6AC4B6BD6}.Release|x64.Build.0 = Release|x64
 		{93BDC8D8-9F0D-44ED-94FB-1BE6AC4B6BD6}.Release|x86.ActiveCfg = Release|Win32
 		{93BDC8D8-9F0D-44ED-94FB-1BE6AC4B6BD6}.Release|x86.Build.0 = Release|Win32
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Debug|x64.ActiveCfg = Debug|x64
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Debug|x64.Build.0 = Debug|x64
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Debug|x86.ActiveCfg = Debug|Win32
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Debug|x86.Build.0 = Debug|Win32
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Release|x64.ActiveCfg = Release|x64
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Release|x64.Build.0 = Release|x64
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Release|x86.ActiveCfg = Release|Win32
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B8DA7BFF-C4C5-4F5C-BBED-D549DA9D3B69}
 	EndGlobalSection
 EndGlobal
