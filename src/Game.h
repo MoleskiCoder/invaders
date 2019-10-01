@@ -25,7 +25,7 @@ public:
 	const Board& BUS() const noexcept { return m_board; }
 
 protected:
-	int fps() const noexcept final { return m_configuration.getFramesPerSecond(); }
+	float fps() const noexcept final { return m_configuration.getFramesPerSecond(); }
 	bool useVsync() const noexcept final { return m_configuration.getVsyncLocked(); }
 
 	int windowWidth() const noexcept final { return displayHeight() * displayScale(); }
@@ -40,13 +40,14 @@ protected:
 
 	const uint32_t* pixels() const noexcept final;
 
-	void runFrame() final;
+	void runRasterLines() final;
+	void runVerticalBlank() final;
 
-	void handleKeyDown(SDL_Keycode key) final;
-	void handleKeyUp(SDL_Keycode key) final;
+	bool handleKeyDown(SDL_Keycode key) final;
+	bool handleKeyUp(SDL_Keycode key) final;
 
-	void handleJoyButtonDown(SDL_JoyButtonEvent event) final;
-	void handleJoyButtonUp(SDL_JoyButtonEvent event) final;
+	bool handleJoyButtonDown(SDL_JoyButtonEvent event) final;
+	bool handleJoyButtonUp(SDL_JoyButtonEvent event) final;
 
 	void copyTexture() final;
 

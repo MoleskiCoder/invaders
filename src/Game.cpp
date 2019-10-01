@@ -48,7 +48,12 @@ const uint32_t* Game::pixels() const noexcept {
 	return m_pixels.data();
 }
 
-void Game::handleJoyButtonDown(const SDL_JoyButtonEvent event) {
+bool Game::handleJoyButtonDown(const SDL_JoyButtonEvent event) {
+
+	const auto handled = Gaming::Game::handleJoyButtonDown(event);
+	if (handled)
+		return true;
+
 	const auto joystickId = event.which;
 	const auto controllerIndex = mappedController(joystickId);
 	const auto value = event.button;
@@ -64,11 +69,19 @@ void Game::handleJoyButtonDown(const SDL_JoyButtonEvent event) {
 		case SDL_CONTROLLER_BUTTON_GUIDE:
 			who == 1 ? m_board.pressRight1P() : m_board.pressRight2P();
 			break;
+		default:
+			return false;
 		}
 	}
+	return true;
 }
 
-void Game::handleJoyButtonUp(const SDL_JoyButtonEvent event) {
+bool Game::handleJoyButtonUp(const SDL_JoyButtonEvent event) {
+
+	const auto handled = Gaming::Game::handleJoyButtonUp(event);
+	if (handled)
+		return true;
+
 	const auto joystickId = event.which;
 	const auto controllerIndex = mappedController(joystickId);
 	const auto value = event.button;
@@ -84,11 +97,17 @@ void Game::handleJoyButtonUp(const SDL_JoyButtonEvent event) {
 		case SDL_CONTROLLER_BUTTON_GUIDE:
 			who == 1 ? m_board.releaseRight1P() : m_board.releaseRight2P();
 			break;
+		default:
+			return false;
 		}
 	}
+	return true;
 }
 
-void Game::handleKeyDown(const SDL_Keycode key) {
+bool Game::handleKeyDown(const SDL_Keycode key) {
+	const auto handled = Gaming::Game::handleKeyDown(key);
+	if (handled)
+		return true;
 	switch (key) {
 	case SDLK_1:
 		m_board.press1P();
@@ -117,10 +136,16 @@ void Game::handleKeyDown(const SDL_Keycode key) {
 	case SDLK_SLASH:
 		m_board.pressShoot2P();
 		break;
+	default:
+		return false;
 	}
+	return true;
 }
 
-void Game::handleKeyUp(const SDL_Keycode key) {
+bool Game::handleKeyUp(const SDL_Keycode key) {
+	const auto handled = Gaming::Game::handleKeyUp(key);
+	if (handled)
+		return true;
 	switch (key) {
 	case SDLK_1:
 		m_board.release1P();
@@ -149,7 +174,10 @@ void Game::handleKeyUp(const SDL_Keycode key) {
 	case SDLK_SLASH:
 		m_board.releaseShoot2P();
 		break;
+	default:
+		return false;
 	}
+	return true;
 }
 
 int Game::whichPlayer() {
@@ -164,7 +192,7 @@ int Game::whichPlayer() {
 	}
 }
 
-void Game::runFrame() {
+void Game::runRasterLines() {
 
 	int prior = 0;
 
@@ -178,7 +206,10 @@ void Game::runFrame() {
 	}
 
 	m_board.triggerInterruptScanLine224();
-	m_board.runVerticalBlank(prior);
+}
+
+void Game::runVerticalBlank() {
+	m_board.runVerticalBlank(0);
 }
 
 void Game::copyTexture() {
@@ -192,7 +223,7 @@ void Game::copyTexture() {
 	const auto correction = gap / 2 * displayScale();
 	SDL_Rect destinationRectangle = { -correction, correction, displayWidth() * displayScale(), displayHeight() * displayScale() };
 
-	verifySDLCall(
+	Gaming::SDLWrapper::verifySDLCall(
 		::SDL_RenderCopyEx(
 			renderer().get(),		// renderer
 			bitmapTexture().get(),	// texture

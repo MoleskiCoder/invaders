@@ -33,12 +33,12 @@ public:
 	void raisePOWER() final;
 	void lowerPOWER() final;
 
-	void triggerInterruptScanLine224() {
+	void triggerInterruptScanLine224() noexcept {
 		DATA() = 0xd7;	// RST 2
 		EightBit::Chip::lower(CPU().INT());
 	}
 
-	void triggerInterruptScanLine96() {
+	void triggerInterruptScanLine96() noexcept {
 		DATA() = 0xcf;	// RST 1
 		EightBit::Chip::lower(CPU().INT());
 	}
