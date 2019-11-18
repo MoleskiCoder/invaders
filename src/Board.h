@@ -51,21 +51,16 @@ public:
 		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
 	}
 
-	auto runScanLine(const int prior) {
-		return m_cpu.run(getCyclesPerScanLine() - prior);
+	void runScanLine() {
+		runCycles(getCyclesPerScanLine());
 	}
 
-	auto runRasterScan(const int prior) {
-		return m_cpu.run(m_configuration.getCyclesPerRasterScan() - prior);
+	void runRasterScan() {
+		runCycles(m_configuration.getCyclesPerRasterScan());
 	}
 
-	auto runVerticalBlank(const int prior) {
-		return m_cpu.run(m_configuration.getCyclesPerVerticalBlank() - prior);
-	}
-
-	auto runFrame(const int prior) {
-		const auto remaining = runRasterScan(prior);
-		return runVerticalBlank(remaining);
+	void runVerticalBlank() {
+		runCycles(m_configuration.getCyclesPerVerticalBlank());
 	}
 
 	void pressCredit() noexcept { m_credit = true; }
@@ -192,9 +187,17 @@ private:
 
 	bool m_cocktailModeControl = false;
 
+	int m_allowed = 0;
+
 	void Board_PortWriting_SpaceInvaders(const uint8_t& port);
 	void Board_PortWritten_SpaceInvaders(const uint8_t& port);
 	void Board_PortReading_SpaceInvaders(const uint8_t& port);
 
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080& cpuEvent);
+
+	void runCycles(int suggested) {
+		m_allowed += suggested;
+		const auto taken = m_cpu.run(suggested);
+		m_allowed -= taken;
+	}
 };

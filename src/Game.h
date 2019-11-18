@@ -41,7 +41,6 @@ protected:
 	const uint32_t* pixels() const noexcept final;
 
 	void runRasterLines() final;
-	void runVerticalBlank() final;
 
 	bool handleKeyDown(SDL_Keycode key) final;
 	bool handleKeyUp(SDL_Keycode key) final;

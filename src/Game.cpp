@@ -193,30 +193,24 @@ int Game::whichPlayer() {
 }
 
 void Game::runRasterLines() {
-
-	int prior = 0;
-
+	m_board.runVerticalBlank();
 	for (int y = 0; y < Board::RasterHeight; ++y) {
 
 		if (y == 96)
 			m_board.triggerInterruptScanLine96();
 
-		prior = m_board.runScanLine(prior);
+		m_board.runScanLine();
 		drawScanLine(y);
 	}
 
 	m_board.triggerInterruptScanLine224();
 }
 
-void Game::runVerticalBlank() {
-	m_board.runVerticalBlank(0);
-}
-
 void Game::copyTexture() {
 
 	const auto flip = m_configuration.getCocktailTable() && m_board.getCocktailModeControl();
-	const auto flipped = SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL;
-	const auto unflipped = SDL_FLIP_NONE;
+	constexpr auto flipped = SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL;
+	constexpr auto unflipped = SDL_FLIP_NONE;
 	const SDL_RendererFlip effect = (SDL_RendererFlip)(flip ? flipped : unflipped);
 
 	const auto gap = displayWidth() - displayHeight();
