@@ -158,7 +158,7 @@ private:
 	EightBit::Ram m_videoRAM = 0x1c00;
 
 	EightBit::InputOutput m_ports;
-	EightBit::Intel8080 m_cpu;
+	EightBit::Intel8080 m_cpu = *this;
 	EightBit::Disassembler m_disassembler;
 
 	const ShipSwitch m_ships = Three;

@@ -5,7 +5,6 @@
 
 Board::Board(const Configuration& configuration)
 : m_configuration(configuration),
-  m_cpu(EightBit::Intel8080(*this, m_ports)),
   m_disassembler(*this) {}
 
 void Board::initialise() {
@@ -17,9 +16,18 @@ void Board::initialise() {
 	m_romG.load(romDirectory + "/invaders.g");
 	m_romH.load(romDirectory + "/invaders.h");
 
-	m_ports.WritingPort.connect(std::bind(&Board::Board_PortWriting_SpaceInvaders, this, std::placeholders::_1));
-	m_ports.WrittenPort.connect(std::bind(&Board::Board_PortWritten_SpaceInvaders, this, std::placeholders::_1));
-	m_ports.ReadingPort.connect(std::bind(&Board::Board_PortReading_SpaceInvaders, this, std::placeholders::_1));
+	WritingByte.connect([this](EightBit::EventArgs) {
+		if (CPU().requestingIO())
+			Board_PortWriting_SpaceInvaders(ADDRESS().low);
+	});
+	WrittenByte.connect([this](EightBit::EventArgs) {
+		if (CPU().requestingIO())
+			Board_PortWritten_SpaceInvaders(ADDRESS().low);
+	});
+	ReadingByte.connect([this](EightBit::EventArgs) {
+		if (CPU().requestingIO())
+			Board_PortReading_SpaceInvaders(ADDRESS().low);
+	});
 }
 
 void Board::raisePOWER() {
@@ -33,7 +41,7 @@ void Board::lowerPOWER() {
 }
 
 void Board::Board_PortWriting_SpaceInvaders(const uint8_t& port) {
-	auto value = m_ports.readOutputPort(port);
+	const auto value = m_ports.readOutputPort(port);
 	switch (port) {
 	case SOUND1:
 		m_preSound1 = value;
@@ -45,7 +53,7 @@ void Board::Board_PortWriting_SpaceInvaders(const uint8_t& port) {
 }
 
 void Board::Board_PortWritten_SpaceInvaders(const uint8_t& port) {
-	auto value = m_ports.readOutputPort(port);
+	const auto value = m_ports.readOutputPort(port);
 	switch (port) {
 	case SHFTAMNT:
 		m_shiftAmount = value & EightBit::Processor::Mask3;
@@ -158,26 +166,36 @@ void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080&) {
 
 EightBit::MemoryMapping Board::mapping(uint16_t address) {
 
-	const uint16_t mask = 0b0011111111111111;
-	address &= mask;
+	if (m_cpu.requestingMemory()) {
+		constexpr uint16_t mask = 0b0011111111111111;
+		address &= mask;
 
-	if (address < 0x800)
-		return { m_romH, 0x0000, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		if (address < 0x800)
+			return { m_romH, 0x0000, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 
-	if (address < 0x1000)
-		return { m_romG, 0x0800, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		if (address < 0x1000)
+			return { m_romG, 0x0800, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 
-	if (address < 0x1800)
-		return { m_romF, 0x0800 * 2, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		if (address < 0x1800)
+			return { m_romF, 0x0800 * 2, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 
-	if (address < 0x2000)
-		return { m_romE, 0x0800 * 3, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		if (address < 0x2000)
+			return { m_romE, 0x0800 * 3, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 
-	if (address < 0x2400)
-		return { m_workRAM, 0x2000, mask, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+		if (address < 0x2400)
+			return { m_workRAM, 0x2000, mask, EightBit::MemoryMapping::AccessLevel::ReadWrite };
 
-	if (address < 0x4000)
-		return { m_videoRAM, 0x2400, mask, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+		if (address < 0x4000)
+			return { m_videoRAM, 0x2400, mask, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+	}
+
+	if (m_cpu.requestingIO()) {
+		if (m_cpu.requestingRead())
+			m_ports.setAccessType(EightBit::InputOutput::AccessType::Reading);
+		if (m_cpu.requestingWrite())
+			m_ports.setAccessType(EightBit::InputOutput::AccessType::Writing);
+		return { m_ports, 0x00, 0xff, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+	}
 
 	UNREACHABLE;
 }
