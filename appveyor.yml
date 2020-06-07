@@ -1,20 +1,19 @@
-image: Visual Studio 2017
+image: Visual Studio 2019
 
 version: 1.0.{build}
 before_build:
     - git submodule update --init --recursive
     - cd c:\Libraries
-    - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.7-VC.zip
-    - 7z x SDL2-devel-2.0.7-VC.zip
-    - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.2-VC.zip
-    - 7z x SDL2_mixer-devel-2.0.2-VC.zip
+    - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip
+    - 7z x SDL2-devel-2.0.10-VC.zip
+    - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.4-VC.zip
+    - 7z x SDL2_mixer-devel-2.0.4-VC.zip
 
 build:
   project: invaders.sln
   verbosity: minimal
 
 platform:
-    - x86
     - x64
 
 configuration:
