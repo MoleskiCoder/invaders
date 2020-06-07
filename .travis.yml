@@ -5,7 +5,7 @@ os:
 - linux
 sudo: false
 dist: bionic
-script: make clean && make -j 4 all
+script: make clean && make
 
 env:
   global:
@@ -25,7 +25,7 @@ addons:
       - libsdl2-dev
       - libsdl2-mixer-dev
       - libboost-dev
-      - g++-7
+      - g++
   coverity_scan:
     project:
       name: "MoleskiCoder/invaders"
