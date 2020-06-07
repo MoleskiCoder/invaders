@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "Game.h"
+
+#include <memory>
 
 int main(int, char*[]) {
 
@@ -8,15 +9,13 @@ int main(int, char*[]) {
 
 #ifdef _DEBUG
 	configuration.setDebugMode(true);
-	configuration.setProfileMode(true);
-	configuration.setDrawGraphics(false);
 	configuration.setShowWatchdogOutput(true);
 #endif
 
 	try {
-		Game game(configuration);
-		game.initialise();
-		game.runLoop();
+		auto game = std::make_unique<Game>(configuration);
+		game->raisePOWER();
+		game->runLoop();
 	} catch (const std::exception& error) {
 		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "%s", error.what());
 		return 2;

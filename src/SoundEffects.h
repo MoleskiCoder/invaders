@@ -2,18 +2,21 @@
 
 #include <memory>
 #include <stdexcept>
+#include <string>
+
+#include <SDL_mixer.h>
 
 class Configuration;
 struct Mix_Chunk;
 
-class SoundEffects {
+class SoundEffects final {
 public:
 	SoundEffects(const Configuration& configuration);
 	~SoundEffects();
 
-	bool isEnabled() { return m_enabled; }
+	auto isEnabled() const noexcept { return m_enabled; }
 
-	void enable();
+	void enable() noexcept;
 	void disable();
 
 	void playUfo();
@@ -30,7 +33,7 @@ public:
 private:
 	const Configuration& m_configuration;
 
-	bool m_enabled;
+	bool m_enabled = false;
 
 	std::shared_ptr<Mix_Chunk> m_ufoChunk;
 	std::shared_ptr<Mix_Chunk> m_shotChunk;
@@ -55,8 +58,9 @@ private:
 	}
 
 	void open();
-	void close();
+	void close() noexcept;
 
+	void maybePlayEffect(int channel, Mix_Chunk* effect);
 	static void playEffect(int channel, Mix_Chunk* effect);
 
 	std::shared_ptr<Mix_Chunk> loadEffect(const std::string& name) const;

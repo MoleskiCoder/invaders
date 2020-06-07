@@ -1,92 +1,90 @@
 #pragma once
 
-#include <string>
+#include <array>
+#include <cstdint>
 
-#include <Rom.h>
-#include <Ram.h>
 #include <Bus.h>
+#include <Disassembler.h>
+#include <EventArgs.h>
 #include <InputOutput.h>
 #include <Intel8080.h>
 #include <Profiler.h>
-#include <EventArgs.h>
-#include <Disassembler.h>
+#include <Register.h>
+#include <Ram.h>
+#include <Rom.h>
+#include <Signal.h>
 
 #include "Configuration.h"
 
-class Board : public EightBit::Bus {
+class Board final : public EightBit::Bus {
 public:
 	enum {
 		RasterWidth = 256,
 		RasterHeight = 224
 	};
 
-	enum {
-		WorkRam = 0x2000,
-		VideoRam = 0x2400
-	};
-
 	Board(const Configuration& configuration);
 
-	EightBit::Profiler& Profiler() { return m_profiler; }
-	EightBit::Intel8080& CPU() { return m_cpu; }
+	auto& CPU() noexcept { return m_cpu; }
 
-	void initialise();
+	auto& VRAM() noexcept { return m_videoRAM; }
 
-	int triggerInterruptScanLine224() {
-		return m_cpu.interrupt(0xd7);	// RST 2
+	void initialise() final;
+	void raisePOWER() final;
+	void lowerPOWER() final;
+
+	void triggerInterruptScanLine224() noexcept {
+		DATA() = 0xd7;	// RST 2
+		EightBit::Chip::lower(CPU().INT());
 	}
 
-	int triggerInterruptScanLine96() {
-		return m_cpu.interrupt(0xcf);	// RST 1
+	void triggerInterruptScanLine96() noexcept {
+		DATA() = 0xcf;	// RST 1
+		EightBit::Chip::lower(CPU().INT());
 	}
 
-	bool getCocktailModeControl() const {
+	auto getCocktailModeControl() const noexcept {
 		return m_cocktailModeControl;
 	}
 
-	int getCyclesPerScanLine() const {
+	auto getCyclesPerScanLine() const noexcept {
 		return m_configuration.getCyclesPerRasterScan() / RasterHeight;
 	}
 
-	int runFrame(int prior) {
-		prior = runRasterScan(prior);
-		return runVerticalBlank(prior);
+	void runScanLine() {
+		runCycles(getCyclesPerScanLine());
 	}
 
-	int runScanLine(int prior) {
-		return m_cpu.run(getCyclesPerScanLine() - prior);
+	void runRasterScan() {
+		runCycles(m_configuration.getCyclesPerRasterScan());
 	}
 
-	int runRasterScan(int prior) {
-		return m_cpu.run(m_configuration.getCyclesPerRasterScan() - prior);
+	void runVerticalBlank() {
+		runCycles(m_configuration.getCyclesPerVerticalBlank());
 	}
 
-	int runVerticalBlank(int prior) {
-		return m_cpu.run(m_configuration.getCyclesPerVerticalBlank() - prior);
-	}
+	void pressCredit() noexcept { m_credit = true; }
+	void releaseCredit() noexcept { m_credit = false; }
 
-	void pressCredit() { m_credit = true; }
-	void releaseCredit() { m_credit = false; }
+	void press1P() noexcept { m_onePlayerStart = true; }
+	void pressShoot1P() noexcept { m_onePlayerShot = true; }
+	void pressLeft1P() noexcept { m_onePlayerLeft = true; }
+	void pressRight1P() noexcept { m_onePlayerRight = true; }
 
-	void press1P() { m_onePlayerStart = true; }
-	void pressShoot1P() { m_onePlayerShot = true; }
-	void pressLeft1P() { m_onePlayerLeft = true; }
-	void pressRight1P() { m_onePlayerRight = true; }
+	void release1P() noexcept { m_onePlayerStart = false; }
+	void releaseShoot1P() noexcept { m_onePlayerShot = false; }
+	void releaseLeft1P() noexcept { m_onePlayerLeft = false; }
+	void releaseRight1P() noexcept { m_onePlayerRight = false; }
 
-	void release1P() { m_onePlayerStart = false; }
-	void releaseShoot1P() { m_onePlayerShot = false; }
-	void releaseLeft1P() { m_onePlayerLeft = false; }
-	void releaseRight1P() { m_onePlayerRight = false; }
+	void press2P() noexcept { m_twoPlayerStart = true; }
+	void pressShoot2P() noexcept { m_twoPlayerShot = true; }
+	void pressLeft2P() noexcept { m_twoPlayerLeft = true; }
+	void pressRight2P() noexcept { m_twoPlayerRight = true; }
 
-	void press2P() { m_twoPlayerStart = true; }
-	void pressShoot2P() { m_twoPlayerShot = true; }
-	void pressLeft2P() { m_twoPlayerLeft = true; }
-	void pressRight2P() { m_twoPlayerRight = true; }
-
-	void release2P() { m_twoPlayerStart = false; }
-	void releaseShoot2P() { m_twoPlayerShot = false; }
-	void releaseLeft2P() { m_twoPlayerLeft = false; }
-	void releaseRight2P() { m_twoPlayerRight = false; }
+	void release2P() noexcept { m_twoPlayerStart = false; }
+	void releaseShoot2P() noexcept { m_twoPlayerShot = false; }
+	void releaseLeft2P() noexcept { m_twoPlayerLeft = false; }
+	void releaseRight2P() noexcept { m_twoPlayerRight = false; }
 
 	EightBit::Signal<EightBit::EventArgs> UfoSound;
 	EightBit::Signal<EightBit::EventArgs> ShotSound;
@@ -104,26 +102,7 @@ public:
 	EightBit::Signal<EightBit::EventArgs> DisableAmplifier;
 
 protected:
-	virtual uint8_t& reference(uint16_t address, bool& rom) {
-		address &= ~0xc000;
-		if (address < 0x2000) {
-			rom = true;
-			if (address < 0x800)
-				return m_romH.reference(address);
-			if (address < 0x1000)
-				return m_romG.reference(address - 0x800);
-			if (address < 0x1800)
-				return m_romF.reference(address - (0x800 * 2));
-			return m_romE.reference(address - (0x800 * 3));
-		}
-		if (address < 0x4000) {
-			rom = false;
-			if (address < 0x2400)
-				return m_workRAM.reference(address - 0x2000);
-			return m_videoRAM.reference(address - 0x2400);
-		}
-		UNREACHABLE;
-	}
+	virtual EightBit::MemoryMapping mapping(uint16_t address) final;
 
 private:
 	enum InputPorts {
@@ -171,48 +150,54 @@ private:
 
 	const Configuration& m_configuration;
 
-	EightBit::Rom m_romE;
-	EightBit::Rom m_romF;
-	EightBit::Rom m_romG;
-	EightBit::Rom m_romH;
-	EightBit::Ram m_workRAM;
-	EightBit::Ram m_videoRAM;
+	EightBit::Rom m_romE = 0x800;
+	EightBit::Rom m_romF = 0x800;
+	EightBit::Rom m_romG = 0x800;
+	EightBit::Rom m_romH = 0x800;
+	EightBit::Ram m_workRAM = 0x400;
+	EightBit::Ram m_videoRAM = 0x1c00;
 
 	EightBit::InputOutput m_ports;
-	EightBit::Intel8080 m_cpu;
-	EightBit::Profiler m_profiler;
+	EightBit::Intel8080 m_cpu = *this;
 	EightBit::Disassembler m_disassembler;
 
-	ShipSwitch m_ships;
-	ExtraShipSwitch m_extraLife;
-	DemoCoinInfoSwitch m_demoCoinInfo;
+	const ShipSwitch m_ships = Three;
+	const ExtraShipSwitch m_extraLife = OneThousandFiveHundred;
+	const DemoCoinInfoSwitch m_demoCoinInfo = On;
 
-	uint8_t m_shiftAmount;
-	EightBit::register16_t m_shiftData;
+	uint8_t m_shiftAmount = 0;
+	EightBit::register16_t m_shiftData = 0U;
 
-	bool m_credit;
+	bool m_credit = false;
 
-	bool m_onePlayerStart;
-	bool m_onePlayerShot;
-	bool m_onePlayerLeft;
-	bool m_onePlayerRight;
+	bool m_onePlayerStart = false;
+	bool m_onePlayerShot = false;
+	bool m_onePlayerLeft = false;
+	bool m_onePlayerRight = false;
 
-	bool m_twoPlayerStart;
-	bool m_twoPlayerShot;
-	bool m_twoPlayerLeft;
-	bool m_twoPlayerRight;
+	bool m_twoPlayerStart = false;
+	bool m_twoPlayerShot = false;
+	bool m_twoPlayerLeft = false;
+	bool m_twoPlayerRight = false;
 
-	bool m_tilt;
+	bool m_tilt = false;
 
-	uint8_t m_preSound1;
-	uint8_t m_preSound2;
+	uint8_t m_preSound1 = 0;
+	uint8_t m_preSound2 = 0;
 
-	bool m_cocktailModeControl;
+	bool m_cocktailModeControl = false;
 
-	void Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
-	void Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
-	void Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portEvent);
+	int m_allowed = 0;
+
+	void Board_PortWriting_SpaceInvaders(const uint8_t& port);
+	void Board_PortWritten_SpaceInvaders(const uint8_t& port);
+	void Board_PortReading_SpaceInvaders(const uint8_t& port);
 
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080& cpuEvent);
-	void Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpuEvent);
+
+	void runCycles(int suggested) {
+		m_allowed += suggested;
+		const auto taken = m_cpu.run(suggested);
+		m_allowed -= taken;
+	}
 };

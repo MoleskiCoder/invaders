@@ -5,32 +5,7 @@
 
 Board::Board(const Configuration& configuration)
 : m_configuration(configuration),
-  m_romE(0x800),
-  m_romF(0x800),
-  m_romG(0x800),
-  m_romH(0x800),
-  m_workRAM(0x400),
-  m_videoRAM(0x1c00),
-  m_cpu(EightBit::Intel8080(*this, m_ports)),
-  m_ships(Three),
-  m_extraLife(OneThousandFiveHundred),
-  m_demoCoinInfo(On),
-  m_shiftAmount(0),
-  m_credit(false),
-  m_onePlayerStart(false),
-  m_onePlayerShot(false),
-  m_onePlayerLeft(false),
-  m_onePlayerRight(false),
-  m_twoPlayerStart(false),
-  m_twoPlayerShot(false),
-  m_twoPlayerLeft(false),
-  m_twoPlayerRight(false),
-  m_tilt(false),
-  m_preSound1(0),
-  m_preSound2(0),
-  m_cocktailModeControl(false) {
-	m_shiftData.word = 0;
-}
+  m_disassembler(*this) {}
 
 void Board::initialise() {
 
@@ -41,25 +16,32 @@ void Board::initialise() {
 	m_romG.load(romDirectory + "/invaders.g");
 	m_romH.load(romDirectory + "/invaders.h");
 
-	m_ports.WritingPort.connect(std::bind(&Board::Board_PortWriting_SpaceInvaders, this, std::placeholders::_1));
-	m_ports.WrittenPort.connect(std::bind(&Board::Board_PortWritten_SpaceInvaders, this, std::placeholders::_1));
-	m_ports.ReadingPort.connect(std::bind(&Board::Board_PortReading_SpaceInvaders, this, std::placeholders::_1));
-
-	if (m_configuration.isProfileMode()) {
-		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
-	}
-
-	if (m_configuration.isDebugMode()) {
-		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
-	}
-
-	m_cpu.initialise();
-	m_cpu.PC() = m_configuration.getStartAddress();
+	WritingByte.connect([this](EightBit::EventArgs) {
+		if (CPU().requestingIO())
+			Board_PortWriting_SpaceInvaders(ADDRESS().low);
+	});
+	WrittenByte.connect([this](EightBit::EventArgs) {
+		if (CPU().requestingIO())
+			Board_PortWritten_SpaceInvaders(ADDRESS().low);
+	});
+	ReadingByte.connect([this](EightBit::EventArgs) {
+		if (CPU().requestingIO())
+			Board_PortReading_SpaceInvaders(ADDRESS().low);
+	});
 }
 
-void Board::Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portEvent) {
-	auto port = portEvent.getPort();
-	auto value = m_ports.readOutputPort(port);
+void Board::raisePOWER() {
+	CPU().raisePOWER();
+	CPU().raiseRESET();
+	CPU().raiseINT();
+}
+
+void Board::lowerPOWER() {
+	CPU().lowerPOWER();
+}
+
+void Board::Board_PortWriting_SpaceInvaders(const uint8_t& port) {
+	const auto value = m_ports.readOutputPort(port);
 	switch (port) {
 	case SOUND1:
 		m_preSound1 = value;
@@ -70,9 +52,8 @@ void Board::Board_PortWriting_SpaceInvaders(const EightBit::PortEventArgs& portE
 	}
 }
 
-void Board::Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portEvent) {
-	auto port = portEvent.getPort();
-	auto value = m_ports.readOutputPort(port);
+void Board::Board_PortWritten_SpaceInvaders(const uint8_t& port) {
+	const auto value = m_ports.readOutputPort(port);
 	switch (port) {
 	case SHFTAMNT:
 		m_shiftAmount = value & EightBit::Processor::Mask3;
@@ -86,54 +67,54 @@ void Board::Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portE
 			std::cout << (value < 64 ? m_characterSet[value] : '_');
 		break;
 	case SOUND1: {
-			auto soundUfo = ((value & 1) != 0);
+			const auto soundUfo = ((value & 1) != 0);
 			if (soundUfo)
 				UfoSound.fire(EightBit::EventArgs::empty());
 
-			auto soundShot = ((value & 2) != 0) && ((m_preSound1 & 2) == 0);
+			const auto soundShot = ((value & 2) != 0) && ((m_preSound1 & 2) == 0);
 			if (soundShot)
 				ShotSound.fire(EightBit::EventArgs::empty());
 
-			auto soundPlayerDie = ((value & 4) != 0) && ((m_preSound1 & 4) == 0);
+			const auto soundPlayerDie = ((value & 4) != 0) && ((m_preSound1 & 4) == 0);
 			if (soundPlayerDie)
 				PlayerDieSound.fire(EightBit::EventArgs::empty());
 	
-			auto soundInvaderDie = ((value & 8) != 0) && ((m_preSound1 & 8) == 0);
+			const auto soundInvaderDie = ((value & 8) != 0) && ((m_preSound1 & 8) == 0);
 			if (soundInvaderDie)
 				InvaderDieSound.fire(EightBit::EventArgs::empty());
 
-			auto extend = ((value & 0x10) != 0) && ((m_preSound1 & 0x10) == 0);
+			const auto extend = ((value & 0x10) != 0) && ((m_preSound1 & 0x10) == 0);
 			if (extend)
 				ExtendSound.fire(EightBit::EventArgs::empty());
 
-			auto ampenable = ((value & 0x20) != 0) && ((m_preSound1 & 0x20) == 0);
+			const auto ampenable = ((value & 0x20) != 0) && ((m_preSound1 & 0x20) == 0);
 			if (ampenable)
 				EnableAmplifier.fire(EightBit::EventArgs::empty());
 
-			auto ampdisable = ((value & 0x20) == 0) && ((m_preSound1 & 0x20) != 0);
+			const auto ampdisable = ((value & 0x20) == 0) && ((m_preSound1 & 0x20) != 0);
 			if (ampdisable)
 				DisableAmplifier.fire(EightBit::EventArgs::empty());
 		}
 		break;
 
 	case SOUND2: {
-			auto soundWalk1 = ((value & 1) != 0) && ((m_preSound2 & 1) == 0);
+			const auto soundWalk1 = ((value & 1) != 0) && ((m_preSound2 & 1) == 0);
 			if (soundWalk1)
 				Walk1Sound.fire(EightBit::EventArgs::empty());
 
-			auto soundWalk2 = ((value & 2) != 0) && ((m_preSound2 & 2) == 0);
+			const auto soundWalk2 = ((value & 2) != 0) && ((m_preSound2 & 2) == 0);
 			if (soundWalk2)
 				Walk2Sound.fire(EightBit::EventArgs::empty());
 
-			auto soundWalk3 = ((value & 4) != 0) && ((m_preSound2 & 4) == 0);
+			const auto soundWalk3 = ((value & 4) != 0) && ((m_preSound2 & 4) == 0);
 			if (soundWalk3)
 				Walk3Sound.fire(EightBit::EventArgs::empty());
 
-			auto soundWalk4 = ((value & 8) != 0) && ((m_preSound2 & 8) == 0);
+			const auto soundWalk4 = ((value & 8) != 0) && ((m_preSound2 & 8) == 0);
 			if (soundWalk4)
 				Walk4Sound.fire(EightBit::EventArgs::empty());
 
-			auto soundUfoDie = ((value & 0x10) != 0) && ((m_preSound2 & 0x10) == 0);
+			const auto soundUfoDie = ((value & 0x10) != 0) && ((m_preSound2 & 0x10) == 0);
 			if (soundUfoDie)
 				UfoDieSound.fire(EightBit::EventArgs::empty());
 
@@ -143,8 +124,7 @@ void Board::Board_PortWritten_SpaceInvaders(const EightBit::PortEventArgs& portE
 	}
 }
 
-void Board::Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portEvent) {
-	auto port = portEvent.getPort();
+void Board::Board_PortReading_SpaceInvaders(const uint8_t& port) {
 	switch (port) {
 	case INP1:
 		m_ports.writeInputPort(port,
@@ -175,19 +155,47 @@ void Board::Board_PortReading_SpaceInvaders(const EightBit::PortEventArgs& portE
 	}
 }
 
-void Board::Cpu_ExecutingInstruction_Profile(const EightBit::Intel8080& cpu) {
-
-	const auto pc = m_cpu.PC();
-
-	m_profiler.addAddress(pc.word);
-	m_profiler.addInstruction(peek(pc.word));
-}
-
 void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Intel8080&) {
 
 	std::cerr
-		<< EightBit::Disassembler::state(m_cpu)
+		<< EightBit::Disassembler::state(CPU())
 		<< "\t"
-		<< m_disassembler.disassemble(m_cpu)
+		<< m_disassembler.disassemble(CPU())
 		<< '\n';
+}
+
+EightBit::MemoryMapping Board::mapping(uint16_t address) {
+
+	if (m_cpu.requestingMemory()) {
+		constexpr uint16_t mask = 0b0011111111111111;
+		address &= mask;
+
+		if (address < 0x800)
+			return { m_romH, 0x0000, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+
+		if (address < 0x1000)
+			return { m_romG, 0x0800, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+
+		if (address < 0x1800)
+			return { m_romF, 0x0800 * 2, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+
+		if (address < 0x2000)
+			return { m_romE, 0x0800 * 3, mask, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+
+		if (address < 0x2400)
+			return { m_workRAM, 0x2000, mask, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+
+		if (address < 0x4000)
+			return { m_videoRAM, 0x2400, mask, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+	}
+
+	if (m_cpu.requestingIO()) {
+		if (m_cpu.requestingRead())
+			m_ports.setAccessType(EightBit::InputOutput::AccessType::Reading);
+		if (m_cpu.requestingWrite())
+			m_ports.setAccessType(EightBit::InputOutput::AccessType::Writing);
+		return { m_ports, 0x00, 0xff, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+	}
+
+	UNREACHABLE;
 }

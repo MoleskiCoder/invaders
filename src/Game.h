@@ -1,81 +1,70 @@
 #pragma once
 
-#include <stdexcept>
-#include <string>
+#include <cstdint>
 #include <memory>
-#include <map>
+#include <string>
 
-#include <SDL.h>
+#include <Game.h>
+#include <GameController.h>
 
 #include "Board.h"
 #include "ColourPalette.h"
 #include "SoundEffects.h"
-#include "GameController.h"
 
 class Configuration;
+class Expansion;
 
-class Game {
+class Game final : public Gaming::Game {
 public:
-
-	static void throwSDLException(std::string failure) {
-		throw std::runtime_error(failure + ::SDL_GetError());
-	}
-
-	static void verifySDLCall(int returned, std::string failure) {
-		if (returned < 0) {
-			throwSDLException(failure);
-		}
-	}
-
 	Game(const Configuration& configuration);
+	~Game() { }
 
-	void runLoop();
-	void initialise();
+	virtual void raisePOWER() override;
+
+	Board& BUS() noexcept { return m_board; }
+	const Board& BUS() const noexcept { return m_board; }
+
+protected:
+	float fps() const noexcept final { return m_configuration.getFramesPerSecond(); }
+	bool useVsync() const noexcept final { return m_configuration.getVsyncLocked(); }
+
+	int windowWidth() const noexcept final { return displayHeight() * displayScale(); }
+	int windowHeight() const noexcept final { return displayWidth() * displayScale(); }
+	int displayWidth() const noexcept final { return rasterWidth(); }
+	int displayHeight() const noexcept final { return rasterHeight(); }
+	int displayScale() const noexcept final { return 2; }
+	int rasterWidth() const noexcept final { return Board::RasterWidth; }
+	int rasterHeight() const noexcept final { return Board::RasterHeight; }
+
+	std::string title() const final { return "Space Invaders"; }
+
+	const uint32_t* pixels() const noexcept final;
+
+	void runRasterLines() final;
+
+	bool handleKeyDown(SDL_Keycode key) final;
+	bool handleKeyUp(SDL_Keycode key) final;
+
+	bool handleJoyButtonDown(SDL_JoyButtonEvent event) final;
+	bool handleJoyButtonUp(SDL_JoyButtonEvent event) final;
+
+	void copyTexture() final;
 
 private:
-	enum {
-		DisplayScale = 2,
-		DisplayWidth = Board::RasterHeight,
-		DisplayHeight = Board::RasterWidth
-	};
+	std::array<uint32_t, Board::RasterWidth * Board::RasterHeight> m_pixels;
+	std::array<uint32_t, Board::RasterWidth * Board::RasterHeight> m_gel;
 
 	const Configuration& m_configuration;
-	mutable Board m_board;
 	ColourPalette m_colours;
-
-	SDL_Window* m_window;
-	SDL_Renderer* m_renderer;
-
-	SDL_Texture* m_bitmapTexture;
-	Uint32 m_pixelType;
-	SDL_PixelFormat* m_pixelFormat;
-
-	std::vector<uint32_t> m_pixels;
-
-	int m_fps;
-	Uint32 m_startTicks;
-	Uint32 m_frames;
-	bool m_vsync;
-
+	Board m_board;
 	SoundEffects m_effects;
 
-	std::map<int, std::shared_ptr<GameController>> m_gameControllers;
-	std::map<SDL_JoystickID, int> m_mappedControllers;
 
-	int drawFrame(int prior);
+	void createGelPixels();
 
-	void configureBackground() const;
-	void createBitmapTexture();
+	int whichPlayer();
 
-	int getScreenWidth() const {
-		return DisplayWidth * DisplayScale;
-	}
-
-	int getScreenHeight() const {
-		return DisplayHeight * DisplayScale;
-	}
-
-	int whichPlayer() const;
+	void drawScanLine(int y);
 
 	void Board_UfoSound(const EightBit::EventArgs& event);
 	void Board_ShotSound(const EightBit::EventArgs& event);
@@ -91,24 +80,4 @@ private:
 
 	void Board_EnableAmplifier(const EightBit::EventArgs& event);
 	void Board_DisableAmplifier(const EightBit::EventArgs& event);
-
-	void handleKeyDown(SDL_Keycode key);
-	void handleKeyUp(SDL_Keycode key);
-
-	void handleJoyButtonDown(SDL_JoyButtonEvent event);
-	void handleJoyButtonUp(SDL_JoyButtonEvent event);
-
-	int chooseControllerIndex(int who) const;
-	std::shared_ptr<GameController> chooseController(int who) const;
-
-	void handleJoyLeftPress(int who, int joystick);
-	void handleJoyRightPress(int who, int joystick);
-	void handleJoyFirePress(int who, int joystick);
-
-	void handleJoyLeftRelease(int who, int joystick);
-	void handleJoyRightRelease(int who, int joystick);
-	void handleJoyFireRelease(int who, int joystick);
-
-	static void dumpRendererInformation();
-	static void dumpRendererInformation(::SDL_RendererInfo info);
 };

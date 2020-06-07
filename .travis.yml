@@ -3,8 +3,9 @@ compiler:
 - gcc
 os:
 - linux
-dist: trusty
-script: make clean && make -j 4 all
+sudo: false
+dist: bionic
+script: make clean && make
 
 env:
   global:
@@ -14,13 +15,17 @@ env:
 
 before_install:
   - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+  - eval "${MATRIX_EVAL}"
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
       - libsdl2-dev
       - libsdl2-mixer-dev
       - libboost-dev
+      - g++
   coverity_scan:
     project:
       name: "MoleskiCoder/invaders"

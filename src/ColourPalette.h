@@ -5,7 +5,7 @@
 
 struct SDL_PixelFormat;
 
-class ColourPalette {
+class ColourPalette final {
 public:
 	enum {
 		Black,
@@ -14,7 +14,7 @@ public:
 		Green
 	};
 
-	static int calculateColour(int x, int y) {
+	static auto calculateColour(const int x, const int y) noexcept {
 		if (y < 32)
 			return White;
 		if (y < (32 + 32))
@@ -30,13 +30,13 @@ public:
 		return White;
 	}
 
-	ColourPalette();
+	ColourPalette() noexcept;
 
-	uint32_t getColour(size_t index) const {
+	auto getColour(const size_t index) const {
 		return m_colours[index];
 	}
 
-	void load(SDL_PixelFormat* hardware);
+	void load(const SDL_PixelFormat* hardware);
 
 private:
 	std::vector<uint32_t> m_colours;
