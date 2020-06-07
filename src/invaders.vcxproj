@@ -66,26 +66,26 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\Libraries\SDL2-2.0.10\include;C:\Libraries\SDL2_mixer-2.0.2\include;C:\Libraries\boost_1_71_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);C:\Libraries\SDL2_mixer-2.0.2\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\Libraries\SDL2-2.0.10\include;C:\Libraries\SDL2_mixer-2.0.4\include;C:\Libraries\boost_1_71_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);C:\Libraries\SDL2_mixer-2.0.4\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\Libraries\SDL2-2.0.10\include;C:\Libraries\SDL2_mixer-2.0.2\include;C:\Libraries\boost_1_71_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(Platform);C:\Libraries\SDL2_mixer-2.0.2\lib\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\Libraries\SDL2-2.0.10\include;C:\Libraries\SDL2_mixer-2.0.4\include;C:\Libraries\boost_1_71_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(Platform);C:\Libraries\SDL2_mixer-2.0.4\lib\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\Libraries\SDL2-2.0.10\include;C:\Libraries\SDL2_mixer-2.0.2\include;C:\Libraries\boost_1_71_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);C:\Libraries\SDL2_mixer-2.0.2\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\Libraries\SDL2-2.0.10\include;C:\Libraries\SDL2_mixer-2.0.4\include;C:\Libraries\boost_1_71_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);C:\Libraries\SDL2_mixer-2.0.4\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\Libraries\SDL2-2.0.10\include;C:\Libraries\SDL2_mixer-2.0.2\include;C:\Libraries\boost_1_71_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(Platform);C:\Libraries\SDL2_mixer-2.0.2\lib\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Intel8080\inc;..\libraries\EightBit\inc;C:\Libraries\SDL2-2.0.10\include;C:\Libraries\SDL2_mixer-2.0.4\include;C:\Libraries\boost_1_71_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(Platform);C:\Libraries\SDL2_mixer-2.0.4\lib\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
